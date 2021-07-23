@@ -37,5 +37,6 @@ void	print_tokens(t_token *tokens);
 char *ft_strcdup(char *str, char c);
 char *ft_strdup_set(char *str, char *set);
 void free_tokens(t_token *tokens);
+void *ft_calloc(size_t nmemb, size_t size);
 
 #endif
