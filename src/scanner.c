@@ -2,6 +2,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static void ft_bzero(void *s, size_t n)
+{
+	size_t i;
+
+	i = 0;
+	while (i < n)
+	{
+		*((unsigned char *)s + i) = '\0';
+		i++;
+	}
+}
+
+void *ft_calloc(size_t nmemb, size_t size)
+{
+	void *ptr;
+
+	ptr = (void *)malloc(nmemb * size);
+	if (!ptr)
+		return (NULL);
+	ft_bzero(ptr, nmemb * size);
+	return (ptr);
+}
+
 t_token_type	get_char_type(char c)
 {
 	// static char	*special_char = "|\'\" <>";
@@ -101,6 +124,7 @@ int get_pipe_token(char *line, t_token *token, int *index)
 
 t_token	*scanner(char *line)
 {
+	t_token	*tokens;
 	t_token	*current_token;
 	int		len;
 	char	c;
@@ -110,9 +134,10 @@ t_token	*scanner(char *line)
 	len = str_len(line);
 	if (len == 0)
 		return (NULL);
-	current_token = malloc(sizeof(t_token));
-	if (!current_token)
+	tokens = ft_calloc(1, sizeof(t_token));
+	if (!tokens)
 		return (NULL);
+	current_token = tokens;
 	while (i < len)
 	{
 		c = line[i];
@@ -126,16 +151,19 @@ t_token	*scanner(char *line)
 		else if (type == T_GENERAL)
 			get_general_token(line + i, current_token, &i);
 		if (i == len)
-			return (current_token);
+			return (tokens);
 		else
 		{
-			current_token->next = malloc(sizeof(t_token));
+			current_token->next = ft_calloc(1, sizeof(t_token));
 			if (!current_token->next)
+			{
+				free_tokens(tokens);
 				return (NULL);
+			}
 			current_token = current_token->next;
 		}
 	}
-	return (current_token);
+	return (tokens);
 }
 
 void	print_tokens(t_token *tokens)
@@ -145,7 +173,7 @@ void	print_tokens(t_token *tokens)
 	current_token = tokens;
 	while (current_token)
 	{
-		printf("type: %c, data: <%s>\n", current_token->type, current_token->data);
+		printf("type: <%c>, data: <%s>\n", current_token->type, current_token->data);
 		current_token = current_token->next;
 	}
 }
@@ -155,11 +183,11 @@ void	free_tokens(t_token *tokens)
 	t_token *current_token;
 
 	current_token = tokens;
-	while (current_token)
+	if (current_token)
 	{
+		free_tokens(current_token->next);
 		if (current_token->data)
 			free(current_token->data);
-		free_tokens(current_token);
 		free(current_token);
 	}
 }
