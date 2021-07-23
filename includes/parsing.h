@@ -3,6 +3,7 @@
 
 #include "libutils.h"
 
+# define MALLOC_ERROR -1
 typedef	enum e_token_type
 {
 	T_GENERAL = 'g',

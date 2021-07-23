@@ -40,7 +40,9 @@ int	get_quote_token(char *line, t_token *token, int *index)
 {
 	token->type = get_char_type(*line);
 	token->data = ft_strcdup(line, token->type);
-	(*index)++;
+	if (token->data == NULL)
+		return (MALLOC_ERROR);
+	(*index) += str_len(token->data);
 	return (0);
 }
 
@@ -60,7 +62,8 @@ t_token	*scanner(char *line)
 		t_token_type type = get_char_type(c);
 		if (type == T_DQUOTE || type == T_SQUOTE)
 			get_quote_token(line + i, current_token, &i);
-		i++;
+		// else if (type == T_SPACE)
+
 	}
 	return (current_token);
 }
