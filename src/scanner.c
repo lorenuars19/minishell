@@ -4,10 +4,10 @@
 
 t_token_type	get_char_type(char c)
 {
-	static char	*special_char = "|\'\" ";
+	// static char	*special_char = "|\'\" <>";
 
 	// printf("<%s>\n", special_char);
-	if (str_has(special_char, c))
+	if (str_has(SPECIAL_CHARS, c))
 		return (c);
 	return (T_GENERAL);
 }
@@ -46,6 +46,38 @@ int	get_quote_token(char *line, t_token *token, int *index)
 	return (0);
 }
 
+char *ft_strdup_set(char *str, char *set)
+{
+	int		length;
+	char	*result;
+	int		i;
+
+	length = 0;
+	while (str[length] && !str_has(set, str[length]))
+		length++;
+	result = malloc(sizeof(char) * (length + 1));
+	if (!result)
+		return (NULL);
+	i = 0;
+	while (i < length)
+	{
+		result[i] = str[i];
+		i++;
+	}
+	result[i] = '\0';
+	return (result);
+}
+
+int	get_general_token(char *line, t_token *token, int *index)
+{
+	token->type = T_GENERAL;
+	token->data = ft_strdup_set(line, SPECIAL_CHARS);
+	if (token->data == NULL)
+		return (MALLOC_ERROR);
+	(*index) += str_len(token->data);
+	return (0);
+}
+
 int get_space_token(char *line, t_token *token, int *index)
 {
 	token->type = T_SPACE;
@@ -54,6 +86,14 @@ int get_space_token(char *line, t_token *token, int *index)
 		line++;
 		(*index)++;
 	}
+	return (0);
+}
+
+int get_pipe_token(char *line, t_token *token, int *index)
+{
+	(void)line;
+	token->type = T_PIPE;
+	(*index)++;
 	return (0);
 }
 
@@ -79,6 +119,10 @@ t_token	*scanner(char *line)
 			get_quote_token(line + i, current_token, &i);
 		else if (type == T_SPACE)
 			get_space_token(line + i, current_token, &i);
+		else if (type == T_PIPE)
+			get_pipe_token(line + i, current_token, &i);
+		else if (type == T_GENERAL)
+			get_general_token(line + i, current_token, &i);
 		if (i == len)
 			return (current_token);
 		else

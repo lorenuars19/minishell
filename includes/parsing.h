@@ -4,6 +4,7 @@
 #include "libutils.h"
 
 # define MALLOC_ERROR -1
+# define SPECIAL_CHARS "|\'\" <>"
 typedef	enum e_token_type
 {
 	T_GENERAL = 'g',
@@ -34,5 +35,6 @@ t_token	*scanner(char *line);
 t_token_type	get_char_type(char c);
 void	print_tokens(t_token *tokens);
 char *ft_strcdup(char *str, char c);
+char *ft_strdup_set(char *str, char *set);
 
 #endif

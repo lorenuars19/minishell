@@ -15,8 +15,8 @@ int main(int argc, char **argv)
 			printf("Here is the line: <%s>\n", line);
 		if (line && *line)
 			add_history(line);
-		char *str = ft_strcdup(line, T_DQUOTE);
-		put_str(str);
+		char *str = ft_strdup_set(line, SPECIAL_CHARS);
+		printf("<%s>\n", str);
 		free(str);
 		if (str_cmp("exit", line) == 0)
 		{
