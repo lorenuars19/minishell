@@ -46,24 +46,48 @@ int	get_quote_token(char *line, t_token *token, int *index)
 	return (0);
 }
 
+int get_space_token(char *line, t_token *token, int *index)
+{
+	token->type = T_SPACE;
+	while (*line == ' ')
+	{
+		line++;
+		(*index)++;
+	}
+	return (0);
+}
+
 t_token	*scanner(char *line)
 {
-	t_token*	current_token = malloc(sizeof(t_token));
-	int len = str_len(line);
-	int i = 0;
-	t_state state = STATE_GENERAL;
-	(void)len;
-	(void)state;
+	t_token	*current_token;
+	int		len;
 	char	c;
+	int		i;
 
+	i = 0;
+	len = str_len(line);
+	if (len == 0)
+		return (NULL);
+	current_token = malloc(sizeof(t_token));
+	if (!current_token)
+		return (NULL);
 	while (i < len)
 	{
 		c = line[i];
 		t_token_type type = get_char_type(c);
 		if (type == T_DQUOTE || type == T_SQUOTE)
 			get_quote_token(line + i, current_token, &i);
-		// else if (type == T_SPACE)
-
+		else if (type == T_SPACE)
+			get_space_token(line + i, current_token, &i);
+		if (i == len)
+			return (current_token);
+		else
+		{
+			current_token->next = malloc(sizeof(t_token));
+			if (!current_token->next)
+				return (NULL);
+			current_token = current_token->next;
+		}
 	}
 	return (current_token);
 }
