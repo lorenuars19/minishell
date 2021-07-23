@@ -34,11 +34,11 @@ int	get_general_token(char *line, t_token *token, int *index)
 	return (0);
 }
 
-int get_space_token(char *line, t_token *token, int *index)
+int get_blank_token(char *line, t_token *token, int *index)
 {
-	token->type = T_SPACE;
+	token->type = T_BLANK;
 	token->data = NULL;
-	while (*line == ' ')
+	while (*line == ' ' || *line == '\t')
 	{
 		line++;
 		(*index)++;
@@ -86,8 +86,8 @@ t_token	*scanner(char *line)
 		t_token_type type = get_char_type(c);
 		if (type == T_DQUOTE || type == T_SQUOTE)
 			get_quote_token(line + i, current_token, &i);
-		else if (type == T_SPACE)
-			get_space_token(line + i, current_token, &i);
+		else if (type == T_SPACE || type == T_TAB)
+			get_blank_token(line + i, current_token, &i);
 		else if (type == T_PIPE)
 			get_pipe_token(line + i, current_token, &i);
 		else if (type == T_GENERAL)

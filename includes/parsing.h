@@ -4,11 +4,13 @@
 #include "libutils.h"
 
 # define MALLOC_ERROR -1
-# define SPECIAL_CHARS "|\'\" <>"
+# define SPECIAL_CHARS "|\'\" <>\t"
 typedef	enum e_token_type
 {
 	T_GENERAL = 'g',
 	T_SPACE = ' ',
+	T_TAB = '\t',
+	T_BLANK = 'b',
 	T_PIPE = '|',
 	T_SQUOTE = '\'',
 	T_DQUOTE = '\"',
