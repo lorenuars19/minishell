@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
+#    By: aclose <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/07/07 15:18:00 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/07/14 23:24:10 by aclose           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,9 +44,11 @@ LDFLAGS = -lreadline $(LIB_UTILS)
 # **************************************************************************** #
 
 SRCS = \
+	./src/scanner.c \
 	./src/main.c \
 
 HEADERS = \
+	./includes/parsing.h\
 	./includes/minishell.h\
 
 ###▲▲▲<src-updater-do-not-edit-or-remove>▲▲▲

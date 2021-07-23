@@ -5,15 +5,22 @@
 
 typedef	enum e_token_type
 {
-	GENERAL = 'g',
-	SPACE = ' ',
-	PIPE = '|',
-	SQUOTE = '\'',
-	DQUOTE = '\"',
-	GREATER = '>',
-	LESSER = '<',
-	EOL = 'e'
+	T_GENERAL = 'g',
+	T_SPACE = ' ',
+	T_PIPE = '|',
+	T_SQUOTE = '\'',
+	T_DQUOTE = '\"',
+	T_GREATER = '>',
+	T_LESSER = '<',
+	T_EOL = 'e'
 }	t_token_type;
+
+typedef	enum e_state
+{
+	STATE_GENERAL = 'g',
+	STATE_SQUOTE = '\'',
+	STATE_DQUOTE = '\"'
+} t_state;
 
 typedef	struct s_token
 {
@@ -23,5 +30,8 @@ typedef	struct s_token
 }	t_token;
 
 t_token	*scanner(char *line);
+t_token_type	get_char_type(char c);
+void	print_tokens(t_token *tokens);
+char *ft_strcdup(char *str, char c);
 
 #endif

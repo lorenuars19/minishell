@@ -1,4 +1,5 @@
 #include "minishell.h"
+#include "parsing.h"
 #include <stdlib.h>
 
 int main(int argc, char **argv)
@@ -14,6 +15,9 @@ int main(int argc, char **argv)
 			printf("Here is the line: <%s>\n", line);
 		if (line && *line)
 			add_history(line);
+		char *str = ft_strcdup(line, T_DQUOTE);
+		put_str(str);
+		free(str);
 		if (str_cmp("exit", line) == 0)
 		{
 			free(line);
