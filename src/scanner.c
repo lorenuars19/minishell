@@ -55,6 +55,15 @@ int get_pipe_token(char *line, t_token *token, int *index)
 	return (0);
 }
 
+int get_redirection_token(char *line, t_token *token, int *index)
+{
+	(void)line;
+	token->type = get_char_type(*line);
+	token->data = NULL;
+	(*index)++;
+	return (0);
+}
+
 t_token	*scanner(char *line)
 {
 	t_token	*tokens;
@@ -83,6 +92,8 @@ t_token	*scanner(char *line)
 			get_pipe_token(line + i, current_token, &i);
 		else if (type == T_GENERAL)
 			get_general_token(line + i, current_token, &i);
+		else if (type == T_SMALLER || type == T_GREATER)
+			get_redirection_token(line + i, current_token, &i);
 		if (i == len)
 			return (tokens);
 		else
