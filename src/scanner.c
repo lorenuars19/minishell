@@ -81,6 +81,7 @@ int	get_general_token(char *line, t_token *token, int *index)
 int get_space_token(char *line, t_token *token, int *index)
 {
 	token->type = T_SPACE;
+	token->data = NULL;
 	while (*line == ' ')
 	{
 		line++;
@@ -93,6 +94,7 @@ int get_pipe_token(char *line, t_token *token, int *index)
 {
 	(void)line;
 	token->type = T_PIPE;
+	token->data = NULL;
 	(*index)++;
 	return (0);
 }
@@ -145,5 +147,19 @@ void	print_tokens(t_token *tokens)
 	{
 		printf("type: %c, data: <%s>\n", current_token->type, current_token->data);
 		current_token = current_token->next;
+	}
+}
+
+void	free_tokens(t_token *tokens)
+{
+	t_token *current_token;
+
+	current_token = tokens;
+	while (current_token)
+	{
+		if (current_token->data)
+			free(current_token->data);
+		free_tokens(current_token);
+		free(current_token);
 	}
 }
