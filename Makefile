@@ -46,6 +46,7 @@ LDFLAGS = -lreadline $(LIB_UTILS)
 SRCS = \
 	./src/scanner.c \
 	./src/main.c \
+	./src/parser.c \
 	./src/scanner_utils.c \
 
 HEADERS = \

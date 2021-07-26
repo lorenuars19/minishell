@@ -5,6 +5,7 @@
 
 # define MALLOC_ERROR -1
 # define SPECIAL_CHARS "|\'\" <>\t"
+
 typedef	enum e_token_type
 {
 	T_GENERAL = 'g',
@@ -25,6 +26,22 @@ typedef	struct s_token
 	struct s_token	*next;
 }	t_token;
 
+typedef	enum	e_node_type
+{
+	COMMAND_NODE,
+	PIPE_NODE
+}	t_node_type;
+
+typedef	struct s_node	t_node;
+
+struct s_node
+{
+	t_node_type	type;
+	char	**args; //place
+	t_node	*right;	//in case of a pipe node
+	t_node	*left; //in case of a pipe node
+};
+
 t_token	*scanner(char *line);
 t_token_type	get_char_type(char c);
 void	print_tokens(t_token *tokens);
@@ -32,5 +49,6 @@ char *ft_strcdup(char *str, char c);
 char *ft_strdup_set(char *str, char *set);
 void free_tokens(t_token *tokens);
 void *ft_calloc(size_t nmemb, size_t size);
+t_node *parser(t_token *tokens);
 
 #endif
