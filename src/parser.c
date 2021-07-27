@@ -70,7 +70,10 @@ void	skip_tokens_until_next_command(t_token **tokens)
 	{
 		type = (*tokens)->type;
 		if (type == T_PIPE || (*tokens)->next == NULL)
+		{
+			*tokens = (*tokens)->next;
 			return ;
+		}
 		*tokens = (*tokens)->next;
 	}
 }
@@ -81,6 +84,16 @@ void parse_simple_command(t_token *tokens, t_node *node)
 	node->args = get_args(tokens);
 }
 
+void	parse_pipe_command(t_token *tokens, t_node *node)
+{
+	node->type = PIPE_NODE;
+	node->left = ft_calloc(1, sizeof(t_node));
+	parse_simple_command(tokens, node->left);
+	skip_tokens_until_next_command(&tokens);
+	node->right = ft_calloc(1, sizeof(t_node));
+	parse_simple_command(tokens, node->right);
+}
+
 t_node	*parser(t_token *tokens)
 {
 	t_node *nodes = ft_calloc(1, sizeof(t_node));
@@ -89,7 +102,11 @@ t_node	*parser(t_token *tokens)
 	if (!is_pipe_next(tokens))
 	{
 		parse_simple_command(tokens, nodes);
-		skip_tokens_until_next_command(&tokens);
+		return (nodes);
+	}
+	else
+	{
+		parse_pipe_command(tokens, nodes);
 		return (nodes);
 	}
 	return (nodes);
@@ -123,6 +140,15 @@ void	print_nodes(t_node *nodes, int spaces)
 		indent(spaces);
 		printf("COMMAND(");
 		print_args(nodes);
+		printf(")\n");
+	}
+	else if (nodes->type == PIPE_NODE)
+	{
+		indent(spaces);
+		printf("PIPE(\n");
+		print_nodes(nodes->left, spaces + 2);
+		print_nodes(nodes->right, spaces + 2);
+		indent(spaces);
 		printf(")\n");
 	}
 }
