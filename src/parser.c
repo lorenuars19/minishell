@@ -57,11 +57,6 @@ char	**get_args(t_token *tokens)
 	return (args);
 }
 
-// void	get_simple_commands(t_token **tokens, t_node *nodes)
-// {
-
-// }
-
 void	skip_tokens_until_next_command(t_token **tokens)
 {
 	t_token_type	type;
@@ -99,7 +94,7 @@ t_node	*parse_pipe_command(t_token *tokens)
 	if (!node)
 		return (NULL);
 	node->type = PIPE_NODE;
-	//TODO : check all return values of calloc
+	//TODO : check all return values
 	node->left = parse_simple_command(tokens);
 	skip_tokens_until_next_command(&tokens);
 	node->right = parser(tokens);
@@ -138,7 +133,10 @@ static void	print_args(t_node *node)
 	i = 0;
 	while (node->args[i])
 	{
-		printf("%s, ", node->args[i]);
+		if (node->args[i + 1])
+			printf("%s, ", node->args[i]);
+		else
+			printf("%s", node->args[i]);
 		i++;
 	}
 }
