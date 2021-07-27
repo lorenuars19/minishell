@@ -78,38 +78,48 @@ void	skip_tokens_until_next_command(t_token **tokens)
 	}
 }
 
-void parse_simple_command(t_token *tokens, t_node *node)
+t_node	*parse_simple_command(t_token *tokens)
 {
+	t_node	*node;
+
+	node = ft_calloc(1, sizeof(t_node));
+	if (!node)
+		return (NULL);
 	node->type = COMMAND_NODE;
+	//TODO : check return value of get_args
 	node->args = get_args(tokens);
+	return (node);
 }
 
-void	parse_pipe_command(t_token *tokens, t_node *node)
+t_node	*parse_pipe_command(t_token *tokens)
 {
+	t_node *node;
+
+	node = ft_calloc(1, sizeof(t_node));
+	if (!node)
+		return (NULL);
 	node->type = PIPE_NODE;
-	node->left = ft_calloc(1, sizeof(t_node));
-	parse_simple_command(tokens, node->left);
+	//TODO : check all return values of calloc
+	node->left = parse_simple_command(tokens);
 	skip_tokens_until_next_command(&tokens);
-	node->right = ft_calloc(1, sizeof(t_node));
-	parse_simple_command(tokens, node->right);
+	node->right = parser(tokens);
+	return (node);
 }
 
 t_node	*parser(t_token *tokens)
 {
-	t_node *nodes = ft_calloc(1, sizeof(t_node));
-	if (!nodes)
-		return (NULL);
+	t_node	*nodes;
+
 	if (!is_pipe_next(tokens))
 	{
-		parse_simple_command(tokens, nodes);
+		nodes = parse_simple_command(tokens);
 		return (nodes);
 	}
 	else
 	{
-		parse_pipe_command(tokens, nodes);
+		nodes = parse_pipe_command(tokens);
 		return (nodes);
 	}
-	return (nodes);
 }
 
 static void	indent(int spaces)
