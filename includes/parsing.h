@@ -6,6 +6,14 @@
 # define MALLOC_ERROR -1
 # define SPECIAL_CHARS "|\'\" <>\t"
 
+typedef int bool;
+
+enum
+{
+	FALSE,
+	TRUE
+};
+
 typedef	enum e_token_type
 {
 	T_GENERAL = 'g',
@@ -50,5 +58,6 @@ char *ft_strdup_set(char *str, char *set);
 void free_tokens(t_token *tokens);
 void *ft_calloc(size_t nmemb, size_t size);
 t_node *parser(t_token *tokens);
+void print_nodes(t_node *nodes, int spaces);
 
 #endif

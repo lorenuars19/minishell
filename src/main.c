@@ -20,6 +20,8 @@ int main(int argc, char **argv)
 		// free(str);
 		t_token *tokens = scanner(line);
 		print_tokens(tokens);
+		t_node *nodes = parser(tokens);
+		print_nodes(nodes, 0);
 		free_tokens(tokens);
 		if (str_cmp("exit", line) == 0)
 		{
