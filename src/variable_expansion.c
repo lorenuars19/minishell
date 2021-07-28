@@ -1,4 +1,5 @@
 #include "parsing.h"
+#include <stdlib.h>
 
 t_bool	ft_isspace(char c)
 {
@@ -79,22 +80,65 @@ char	*get_value_from_envp(char *name, char **envp)
 	while (envp[i])
 	{
 		if (str_cmp_n(envp[i], name, length) == 0 && envp[i][length] == '=')
-			return (str_dupli(envp[i]));
+			return (str_dupli(&(envp[i][length + 1])));
 		i++;
 	}
-	return (NULL);
+	return (str_dupli(""));
 }
 
-char	*expand_one_variable(t_token *token, char **envp)
+char	*replace_variable_with_its_value(t_token *token, char *value, char *name)
 {
 	(void)token;
-	(void)envp;
+	(void)value;
 
-	char *name = get_variable_name(token);
+	char	*result;
+	int		i;
+	int		length;
+
+	length = str_len(value) - str_len(name) + str_len(token->data);
+	result = ft_calloc(length, sizeof(char));
+	if (!result)
+		return (NULL);
+	i = 0;
+	while (TRUE)
+	{
+		if (token->data[i] == '$' && token->data[i + 1] == name[0])
+			break ;
+		result[i] = token->data[i];
+		i++;
+	}
+	ft_strncpy(result + i, value, str_len(value));
+	while (i + (int)str_len(value) < length)
+	{
+		result[i + str_len(value)] = token->data[i + str_len(name) + 1];
+		i++;
+	}
+	return (result);
+}
+
+char	*expand_in_one_token(t_token *token, char **envp)
+{
+	char	*name;
+	char	*value;
+	char	*expanded_token;
+
+	name = get_variable_name(token);
 	if (!name)
 		return (NULL);
-	char *value = get_value_from_envp(name, envp);
-	return (value);
+	value = get_value_from_envp(name, envp);
+	if (!value)
+	{
+		free(name);
+		return (NULL);
+	}
+	expanded_token = replace_variable_with_its_value(token, value, name);
+	free(name);
+	free(value);
+	if (!expanded_token)
+		return (NULL);
+	free(token->data);
+	token->data = expanded_token;
+	return (token->data);
 }
 
 void	expand_variables(char **envp, t_token *tokens)
@@ -107,7 +151,7 @@ void	expand_variables(char **envp, t_token *tokens)
 	while (current_token)
 	{
 		if (should_token_be_expanded(current_token))
-			current_token->data = expand_one_variable(current_token, envp);
+			current_token->data = expand_in_one_token(current_token, envp);
 		current_token = current_token->next;
 	}
 }
