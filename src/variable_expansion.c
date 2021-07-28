@@ -50,6 +50,13 @@ char	*get_variable_name(t_token *token)
 	return (name);
 }
 
+static t_bool	is_a_valid_name(char *data)
+{
+	if (data[0] == '$' && (data[1] == '_' || is_alnum(data[1])))
+		return (TRUE);
+	return (FALSE);
+}
+
 t_bool	should_token_be_expanded(t_token *token)
 {
 	t_token_type	type;
@@ -61,8 +68,7 @@ t_bool	should_token_be_expanded(t_token *token)
 		i = 0;
 		while (token->data[i])
 		{
-			//not the right set of characters , check what characters are valid
-			if (token->data[i] == '$')
+			if (token->data[i] == '$' && is_a_valid_name(token->data + i))
 				return (TRUE);
 			i++;
 		}
@@ -116,7 +122,7 @@ char	*replace_variable_with_its_value(t_token *token, char *value, char *name)
 	return (result);
 }
 
-char	*expand_in_one_token(t_token *token, char **envp)
+char	*expand_one_variable(t_token *token, char **envp)
 {
 	char	*name;
 	char	*value;
@@ -134,24 +140,36 @@ char	*expand_in_one_token(t_token *token, char **envp)
 	expanded_token = replace_variable_with_its_value(token, value, name);
 	free(name);
 	free(value);
-	if (!expanded_token)
-		return (NULL);
-	free(token->data);
-	token->data = expanded_token;
+	return (expanded_token);
+}
+
+char	*expand_in_one_token(t_token *token, char **envp)
+{
+	char	*expanded_token;
+
+	while (should_token_be_expanded(token))
+	{
+		expanded_token = expand_one_variable(token, envp);
+		if (!expanded_token)
+			return (NULL);
+		free(token->data);
+		token->data = expanded_token;
+	}
 	return (token->data);
 }
 
 void	expand_variables(char **envp, t_token *tokens)
 {
-	(void)envp;
-	(void)tokens;
 	t_token	*current_token;
 
 	current_token = tokens;
 	while (current_token)
 	{
 		if (should_token_be_expanded(current_token))
-			current_token->data = expand_in_one_token(current_token, envp);
+		{
+			expand_in_one_token(current_token, envp);
+			//TODO check value of current_token->data, if NULL handle error
+		}
 		current_token = current_token->next;
 	}
 }
