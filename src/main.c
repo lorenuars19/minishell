@@ -2,7 +2,7 @@
 #include "parsing.h"
 #include <stdlib.h>
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **envp)
 {
 	(void)argc;
 	(void)argv;
@@ -19,6 +19,7 @@ int main(int argc, char **argv)
 		// printf("<%s>\n", str);
 		// free(str);
 		t_token *tokens = scanner(line);
+		expand_variables(envp, tokens);
 		print_tokens(tokens);
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);

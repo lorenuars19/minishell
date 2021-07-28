@@ -48,6 +48,7 @@ SRCS = \
 	./src/main.c \
 	./src/parser.c \
 	./src/scanner_utils.c \
+	./src/variable_expansion.c \
 
 HEADERS = \
 	./includes/parsing.h\
