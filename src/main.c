@@ -24,6 +24,7 @@ int main(int argc, char **argv, char **envp)
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);
 		free_tokens(tokens);
+		free_nodes(nodes);
 		if (str_cmp("exit", line) == 0)
 		{
 			free(line);

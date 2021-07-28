@@ -91,8 +91,8 @@ void free_tokens(t_token *tokens)
 	if (current_token)
 	{
 		free_tokens(current_token->next);
-		if (current_token->data)
-			free(current_token->data);
+		// if (current_token->data)
+		// 	free(current_token->data);
 		free(current_token);
 	}
 }

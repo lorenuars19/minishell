@@ -160,3 +160,31 @@ void	print_nodes(t_node *nodes, int spaces)
 		printf(")\n");
 	}
 }
+
+static void	free_args(char **args)
+{
+	int	i;
+
+	i = 0;
+	while (args[i])
+	{
+		free(args[i]);
+		i++;
+	}
+	free(args);
+}
+
+void	free_nodes(t_node *nodes)
+{
+	if (nodes->type == COMMAND_NODE)
+	{
+		free_args(nodes->args);
+		free(nodes);
+	}
+	else if (nodes->type == PIPE_NODE)
+	{
+		free_nodes(nodes->left);
+		free_nodes(nodes->right);
+		free(nodes);
+	}
+}

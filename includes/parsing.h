@@ -60,5 +60,6 @@ void *ft_calloc(size_t nmemb, size_t size);
 t_node *parser(t_token *tokens);
 void print_nodes(t_node *nodes, int spaces);
 void expand_variables(char **envp, t_token *tokens);
+void free_nodes(t_node *nodes);
 
 #endif
