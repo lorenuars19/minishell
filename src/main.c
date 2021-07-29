@@ -18,6 +18,11 @@ int main(int argc, char **argv, char **envp)
 		// char *str = ft_strdup_set(line, SPECIAL_CHARS);
 		// printf("<%s>\n", str);
 		// free(str);
+		if (is_there_unclosed_quotes(line))
+		{
+			free(line);
+			continue ;
+		}
 		t_token *tokens = scanner(line);
 		expand_variables(envp, tokens);
 		print_tokens(tokens);

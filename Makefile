@@ -44,8 +44,10 @@ LDFLAGS = -lreadline $(LIB_UTILS)
 # **************************************************************************** #
 
 SRCS = \
+	./src/merge_tokens.c \
 	./src/scanner.c \
 	./src/main.c \
+	./src/syntax_checker.c \
 	./src/parser.c \
 	./src/scanner_utils.c \
 	./src/variable_expansion.c \

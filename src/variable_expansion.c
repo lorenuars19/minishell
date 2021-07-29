@@ -1,11 +1,6 @@
 #include "parsing.h"
 #include <stdlib.h>
 
-t_bool	ft_isspace(char c)
-{
-	return (str_has(SPACE_STRING, c));
-}
-
 int	get_variable_length(char *data)
 {
 	int	length;

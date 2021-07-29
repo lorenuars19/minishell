@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-bool	is_pipe_next(t_token *tokens)
+t_bool	is_pipe_next(t_token *tokens)
 {
 	t_token	*current_token;
 
