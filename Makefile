@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/07/07 15:18:00 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/07/20 16:02:45 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ CFLAGS += -I ./lib/lib_utils/includes/
 # Linking stage flags
 LIB_UTILS = ./lib/lib_utils/libutils.a
 
-LDFLAGS = -lreadline $(LIB_UTILS)
+LDFLAGS = -lreadline -ltermcap $(LIB_UTILS)
 
 ###▼▼▼<src-updater-do-not-edit-or-remove>▼▼▼
 # **************************************************************************** #
