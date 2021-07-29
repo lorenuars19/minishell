@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: aclose <marvin@42.fr>                      +#+  +:+       +#+         #
+#    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/07/14 23:24:10 by aclose           ###   ########.fr        #
+#    Updated: 2021/07/29 18:22:15 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ CFLAGS += -I ./lib/lib_utils/includes/
 # Linking stage flags
 LIB_UTILS = ./lib/lib_utils/libutils.a
 
-LDFLAGS = -lreadline $(LIB_UTILS)
+LDFLAGS = -lreadline -ltermcap $(LIB_UTILS)
 
 ###▼▼▼<src-updater-do-not-edit-or-remove>▼▼▼
 # **************************************************************************** #
