@@ -34,21 +34,7 @@ typedef	struct s_token
 	struct s_token	*next;
 }	t_token;
 
-typedef	enum	e_node_type
-{
-	COMMAND_NODE,
-	PIPE_NODE
-}	t_node_type;
 
-typedef	struct s_node	t_node;
-
-struct s_node
-{
-	t_node_type	type;
-	char	**args; //place
-	t_node	*right;	//in case of a pipe node
-	t_node	*left; //in case of a pipe node
-};
 
 t_token	*scanner(char *line);
 t_token_type	get_char_type(char c);

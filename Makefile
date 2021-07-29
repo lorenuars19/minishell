@@ -44,15 +44,16 @@ LDFLAGS = -lreadline $(LIB_UTILS)
 # **************************************************************************** #
 
 SRCS = \
-	./src/scanner.c \
-	./src/main.c \
-	./src/parser.c \
-	./src/scanner_utils.c \
-	./src/variable_expansion.c \
+	./src/minishell.c \
+	./src/parsing/variable_expansion.c \
+	./src/parsing/parser.c \
+	./src/parsing/scanner_utils.c \
+	./src/parsing/scanner.c \
 
 HEADERS = \
-	./includes/parsing.h\
+	./includes/exec.h\
 	./includes/minishell.h\
+	./includes/parsing.h\
 
 ###▲▲▲<src-updater-do-not-edit-or-remove>▲▲▲
 
