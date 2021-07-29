@@ -60,5 +60,7 @@ void print_nodes(t_node *nodes, int spaces);
 void expand_variables(char **envp, t_token *tokens);
 void free_nodes(t_node *nodes);
 t_bool is_there_unclosed_quotes(char *line);
+int ft_strncpy(char *dest, char *src, int n);
+t_token *merge_tokens(t_token *tokens);
 
 #endif
