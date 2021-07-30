@@ -10,7 +10,7 @@
 # include "libutils.h"
 
 # include "exec.h"
-# include "parsing.h"
+
 
 typedef	enum	e_node_type
 {
@@ -27,5 +27,7 @@ struct s_node
 	t_node	*right;	//in case of a pipe node
 	t_node	*left; //in case of a pipe node
 };
+
+# include "parsing.h"
 
 #endif

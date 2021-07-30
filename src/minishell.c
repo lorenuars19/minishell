@@ -10,7 +10,7 @@ int main(int argc, char **argv, char **envp)
 
 	while (1)
 	{
-		line = readline("\033[32;1mminishell \033[0m> ");
+		line = readline("\033[32;1mMINISHELL \033[0m\033[33;1m>\033[0m ");
 		if (line)
 			printf("Here is the line: <%s>\n", line);
 		if (line && *line)
