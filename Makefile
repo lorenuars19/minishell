@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/07/29 18:22:15 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/07/30 13:34:03 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,6 +33,11 @@ OBJDIR	= bin/
 CFLAGS	+= -I $(INCDIR)
 
 CFLAGS += -I ./lib/lib_utils/includes/
+
+ifeq ($(DBG),1)
+	CFLAGS += -g3 -fsanitize=address -fsanitize=leak
+endif
+
 # Linking stage flags
 LIB_UTILS = ./lib/lib_utils/libutils.a
 
@@ -44,11 +49,12 @@ LDFLAGS = -lreadline -ltermcap $(LIB_UTILS)
 # **************************************************************************** #
 
 SRCS = \
-	./src/minishell.c \
-	./src/parsing/variable_expansion.c \
-	./src/parsing/parser.c \
-	./src/parsing/scanner_utils.c \
-	./src/parsing/scanner.c \
+	./src/variable_expansion.c \
+	./src/parser.c \
+	./src/scanner_utils.c \
+	./src/exec.c \
+	./src/scanner.c \
+	./src/main.c \
 
 HEADERS = \
 	./includes/exec.h\

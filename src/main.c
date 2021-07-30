@@ -12,7 +12,7 @@ int main(int argc, char **argv, char **envp)
 	{
 		line = readline("\033[32;1mMINISHELL \033[0m\033[33;1m>\033[0m ");
 		if (line)
-			printf("Here is the line: <%s>\n", line);
+			printf("Input : \"%s\"\n", line);
 		if (line && *line)
 			add_history(line);
 		// char *str = ft_strdup_set(line, SPECIAL_CHARS);
@@ -23,6 +23,10 @@ int main(int argc, char **argv, char **envp)
 		print_tokens(tokens);
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);
+		// exec
+
+
+
 		free_tokens(tokens);
 		free_nodes(nodes);
 		if (str_cmp("exit", line) == 0)

@@ -147,7 +147,7 @@ void	print_nodes(t_node *nodes, int spaces)
 	if (nodes->type == COMMAND_NODE)
 	{
 		indent(spaces);
-		printf("COMMAND(");
+		printf("\033[33;1mCOMMAND\033[0m(");
 		print_args(nodes);
 		printf(")\n");
 	}
