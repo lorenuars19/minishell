@@ -6,8 +6,8 @@ then
 	exit 0
 fi
 
-cat /dev/random | head -n 2 | tr -cd '[:print:]' > random.txt
+cat /dev/random | head -n $1 | tr -cd '[:print:]' > random.txt
 
-printf "\n\n\n\n\n\n\n\nexit" >> random.txt
+printf "\nexit\n" >> random.txt
 
 ./minishell < random.txt
