@@ -38,14 +38,29 @@ typedef	enum	e_node_type
 	PIPE_NODE
 }	t_node_type;
 
+
+typedef	enum e_redirection_mode
+{
+	M_APPEND,
+	M_TRUNCATE
+}	t_redirection_mode;
+
+typedef	struct s_redirection
+{
+	char				*filename;
+	t_redirection_mode	mode;
+}	t_redirection;
+
 typedef	struct s_node	t_node;
 
 struct s_node
 {
-	t_node_type	type;
-	char	**args; //place
-	t_node	*right;	//in case of a pipe node
-	t_node	*left; //in case of a pipe node
+	t_node_type		type;
+	char			**args;
+	t_redirection	*input_redir;
+	t_redirection	*output_redir;
+	t_node			*right;	//in case of a pipe node
+	t_node			*left; //in case of a pipe node
 };
 
 t_token	*scanner(char *line);
