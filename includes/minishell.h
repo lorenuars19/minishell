@@ -9,7 +9,6 @@
 
 # include "libutils.h"
 
-# include "exec.h"
 
 
 typedef	enum	e_node_type
@@ -29,5 +28,6 @@ struct s_node
 };
 
 # include "parsing.h"
+# include "exec.h"
 
 #endif
