@@ -22,7 +22,9 @@ typedef	enum e_token_type
 	T_SQUOTE = '\'',
 	T_DQUOTE = '\"',
 	T_GREATER = '>',
-	T_SMALLER = '<'
+	T_SMALLER = '<',
+	T_HEREDOC = 'h',
+	T_APPEND = 'a'
 }	t_token_type;
 
 typedef	struct s_token

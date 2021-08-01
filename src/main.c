@@ -29,7 +29,7 @@ int main(int argc, char **argv, char **envp)
 		}
 		t_token *tokens = scanner(line);
 		expand_variables(envp, tokens);
-		tokens = merge_tokens(tokens);
+		merge_tokens(tokens);
 		print_tokens(tokens);
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);

@@ -57,10 +57,21 @@ int get_pipe_token(char *line, t_token *token, int *index)
 
 int get_redirection_token(char *line, t_token *token, int *index)
 {
-	(void)line;
-	token->type = get_char_type(*line);
-	token->data = NULL;
-	(*index)++;
+	if (*line == '<' && *(line + 1) == '<')
+	{
+		token->type = T_HEREDOC;
+		*index += 2;
+	}
+	else if (*line == '>' && *(line + 1) == '>')
+	{
+		token->type = T_APPEND;
+		*index += 2;
+	}
+	else
+	{
+		token->type = get_char_type(*line);
+		(*index)++;
+	}
 	return (0);
 }
 

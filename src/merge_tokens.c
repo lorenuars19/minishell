@@ -71,6 +71,6 @@ t_token	*merge_tokens(t_token *tokens)
 		else
 			current_token = current_token->next;
 	}
-	tokens = delete_superfluous_blank_tokens(tokens);
+	delete_superfluous_blank_tokens(tokens);
 	return (tokens);
 }
