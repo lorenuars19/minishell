@@ -76,6 +76,8 @@ t_token	*scanner(char *line)
 	len = str_len(line);
 	if (len == 0)
 		return (NULL);
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
 	tokens = ft_calloc(1, sizeof(t_token));
 	if (!tokens)
 		return (NULL);
