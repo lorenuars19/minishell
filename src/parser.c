@@ -25,7 +25,14 @@ int		count_args(t_token *tokens)
 	{
 		if (tokens->type == T_PIPE)
 			return (count);
-		if (tokens->type != T_BLANK)
+		else if (has_redirection_type(tokens))
+		{
+			if (tokens->next)
+				tokens = tokens->next;
+			else
+				return (count);
+		}
+		else if (tokens->type != T_BLANK)
 			count++;
 		tokens = tokens->next;
 	}
@@ -47,7 +54,9 @@ char	**get_args(t_token *tokens)
 	i = 0;
 	while (current_token && i < args_count)
 	{
-		if (current_token->type != T_BLANK)
+		if (has_redirection_type(current_token))
+			current_token = current_token->next;
+		else if (current_token->type != T_BLANK)
 		{
 			args[i] = current_token->data;
 			i++;
@@ -73,6 +82,19 @@ void	skip_tokens_until_next_command(t_token **tokens)
 	}
 }
 
+t_bool	has_redirection_type(t_token *token)
+{
+	t_token_type	type;
+
+	if (!token)
+		return (FALSE);
+	type = token->type;
+	if (type == T_GREATER || type == T_SMALLER
+		|| type == T_APPEND || type == T_HEREDOC)
+		return (TRUE);
+	return (FALSE);
+}
+
 t_bool	contains_redirections(t_token *tokens)
 {
 	t_token			*current_token;
@@ -81,21 +103,53 @@ t_bool	contains_redirections(t_token *tokens)
 	if (!tokens)
 		return (FALSE);
 	current_token = tokens;
-	type = current_token->type;
-	while (current_token && type != T_PIPE)
+	while (current_token && current_token->type != T_PIPE)
 	{
+		//TODO need to think what to do about heredocs
 		type = current_token->type;
-		if (type == T_GREATER || type == T_SMALLER)
+		if (type == T_GREATER || type == T_SMALLER
+			|| type == T_APPEND || type == T_HEREDOC)
 			return (TRUE);
 		current_token = current_token->next;
 	}
 	return (FALSE);
 }
 
+char	*get_filename(t_token *token)
+{
+	if (has_redirection_type(token))
+		token = token->next;
+	if (token && token->data)
+		return (token->data);
+	return (NULL);
+}
+
 void	get_redirections(t_token *tokens, t_node *node)
 {
-	(void)tokens;
-	(void)node;
+	t_token	*current_token;
+	t_redirection	*current_redirection;
+
+	//TODO check return value
+	current_token = tokens;
+	while (current_token && current_token->type != T_PIPE)
+	{
+		if (has_redirection_type(current_token))
+		{
+			if (!node->redirections)
+			{
+				node->redirections = ft_calloc(1, sizeof(t_redirection));
+				current_redirection = node->redirections;
+			}
+			else
+			{
+				current_redirection->next = ft_calloc(1, sizeof(t_redirection));
+				current_redirection = current_redirection->next;
+			}
+			current_redirection->mode = current_token->type;
+			current_redirection->filename = get_filename(current_token);
+		}
+		current_token = current_token->next;
+	}
 	return ;
 }
 
@@ -109,7 +163,7 @@ t_node	*parse_simple_command(t_token *tokens)
 	node->type = COMMAND_NODE;
 	if (contains_redirections(tokens))
 		get_redirections(tokens, node);
-	//TODO : check return value of get_args
+	//TODO : check return value of get_args and get_redirections
 	node->args = get_args(tokens);
 	return (node);
 }
@@ -169,13 +223,36 @@ static void	print_args(t_node *node)
 	}
 }
 
+static void	print_redirections(t_node *node)
+{
+	t_redirection	*current_redir;
+
+	if (!node->redirections)
+	{
+		printf("NONE");
+		return ;
+	}
+	current_redir = node->redirections;
+	while (current_redir)
+	{
+		if (current_redir->next)
+			printf("MODE: %c, FILENAME: %s, ", current_redir->mode, current_redir->filename);
+		else
+			printf("MODE: %c, FILENAME: %s", current_redir->mode, current_redir->filename);
+		current_redir = current_redir->next;
+	}
+}
+
 void	print_nodes(t_node *nodes, int spaces)
 {
 	if (nodes->type == COMMAND_NODE)
 	{
 		indent(spaces);
 		printf("COMMAND(");
+		printf("ARGS: ");
 		print_args(nodes);
+		printf("; REDIRECTIONS: ");
+		print_redirections(nodes);
 		printf(")\n");
 	}
 	else if (nodes->type == PIPE_NODE)
@@ -193,6 +270,8 @@ static void	free_args(char **args)
 {
 	int	i;
 
+	if (!args)
+		return ;
 	i = 0;
 	while (args[i])
 	{
@@ -202,11 +281,22 @@ static void	free_args(char **args)
 	free(args);
 }
 
+static void	free_redirections(t_redirection *redirections)
+{
+	if (redirections)
+	{
+		free_redirections(redirections->next);
+		free(redirections->filename);
+		free(redirections);
+	}
+}
+
 void	free_nodes(t_node *nodes)
 {
 	if (nodes->type == COMMAND_NODE)
 	{
 		free_args(nodes->args);
+		free_redirections(nodes->redirections);
 		free(nodes);
 	}
 	else if (nodes->type == PIPE_NODE)

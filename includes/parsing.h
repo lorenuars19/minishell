@@ -21,8 +21,8 @@ typedef	enum e_token_type
 	T_PIPE = '|',
 	T_SQUOTE = '\'',
 	T_DQUOTE = '\"',
-	T_GREATER = '>',
 	T_SMALLER = '<',
+	T_GREATER = '>',
 	T_HEREDOC = 'h',
 	T_APPEND = 'a'
 }	t_token_type;
@@ -43,14 +43,17 @@ typedef	enum	e_node_type
 
 typedef	enum e_redirection_mode
 {
-	M_APPEND,
-	M_TRUNCATE
+	M_INPUT = T_SMALLER,
+	M_TRUNCATE = T_GREATER,
+	M_HEREDOC = T_HEREDOC,
+	M_APPEND = T_APPEND
 }	t_redirection_mode;
 
 typedef	struct s_redirection
 {
-	char				*filename;
-	t_redirection_mode	mode;
+	char					*filename;
+	t_redirection_mode		mode;
+	struct s_redirection	*next;
 }	t_redirection;
 
 typedef	struct s_node	t_node;
@@ -59,8 +62,7 @@ struct s_node
 {
 	t_node_type		type;
 	char			**args;
-	t_redirection	*input_redir;
-	t_redirection	*output_redir;
+	t_redirection	*redirections;
 	t_node			*right;	//in case of a pipe node
 	t_node			*left; //in case of a pipe node
 };
@@ -79,5 +81,6 @@ void free_nodes(t_node *nodes);
 t_bool is_there_unclosed_quotes(char *line);
 int ft_strncpy(char *dest, char *src, int n);
 t_token *merge_tokens(t_token *tokens);
+t_bool has_redirection_type(t_token *token);
 
 #endif
