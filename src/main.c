@@ -13,13 +13,17 @@ int main(int argc, char **argv, char **envp)
 		line = readline("Here is my prompt:");
 		if (line)
 			printf("Here is the line: <%s>\n", line);
+		else
+		{
+			printf("Readline is NULL\n");
+			//free everything before exiting
+			exit(EXIT_FAILURE);
+		}
 		if (line && *line)
 			add_history(line);
-		// char *str = ft_strdup_set(line, SPECIAL_CHARS);
-		// printf("<%s>\n", str);
-		// free(str);
 		if (is_there_unclosed_quotes(line))
 		{
+			printf("There are unclosed quotes\n");
 			free(line);
 			continue ;
 		}

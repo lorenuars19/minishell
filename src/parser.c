@@ -73,6 +73,32 @@ void	skip_tokens_until_next_command(t_token **tokens)
 	}
 }
 
+t_bool	contains_redirections(t_token *tokens)
+{
+	t_token			*current_token;
+	t_token_type	type;
+
+	if (!tokens)
+		return (FALSE);
+	current_token = tokens;
+	type = current_token->type;
+	while (current_token && type != T_PIPE)
+	{
+		type = current_token->type;
+		if (type == T_GREATER || type == T_SMALLER)
+			return (TRUE);
+		current_token = current_token->next;
+	}
+	return (FALSE);
+}
+
+void	get_redirections(t_token *tokens, t_node *node)
+{
+	(void)tokens;
+	(void)node;
+	return ;
+}
+
 t_node	*parse_simple_command(t_token *tokens)
 {
 	t_node	*node;
@@ -81,6 +107,8 @@ t_node	*parse_simple_command(t_token *tokens)
 	if (!node)
 		return (NULL);
 	node->type = COMMAND_NODE;
+	if (contains_redirections(tokens))
+		get_redirections(tokens, node);
 	//TODO : check return value of get_args
 	node->args = get_args(tokens);
 	return (node);
