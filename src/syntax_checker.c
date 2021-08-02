@@ -98,9 +98,22 @@ t_bool	has_a_valid_command_before_and_after_pipes(t_token *tokens)
 	return (has_met_a_string_token_since_last_pipe);
 }
 
+t_bool	line_contains_only_blanks(char *line)
+{
+	while (*line)
+	{
+		if (*line != ' ' && *line != '\t')
+			return (FALSE);
+		line++;
+	}
+	return (TRUE);
+}
+
 int syntax_checker(char *line, t_token *tokens)
 {
 	(void)tokens;
+	if (line_contains_only_blanks(line))
+		return (1);
 	if (contains_unclosed_quotes(line))
 	{
 		printf("There are unclosed quotes in line\n");
