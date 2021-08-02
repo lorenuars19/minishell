@@ -46,6 +46,24 @@ t_bool	contains_consecutive_pipes(t_token *tokens)
 	return (FALSE);
 }
 
+
+t_bool contains_consecutive_redirections_operators(t_token *tokens)
+{
+	while (tokens)
+	{
+		if (has_redirection_type(tokens))
+		{
+			tokens = tokens->next;
+			skip_blank_tokens(&tokens);
+			if (!tokens || has_redirection_type(tokens))
+				return (TRUE);
+		}
+		else
+			tokens = tokens->next;
+	}
+	return (FALSE);
+}
+
 int syntax_checker(char *line, t_token *tokens)
 {
 	(void)tokens;
@@ -57,6 +75,11 @@ int syntax_checker(char *line, t_token *tokens)
 	if (contains_consecutive_pipes(tokens))
 	{
 		printf("syntax error near '|'\n");
+		return (1);
+	}
+	if (contains_consecutive_redirections_operators(tokens))
+	{
+		printf("syntax error near redirection operator\n");
 		return (1);
 	}
 	return (0);
