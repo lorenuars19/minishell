@@ -46,22 +46,56 @@ t_bool	contains_consecutive_pipes(t_token *tokens)
 	return (FALSE);
 }
 
-
-t_bool contains_consecutive_redirections_operators(t_token *tokens)
+t_bool	token_contains_a_string(t_token *token)
 {
+	t_token_type	type;
+
+	if (!token)
+		return (FALSE);
+	type = token->type;
+	if (type == T_GENERAL || type == T_DQUOTE || type == T_SQUOTE)
+		return (TRUE);
+	return (FALSE);
+}
+
+t_bool	has_a_filename_after_redirection_operators(t_token *tokens)
+{
+	if (!tokens)
+		return (FALSE);
 	while (tokens)
 	{
 		if (has_redirection_type(tokens))
 		{
 			tokens = tokens->next;
+			if (!tokens)
+				return (FALSE);
 			skip_blank_tokens(&tokens);
-			if (!tokens || has_redirection_type(tokens))
-				return (TRUE);
+			if (!token_contains_a_string(tokens))
+				return (FALSE);
 		}
-		else
-			tokens = tokens->next;
+		tokens = tokens->next;
 	}
-	return (FALSE);
+	return (TRUE);
+}
+
+t_bool	has_a_valid_command_before_and_after_pipes(t_token *tokens)
+{
+	t_bool	has_met_a_string_token_since_last_pipe;
+
+	has_met_a_string_token_since_last_pipe = FALSE;
+	while (tokens)
+	{
+		if (tokens->type == T_PIPE)
+		{
+			if (!has_met_a_string_token_since_last_pipe)
+				return (FALSE);
+			has_met_a_string_token_since_last_pipe = FALSE;
+		}
+		else if (token_contains_a_string(tokens))
+			has_met_a_string_token_since_last_pipe = TRUE;
+		tokens = tokens->next;
+	}
+	return (has_met_a_string_token_since_last_pipe);
 }
 
 int syntax_checker(char *line, t_token *tokens)
@@ -72,14 +106,14 @@ int syntax_checker(char *line, t_token *tokens)
 		printf("There are unclosed quotes in line\n");
 		return (1);
 	}
-	if (contains_consecutive_pipes(tokens))
-	{
-		printf("syntax error near '|'\n");
-		return (1);
-	}
-	if (contains_consecutive_redirections_operators(tokens))
+	if (!has_a_filename_after_redirection_operators(tokens))
 	{
 		printf("syntax error near redirection operator\n");
+		return (1);
+	}
+	if (!has_a_valid_command_before_and_after_pipes(tokens))
+	{
+		printf("syntax error near '|'\n");
 		return (1);
 	}
 	return (0);
