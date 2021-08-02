@@ -114,7 +114,7 @@ t_token	*scanner(char *line)
 			current_token->next = ft_calloc(1, sizeof(t_token));
 			if (!current_token->next)
 			{
-				free_tokens(tokens);
+				free_tokens_with_data(tokens);
 				return (NULL);
 			}
 			current_token = current_token->next;

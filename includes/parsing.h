@@ -72,15 +72,17 @@ t_token_type	get_char_type(char c);
 void	print_tokens(t_token *tokens);
 char *ft_strcdup(char *str, char c);
 char *ft_strdup_set(char *str, char *set);
-void free_tokens(t_token *tokens);
+void free_tokens_without_data(t_token *tokens);
+void free_tokens_with_data(t_token *tokens);
 void *ft_calloc(size_t nmemb, size_t size);
 t_node *parser(t_token *tokens);
 void print_nodes(t_node *nodes, int spaces);
 void expand_variables(char **envp, t_token *tokens);
 void free_nodes(t_node *nodes);
-t_bool is_there_unclosed_quotes(char *line);
 int ft_strncpy(char *dest, char *src, int n);
 t_token *merge_tokens(t_token *tokens);
 t_bool has_redirection_type(t_token *token);
+int syntax_checker(char *line, t_token *tokens);
+t_bool contains_unclosed_quotes(char *line);
 
 #endif
