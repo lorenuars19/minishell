@@ -9,9 +9,10 @@ int builtin_echo(char *argv[], char *envp[])
 
 	while (argv && argv[i])
 	{
-		put_str_fd(1, argv[i]);
+		put_str(argv[i]);
 		i++;
 	}
+	put_chr('\n');
 	return (0);
 }
 
@@ -24,8 +25,13 @@ int builtin_cd(char *argv[], char *envp[])
 
 int builtin_pwd(char *argv[], char *envp[])
 {
-	(void)envp;
-	(void)argv;
+	char buf[BUFF_SIZ + 1];
+
+DM(builtin_pwd, buf);
+
+	if (!getcwd(buf, BUFF_SIZ))
+		return (1);
+	put_str_nl(buf);
 	return (0);
 }
 

@@ -60,7 +60,8 @@ int find_and_execute(t_node *node)
 
 int check_for_builtins(t_node *node, char *envp[])
 {
-	static char *builtins[] = {
+	int			i;
+	static char	*builtins[] = {
 		"echo",
 		"cd",
 		"pwd",
@@ -70,18 +71,20 @@ int check_for_builtins(t_node *node, char *envp[])
 		"exit",
 		NULL
 	};
-
-	int i;
-DE(node->args[0])
 	i = 0;
-	while (node->args && node->args[0] &&  builtins[i]
+	while (node->args && node->args[0] && builtins[i]
 		&& str_cmp(node->args[0], builtins[0]))
 		i++;
+DM(builtin, builtins[i]);
+DE(i);
+D_STR_DETAILS(node->args[0])
+
 	if (exec_builtin(node, envp, i))
 		return (1);
+	return (0);
 }
 
-int	exec_builtin(t_node *node, char *envp[], int index)
+int exec_builtin(t_node *node, char *envp[], int index)
 {
 	static int (*builtins[])(char *argv[], char *envp[]) = {
 		builtin_echo,
@@ -92,10 +95,9 @@ int	exec_builtin(t_node *node, char *envp[], int index)
 		builtin_env,
 		builtin_exit
 	};
-
 	if (index >= 0 && index < BUILTIN_END)
 	{
-		if (builtins[index](node->args))
+		if (builtins[index](node->args, envp))
 			return (1);
 	}
 	return (0);
@@ -103,8 +105,8 @@ int	exec_builtin(t_node *node, char *envp[], int index)
 
 int exec_command(t_node *node, char *envp[])
 {
-	int		status;
-	pid_t	cpid;
+	int status;
+	pid_t cpid;
 
 	cpid = fork();
 	if (cpid < 0)
@@ -113,13 +115,16 @@ int exec_command(t_node *node, char *envp[])
 	}
 	else if (cpid == FORKED_CHILD)
 	{
-		if (check_for_builtins(node))
+		if (check_for_builtins(node, envp))
 			return (1);
 	}
 	else
 	{
 		//TODO parent stuff
 		status = wait_for_child(cpid);
+
+		if (status)
+			return (status);
 
 		//TODO close pipe ? or other sutff maybe IDK
 	}
@@ -133,24 +138,18 @@ int wait_for_child(pid_t cpid)
 
 	w = waitpid(cpid, &wstatus, WUNTRACED | WCONTINUED);
 	if (w == -1)
+		return (-1);
+	while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus))
 	{
-		perror("waitpid");
-		exit(EXIT_FAILURE);
-		while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus))
-		{
-			w = waitpid(cpid, &wstatus, WUNTRACED | WCONTINUED);
-		}
+		w = waitpid(cpid, &wstatus, WUNTRACED | WCONTINUED);
 		if (WIFEXITED(wstatus))
-			return (EXITSTATUS(wstatus));
+			return (WEXITSTATUS(wstatus));
 		else if (WIFSIGNALED(wstatus))
 			return (WTERMSIG(wstatus));
 		else if (WIFSTOPPED(wstatus))
 			return (WSTOPSIG(wstatus));
-		else if (WIFCONTINUED(wstatus))
-		{
-			printf("continued\n");
-		}
 	}
+	return (0);
 }
 
 int exec_piped(t_node *node, t_ctx *ctx, char *envp[])

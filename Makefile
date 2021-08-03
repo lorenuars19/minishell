@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/08/03 19:31:25 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/08/03 21:18:52 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,10 @@ NAME	= minishell
 
 # Compiler and compiling flags
 CC	= gcc
+
+ifneq ($(SOFT), 1)
 CFLAGS	= -Wall -Werror -Wextra
+endif
 
 # Debug, use with`make DEBUG=1`
 ifeq ($(DEBUG),1)
@@ -53,6 +56,7 @@ SRCS = \
 	./src/variable_expansion.c \
 	./src/parser.c \
 	./src/scanner_utils.c \
+	./src/builtins.c \
 	./src/exec.c \
 	./src/scanner.c \
 	./src/merge_tokens.c \
@@ -84,14 +88,14 @@ VPATH := $(SRCDIR) $(OBJDIR) $(shell find $(SRCDIR) -type d)
 
 # ================================== RULES =================================== #
 
-ifndef ($(NOLIB))
+ifneq ($(NOLIB), 1)
 define MAKE_LIB_UTILS =
 	@printf "$(GR)=== Compile $(dir $(LIB_UTILS)) $(MAKECMDGOALS) $(RC)\n"
 	@$(MAKE) -C $(dir $(LIB_UTILS)) $(MAKECMDGOALS)
 endef
 else
 define MAKE_LIB_UTILS =
-	echo NOLIB
+	@echo Compiled without library
 endef
 endif
 
