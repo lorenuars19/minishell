@@ -49,14 +49,13 @@ LDFLAGS = -lreadline -ltermcap $(LIB_UTILS)
 # **************************************************************************** #
 
 SRCS = \
-	./src/merge_tokens.c \
-	./src/scanner.c \
-	./src/main.c \
 	./src/syntax_checker.c \
+	./src/variable_expansion.c \
 	./src/parser.c \
 	./src/scanner_utils.c \
 	./src/exec.c \
 	./src/scanner.c \
+	./src/merge_tokens.c \
 	./src/main.c \
 
 HEADERS = \
