@@ -65,6 +65,7 @@ int check_for_builtins(t_node *node, char *envp[])
 		"cd",
 		"pwd",
 		"export",
+		"unset",
 		"env",
 		"exit",
 		NULL
@@ -76,13 +77,13 @@ DE(node->args[0])
 	while (node->args && node->args[0] &&  builtins[i]
 		&& str_cmp(node->args[0], builtins[0]))
 		i++;
-	if (exec_builtin(node, envp))
+	if (exec_builtin(node, envp, i))
 		return (1);
 }
 
-int	exec_builtin(t_node *node, char *envp[])
+int	exec_builtin(t_node *node, char *envp[], int index)
 {
-	static (int builtins[])(char **argv) = {
+	static int (*builtins[])(char *argv[], char *envp[]) = {
 		builtin_echo,
 		builtin_cd,
 		builtin_pwd,
@@ -90,6 +91,13 @@ int	exec_builtin(t_node *node, char *envp[])
 		builtin_env,
 		builtin_exit
 	};
+
+	if (index >= 0 && index < BUILTIN_END)
+	{
+		if (builtins[index](node->args))
+			return (1);
+	}
+	return (0);
 }
 
 int exec_command(t_node *node, char *envp[])
