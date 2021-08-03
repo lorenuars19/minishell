@@ -85,5 +85,6 @@ t_bool has_redirection_type(t_token *token);
 int syntax_checker(char *line, t_token *tokens);
 t_bool contains_unclosed_quotes(char *line);
 t_bool has_redirection_type(t_token *token);
+void skip_blank_tokens(t_token **tokens);
 
 #endif

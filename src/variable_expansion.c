@@ -154,6 +154,23 @@ char	*expand_in_one_token(t_token *token, char **envp)
 	return (token->data);
 }
 
+static void	skip_delimiter(t_token **tokens)
+{
+	t_token_type	type;
+
+	type = (*tokens)->type;
+	if (type == T_HEREDOC)
+		*tokens = (*tokens)->next;
+	skip_blank_tokens(tokens);
+	type = (*tokens)->type;
+	while ((*tokens) && (type == T_GENERAL || type == T_DQUOTE || type == T_SQUOTE))
+	{
+		*tokens = (*tokens)->next;
+		if (*tokens)
+			type = (*tokens)->type;
+	}
+}
+
 void	expand_variables(char **envp, t_token *tokens)
 {
 	t_token	*current_token;
@@ -165,6 +182,11 @@ void	expand_variables(char **envp, t_token *tokens)
 		{
 			expand_in_one_token(current_token, envp);
 			//TODO check value of current_token->data, if NULL handle error
+		}
+		if (current_token->type == T_HEREDOC)
+		{
+			skip_delimiter(&current_token);
+			continue ;
 		}
 		current_token = current_token->next;
 	}
