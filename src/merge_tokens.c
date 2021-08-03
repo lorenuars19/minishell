@@ -45,7 +45,7 @@ t_token *delete_superfluous_blank_tokens(t_token *tokens)
 	if (!tokens)
 		return (NULL);
 	current_token = tokens;
-	while (current_token->next)
+	while (current_token && current_token->next)
 	{
 		if (current_token->next->type == T_BLANK)
 		{
