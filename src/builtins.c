@@ -2,17 +2,29 @@
 
 int builtin_echo(char *argv[], char *envp[])
 {
+	int		i;
+	t_bool	should_print_trailing_nl;
+
 	(void)envp;
-	int i;
-
-	i = 1;
-
-	while (argv && argv[i])
+	if (*argv && argv[1] && str_cmp(argv[1], "-n") == 0)
 	{
-		put_str(argv[i]);
+		should_print_trailing_nl = FALSE;
+		i = 2;
+	}
+	else
+	{
+		should_print_trailing_nl = TRUE;
+		i = 1;
+	}
+	while (argv[i])
+	{
+		printf("%s", argv[i]);
+		if (argv[i + 1])
+			printf(" ");
 		i++;
 	}
-	put_chr('\n');
+	if (should_print_trailing_nl)
+		printf("\n");
 	return (0);
 }
 
@@ -27,11 +39,7 @@ int builtin_pwd(char *argv[], char *envp[])
 {
 	(void)argv;
 	(void)envp;
-	char buf[BUFF_SIZ + 1];
 
-	if (!getcwd(buf, BUFF_SIZ))
-		return (1);
-	put_str_nl(buf);
 	return (0);
 }
 

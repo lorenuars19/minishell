@@ -11,9 +11,7 @@ int main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		line = readline("$>");
-		if (line)
-			printf("Here is the line: <%s>\n", line);
-		else
+		if (!line)
 		{
 			printf("Readline is NULL\n");
 			//free everything before exiting
@@ -33,9 +31,8 @@ int main(int argc, char **argv, char **envp)
 		print_tokens(tokens);
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);
-
-		// //TODO Excution
-		// execution(nodes, envp);
+		if (nodes->type == COMMAND_NODE)
+			exec_command(nodes, envp);
 
 		free_tokens_without_data(tokens);
 		free_nodes(nodes);

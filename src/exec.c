@@ -99,33 +99,16 @@
 // 	return (0);
 // }
 
-// int exec_command(t_node *node, char *envp[])
-// {
-// 	int status;
-// 	pid_t cpid;
-
-// 	cpid = fork();
-// 	if (cpid < 0)
-// 	{
-// 		return (1);
-// 	}
-// 	else if (cpid == FORKED_CHILD)
-// 	{
-// 		if (check_for_builtins(node, envp))
-// 			return (1);
-// 	}
-// 	else
-// 	{
-// 		//TODO parent stuff
-// 		status = wait_for_child(cpid);
-
-// 		if (status)
-// 			return (status);
-
-// 		//TODO close pipe ? or other sutff maybe IDK
-// 	}
-// 	return (0);
-// }
+int exec_command(t_node *node, char *envp[])
+{
+	if (node->type != COMMAND_NODE || node->args == NULL)
+		return (0);
+	if (node->args[0] && strcmp(node->args[0], "echo") == 0)
+	{
+		builtin_echo(node->args, envp);
+	}
+	return (0);
+}
 
 // int wait_for_child(pid_t cpid)
 // {

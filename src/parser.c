@@ -249,7 +249,7 @@ void	print_nodes(t_node *nodes, int spaces)
 	if (nodes->type == COMMAND_NODE)
 	{
 		indent(spaces);
-		printf("(");
+		printf("COMMAND(");
 		printf("ARGS: ");
 		print_args(nodes);
 		printf("; REDIRECTIONS: ");
