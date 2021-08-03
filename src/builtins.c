@@ -36,6 +36,13 @@ int builtin_export(char *argv[], char *envp[])
 	return (0);
 }
 
+int builtin_unset(char *argv[], char *envp[])
+{
+	(void)envp;
+	(void)argv;
+	return (0);
+}
+
 int builtin_env(char *argv[], char *envp[])
 {
 	(void)envp;

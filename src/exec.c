@@ -88,6 +88,7 @@ int	exec_builtin(t_node *node, char *envp[], int index)
 		builtin_cd,
 		builtin_pwd,
 		builtin_export,
+		builtin_unset,
 		builtin_env,
 		builtin_exit
 	};
