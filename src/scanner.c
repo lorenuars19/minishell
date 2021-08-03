@@ -1,7 +1,6 @@
-#include "minishell.h"
-#include "parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "minishell.h"
 
 
 t_token_type	get_char_type(char c)

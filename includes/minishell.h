@@ -8,9 +8,6 @@
 # include <sys/wait.h>
 
 # include "libutils.h"
-
-
-
 typedef	enum	e_node_type
 {
 	COMMAND_NODE,

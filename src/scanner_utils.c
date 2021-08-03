@@ -1,7 +1,6 @@
-#include "minishell.h"
-#include "parsing.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "minishell.h"
 
 static void ft_bzero(void *s, size_t n)
 {

@@ -1,7 +1,6 @@
-#include "minishell.h"
-#include "parsing.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "minishell.h"
 
 t_bool	is_pipe_next(t_token *tokens)
 {

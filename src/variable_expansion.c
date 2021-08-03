@@ -1,6 +1,5 @@
-#include "minishell.h"
-#include "parsing.h"
 #include <stdlib.h>
+#include "minishell.h"
 
 int	get_variable_length(char *data)
 {
