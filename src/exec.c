@@ -33,11 +33,18 @@ int exec_nodes(t_node *node, t_ctx * ctx, char *envp[])
 int find_and_execute(t_node *node)
 {
 	char *path;
+	char **tab;
 
 	path = getenv("PATH");
 
-DE(path)
-DM(find_and_execute, node)
+	tab = str_split(path, ":");
+
+	for (int i = 0 ; tab && tab[i]; i++)
+	{
+		printf("paths tab[i %d] \"%s\"\n", i, tab[i]);
+	}
+
+	(void)node;
 
 	return (0);
 }

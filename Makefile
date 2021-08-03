@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/08/03 13:57:29 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/08/03 19:02:52 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -60,6 +60,7 @@ SRCS = \
 
 HEADERS = \
 	./includes/exec.h\
+	./includes/debug_utils.h\
 	./includes/minishell.h\
 	./includes/parsing.h\
 
@@ -82,10 +83,16 @@ VPATH := $(SRCDIR) $(OBJDIR) $(shell find $(SRCDIR) -type d)
 
 # ================================== RULES =================================== #
 
+ifndef ($(NOLIB))
 define MAKE_LIB_UTILS =
-@printf "$(GR)=== Compile $(dir $(LIB_UTILS)) $(MAKECMDGOALS) $(RC)\n"
-@$(MAKE) -C $(dir $(LIB_UTILS)) $(MAKECMDGOALS)
+	@printf "$(GR)=== Compile $(dir $(LIB_UTILS)) $(MAKECMDGOALS) $(RC)\n"
+	@$(MAKE) -C $(dir $(LIB_UTILS)) $(MAKECMDGOALS)
 endef
+else
+define MAKE_LIB_UTILS =
+	echo NOLIB
+endef
+endif
 
 all : $(LIB_UTILS) $(NAME)
 

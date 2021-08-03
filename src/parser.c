@@ -146,7 +146,7 @@ void	get_redirections(t_token *tokens, t_node *node)
 				current_redirection = current_redirection->next;
 			}
 			// TODO fix compilation error
-			// current_redirection->mode = current_token->type;
+			current_redirection->mode = (t_redirection_mode)current_token->type;
 			current_redirection->filename = get_filename(current_token);
 		}
 		current_token = current_token->next;
