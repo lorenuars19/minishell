@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/08/03 19:02:52 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/08/03 19:31:25 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -57,6 +57,7 @@ SRCS = \
 	./src/scanner.c \
 	./src/merge_tokens.c \
 	./src/main.c \
+	./src/handle_heredoc.c \
 
 HEADERS = \
 	./includes/exec.h\
