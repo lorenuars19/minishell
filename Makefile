@@ -46,6 +46,7 @@ LDFLAGS = -lreadline $(LIB_UTILS)
 SRCS = \
 	./src/merge_tokens.c \
 	./src/scanner.c \
+	./src/handle_heredoc.c \
 	./src/main.c \
 	./src/syntax_checker.c \
 	./src/parser.c \
