@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include "minishell.h"
+#include <stdlib.h>
 
 int main(int argc, char **argv, char **envp)
 {
@@ -29,7 +29,7 @@ int main(int argc, char **argv, char **envp)
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);
 		// exec
-		exec_nodes(nodes, NULL);
+		execution(nodes, NULL);
 
 
 		free_tokens(tokens);

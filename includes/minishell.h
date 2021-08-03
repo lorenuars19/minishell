@@ -8,6 +8,8 @@
 # include <sys/wait.h>
 
 # include "libutils.h"
+
+# define ERR 1
 typedef	enum	e_node_type
 {
 	COMMAND_NODE,
