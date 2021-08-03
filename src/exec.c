@@ -120,7 +120,9 @@ int exec_command(t_node *node, char *envp[])
 		status = wait_for_child(cpid);
 
 		if (status)
-			return (status);
+		{
+			return (error_printf(status, "Child Status code : %d\n", status));
+		}
 
 		//TODO close pipe ? or other sutff maybe IDK
 	}

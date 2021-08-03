@@ -49,6 +49,14 @@ int builtin_unset(char *argv[], char *envp[])
 
 int builtin_env(char *argv[], char *envp[])
 {
+	int i;
+
+	i = 0;
+	while (envp && envp[i])
+	{
+		put_str_nl(envp[i]);
+		i++;
+	}
 	(void)envp;
 	(void)argv;
 	return (0);
@@ -58,5 +66,6 @@ int builtin_exit(char *argv[], char *envp[])
 {
 	(void)envp;
 	(void)argv;
+	exit(0);
 	return (0);
 }
