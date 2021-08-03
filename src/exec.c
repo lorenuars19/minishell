@@ -107,6 +107,10 @@ int exec_command(t_node *node, char *envp[])
 	{
 		builtin_echo(node->args, envp);
 	}
+	if (node->args[0] && strcmp(node->args[0], "env") == 0)
+	{
+		builtin_env(node->args, envp);
+	}
 	return (0);
 }
 
