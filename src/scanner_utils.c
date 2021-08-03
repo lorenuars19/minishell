@@ -35,15 +35,13 @@ char *ft_strcdup(char *str, char c)
 	length = 1;
 	while (str[length] && str[length] != c)
 		length++;
-	if (str[length] == c)
-		length++;
-	result = malloc(sizeof(char) * (length + 1));
+	result = malloc(sizeof(char) * (length));
 	if (!result)
 		return (NULL);
 	i = 0;
-	while (i < length)
+	while (i < length - 1)
 	{
-		result[i] = str[i];
+		result[i] = str[i + 1];
 		i++;
 	}
 	result[i] = '\0';

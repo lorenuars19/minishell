@@ -21,7 +21,7 @@ int	get_quote_token(char *line, t_token *token, int *index)
 	token->data = ft_strcdup(line, token->type);
 	if (token->data == NULL)
 		return (MALLOC_ERROR);
-	(*index) += str_len(token->data);
+	(*index) += str_len(token->data) + 2;
 	return (0);
 }
 

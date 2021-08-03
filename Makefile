@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/07/30 13:34:03 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/08/03 13:57:29 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,7 +49,10 @@ LDFLAGS = -lreadline -ltermcap $(LIB_UTILS)
 # **************************************************************************** #
 
 SRCS = \
-	./src/variable_expansion.c \
+	./src/merge_tokens.c \
+	./src/scanner.c \
+	./src/main.c \
+	./src/syntax_checker.c \
 	./src/parser.c \
 	./src/scanner_utils.c \
 	./src/exec.c \

@@ -2,11 +2,6 @@
 #include "parsing.h"
 #include <stdlib.h>
 
-t_bool	ft_isspace(char c)
-{
-	return (str_has(SPACE_STRING, c));
-}
-
 int	get_variable_length(char *data)
 {
 	int	length;
@@ -19,7 +14,7 @@ int	get_variable_length(char *data)
 	return (length);
 }
 
-static	void	ft_strncpy(char *dest, char *src, int n)
+int	ft_strncpy(char *dest, char *src, int n)
 {
 	int	i;
 
@@ -30,6 +25,7 @@ static	void	ft_strncpy(char *dest, char *src, int n)
 		i++;
 	}
 	dest[i] = '\0';
+	return (i);
 }
 
 char	*get_variable_name(t_token *token)
