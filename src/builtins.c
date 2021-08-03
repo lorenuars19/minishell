@@ -1,4 +1,6 @@
 #include "minishell.h"
+#include <unistd.h>
+#include <stdlib.h>
 
 int builtin_echo(char *argv[], char *envp[])
 {
@@ -37,9 +39,15 @@ int builtin_cd(char *argv[], char *envp[])
 
 int builtin_pwd(char *argv[], char *envp[])
 {
+	char	*pwd;
+
 	(void)argv;
 	(void)envp;
-
+	pwd = getcwd(NULL, 0);
+	if (!pwd)
+		return (1);
+	printf("%s\n", pwd);
+	free(pwd);
 	return (0);
 }
 
