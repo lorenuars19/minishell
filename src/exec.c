@@ -94,7 +94,10 @@ int exec_builtin(t_node *node, char *envp[], int index)
 	if (index >= 0 && index < BUILTIN_END)
 	{
 		if (builtins[index](node->args, envp))
+		{
+BM(ERROR FROM BUILTIN)
 			return (1);
+		}
 	}
 	return (0);
 }
@@ -112,12 +115,19 @@ int exec_command(t_node *node, char *envp[])
 	else if (cpid == FORKED_CHILD)
 	{
 		if (check_for_builtins(node, envp))
+		{
+			BM(ERROR BUILTIN)
 			return (1);
+		}
+		return (0);
 	}
 	else
 	{
 		//TODO parent stuff
+DE(cpid)
 		status = wait_for_child(cpid);
+
+DE(status);
 
 		if (status)
 		{
@@ -131,21 +141,37 @@ int exec_command(t_node *node, char *envp[])
 
 int wait_for_child(pid_t cpid)
 {
-	int wstatus;
-	pid_t w;
+	int	wstatus;
+	pid_t	w;
 
-	w = waitpid(cpid, &wstatus, WUNTRACED | WCONTINUED);
+DE(cpid)
+
+	w = waitpid(cpid, &wstatus, WUNTRACED);
+DE(cpid)
+DE(w);
 	if (w == -1)
 		return (-1);
+DE(cpid)
+	wstatus = 1;
 	while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus))
 	{
-		w = waitpid(cpid, &wstatus, WUNTRACED | WCONTINUED);
+BM(LOOP)
+		w = waitpid(cpid, &wstatus, WUNTRACED);
 		if (WIFEXITED(wstatus))
+		{
+DE(WEXITSTATUS(wstatus))
 			return (WEXITSTATUS(wstatus));
+		}
 		else if (WIFSIGNALED(wstatus))
+		{
+DE(WTERMSIG(wstatus))
 			return (WTERMSIG(wstatus));
+		}
 		else if (WIFSTOPPED(wstatus))
+		{
+DE(WIFSTOPPED(wstatus))
 			return (WSTOPSIG(wstatus));
+		}
 	}
 	return (0);
 }

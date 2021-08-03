@@ -19,12 +19,18 @@ int builtin_echo(char *argv[], char *envp[])
 int builtin_cd(char *argv[], char *envp[])
 {
 	(void)envp;
-	(void)argv;
+	if (argv && chdir(argv[1]))
+	{
+		return (error_sys_put(errno));
+	}
 	return (0);
 }
 
 int builtin_pwd(char *argv[], char *envp[])
 {
+	(void)envp;
+	(void)argv;
+
 	char buf[BUFF_SIZ + 1];
 
 	if (!getcwd(buf, BUFF_SIZ))
