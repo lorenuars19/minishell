@@ -95,7 +95,6 @@ int exec_builtin(t_node *node, char *envp[], int index)
 	{
 		if (builtins[index](node->args, envp))
 		{
-BM(ERROR FROM BUILTIN)
 			return (1);
 		}
 	}
@@ -110,70 +109,67 @@ int exec_command(t_node *node, char *envp[])
 	cpid = fork();
 	if (cpid < 0)
 	{
-		return (1);
+		return (error_sys_put(errno));
 	}
 	else if (cpid == FORKED_CHILD)
 	{
 		if (check_for_builtins(node, envp))
 		{
 			BM(ERROR BUILTIN)
-			return (1);
+			exit(1);
 		}
-		return (0);
+		exit(0);
 	}
 	else
 	{
 		//TODO parent stuff
-DE(cpid)
 		status = wait_for_child(cpid);
-
-DE(status);
-
 		if (status)
 		{
-			return (error_printf(status, "Child Status code : %d\n", status));
+			return (error_printf(status, "child exit code : %d\n", status));
 		}
-
 		//TODO close pipe ? or other sutff maybe IDK
 	}
 	return (0);
 }
 
-int wait_for_child(pid_t cpid)
+int	sub_wait_for_child(int wstatus)
 {
-	int	wstatus;
-	pid_t	w;
-
-DE(cpid)
-
-	w = waitpid(cpid, &wstatus, WUNTRACED);
-DE(cpid)
-DE(w);
-	if (w == -1)
-		return (-1);
-DE(cpid)
-	wstatus = 1;
-	while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus))
-	{
-BM(LOOP)
-		w = waitpid(cpid, &wstatus, WUNTRACED);
-		if (WIFEXITED(wstatus))
+	if (WIFEXITED(wstatus))
 		{
-DE(WEXITSTATUS(wstatus))
 			return (WEXITSTATUS(wstatus));
 		}
 		else if (WIFSIGNALED(wstatus))
 		{
-DE(WTERMSIG(wstatus))
 			return (WTERMSIG(wstatus));
 		}
 		else if (WIFSTOPPED(wstatus))
 		{
-DE(WIFSTOPPED(wstatus))
 			return (WSTOPSIG(wstatus));
 		}
+	return (wstatus);
+}
+
+int wait_for_child(pid_t cpid)
+{
+	int	ret;
+	int	wstatus;
+	pid_t	w;
+
+	w = waitpid(cpid, &wstatus, WUNTRACED);
+	if (w == -1)
+		return (-1);
+	ret = sub_wait_for_child(wstatus);
+	if (ret)
+		return (ret);
+	while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus))
+	{
+		w = waitpid(cpid, &wstatus, WUNTRACED);
+		ret = sub_wait_for_child(wstatus);
+		if (ret)
+			return (ret);
 	}
-	return (0);
+	return (ret);
 }
 
 int exec_piped(t_node *node, t_ctx *ctx, char *envp[])
