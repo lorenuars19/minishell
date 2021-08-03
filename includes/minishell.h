@@ -14,6 +14,9 @@
 # include "parsing.h"
 # include "exec.h"
 
+# include "debug_utils.h" // Debugging Helper
+
+
 # define HEREDOC_FILENAME "/tmp/.minishell_heredoc.txt"
 
 #endif
