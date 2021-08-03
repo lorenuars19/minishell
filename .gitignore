@@ -54,3 +54,5 @@ dkms.conf
 
 minishell
 .*
+random.txt
+valgrind-out.txt

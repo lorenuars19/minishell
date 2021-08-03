@@ -1,6 +1,7 @@
 #include "minishell.h"
 #include <stdlib.h>
 
+
 int main(int argc, char **argv, char **envp)
 {
 	(void)argc;
@@ -9,30 +10,30 @@ int main(int argc, char **argv, char **envp)
 
 	while (1)
 	{
-		line = readline("\033[32;1mMINISHELL \033[0m\033[33;1m>\033[0m ");
+		line = readline("$>");
 		if (line)
-			printf("Input : \"%s\"\n", line);
+			printf("Here is the line: <%s>\n", line);
+		else
+		{
+			printf("Readline is NULL\n");
+			//free everything before exiting
+			exit(EXIT_FAILURE);
+		}
 		if (line && *line)
 			add_history(line);
-		// char *str = ft_strdup_set(line, SPECIAL_CHARS);
-		// printf("<%s>\n", str);
-		// free(str);
-		if (is_there_unclosed_quotes(line))
+		t_token *tokens = scanner(line);
+		if (syntax_checker(line, tokens) != 0)
 		{
+			free_tokens_with_data(tokens);
 			free(line);
 			continue ;
 		}
-		t_token *tokens = scanner(line);
 		expand_variables(envp, tokens);
 		merge_tokens(tokens);
 		print_tokens(tokens);
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);
-		// exec
-		execution(nodes);
-
-
-		free_tokens(tokens);
+		free_tokens_without_data(tokens);
 		free_nodes(nodes);
 		if (str_cmp("exit", line) == 0)
 		{

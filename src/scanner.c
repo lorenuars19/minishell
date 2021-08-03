@@ -57,10 +57,21 @@ int get_pipe_token(char *line, t_token *token, int *index)
 
 int get_redirection_token(char *line, t_token *token, int *index)
 {
-	(void)line;
-	token->type = get_char_type(*line);
-	token->data = NULL;
-	(*index)++;
+	if (*line == '<' && *(line + 1) == '<')
+	{
+		token->type = T_HEREDOC;
+		*index += 2;
+	}
+	else if (*line == '>' && *(line + 1) == '>')
+	{
+		token->type = T_APPEND;
+		*index += 2;
+	}
+	else
+	{
+		token->type = get_char_type(*line);
+		(*index)++;
+	}
 	return (0);
 }
 
@@ -76,6 +87,8 @@ t_token	*scanner(char *line)
 	len = str_len(line);
 	if (len == 0)
 		return (NULL);
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
 	tokens = ft_calloc(1, sizeof(t_token));
 	if (!tokens)
 		return (NULL);
@@ -101,7 +114,7 @@ t_token	*scanner(char *line)
 			current_token->next = ft_calloc(1, sizeof(t_token));
 			if (!current_token->next)
 			{
-				free_tokens(tokens);
+				free_tokens_with_data(tokens);
 				return (NULL);
 			}
 			current_token = current_token->next;

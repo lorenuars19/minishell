@@ -37,6 +37,27 @@ t_token	*merge_next_tokens(t_token	*tokens)
 	return (tokens);
 }
 
+t_token *delete_superfluous_blank_tokens(t_token *tokens)
+{
+	t_token *current_token;
+	t_token *temp;
+
+	if (!tokens)
+		return (NULL);
+	current_token = tokens;
+	while (current_token->next)
+	{
+		if (current_token->next->type == T_BLANK)
+		{
+			temp = current_token->next->next;
+			free(current_token->next);
+			current_token->next = temp;
+		}
+		current_token = current_token->next;
+	}
+	return (tokens);
+}
+
 t_token	*merge_tokens(t_token *tokens)
 {
 	t_token	*current_token;
@@ -50,5 +71,6 @@ t_token	*merge_tokens(t_token *tokens)
 		else
 			current_token = current_token->next;
 	}
+	delete_superfluous_blank_tokens(tokens);
 	return (tokens);
 }
