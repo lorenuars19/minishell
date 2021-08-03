@@ -2,6 +2,8 @@
 # define MINISHELL_H
 
 # include <stdio.h>
+# include <unistd.h>
+# include <errno.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/types.h>

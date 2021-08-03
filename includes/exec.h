@@ -9,7 +9,7 @@ typedef struct s_pipe_context
 	int	close_fd;
 }	t_ctx;
 
-int	execution(t_node *nodes);
+int	execution(t_node *node, char *envp[]);
 
 
 #endif
