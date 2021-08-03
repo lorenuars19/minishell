@@ -1,15 +1,17 @@
+#include <stdlib.h>
 #include "minishell.h"
 
 int	execution(t_node *node, char *envp[])
 {
 	t_ctx ctx;
 
-	exec_nodes(node, &ctx);
+	if (exec_nodes(node, &ctx, envp))
+		return (1);
 
 	return (0);
 }
 
-int exec_nodes(t_node *node, t_ctx * ctx)
+int exec_nodes(t_node *node, t_ctx * ctx, char *envp[])
 {
 	if (node->type == COMMAND_NODE)
 	{
@@ -18,7 +20,7 @@ int exec_nodes(t_node *node, t_ctx * ctx)
 	}
 	else if (node->type == PIPE_NODE)
 	{
-		if (exec_piped(node))
+		if (exec_piped(node, ctx, envp))
 			return (1);
 	}
 	else
@@ -28,10 +30,21 @@ int exec_nodes(t_node *node, t_ctx * ctx)
 	return (0);
 }
 
-int exec_command(t_node *node, char *envp[])
+int find_and_execute(t_node *node)
+{
+	char *path;
+
+	path = getenv("PATH");
+
+DE(path)
+DM(find_and_execute, node)
+
+	return (0);
+}
+
+int exec_command(t_node *node)
 {
 	int		cpid;
-	char	*path;
 
 	if (node->type != COMMAND_NODE)
 		return (1);
@@ -43,22 +56,24 @@ int exec_command(t_node *node, char *envp[])
 	}
 	else if (cpid == FORKED_CHILD)
 	{
-		// TODO chidl stuff
-		path = get_path(node);
-		if (!path)
-		{
-			free(path);
+		if (find_and_execute(node))
 			return (1);
-		}
-		int ret = execve(path, node->args, envp);
-		if (ret < 0)
-		{
-			error_sys_put(errno);
-		}
 	}
 	else
 	{
 		//TODO parent stuff
+		//TODO close pipe ? or other sutff maybe IDK
 	}
 	return(0);
+}
+
+
+int exec_piped(t_node * node, t_ctx *ctx, char *envp[])
+{
+	if (node->type != PIPE_NODE)
+		return(1);
+
+DBM(EX_PIPE, node, ctx, ctx->fd[0], ctx->fd[1], ctx->close_fd, envp)
+
+	return (0);
 }
