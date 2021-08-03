@@ -1,6 +1,6 @@
-#include "parsing.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "minishell.h"
 
 t_bool	is_pipe_next(t_token *tokens)
 {
@@ -145,7 +145,8 @@ void	get_redirections(t_token *tokens, t_node *node)
 				current_redirection->next = ft_calloc(1, sizeof(t_redirection));
 				current_redirection = current_redirection->next;
 			}
-			current_redirection->mode = current_token->type;
+			// TODO fix compilation error
+			current_redirection->mode = (t_redirection_mode)current_token->type;
 			current_redirection->filename = get_filename(current_token);
 		}
 		current_token = current_token->next;
@@ -248,7 +249,7 @@ void	print_nodes(t_node *nodes, int spaces)
 	if (nodes->type == COMMAND_NODE)
 	{
 		indent(spaces);
-		printf("COMMAND(");
+		printf("\033[33;1mCOMMAND\033[0m(");
 		printf("ARGS: ");
 		print_args(nodes);
 		printf("; REDIRECTIONS: ");

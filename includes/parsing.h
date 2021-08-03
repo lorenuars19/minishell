@@ -34,13 +34,6 @@ typedef	struct s_token
 	struct s_token	*next;
 }	t_token;
 
-typedef	enum	e_node_type
-{
-	COMMAND_NODE,
-	PIPE_NODE
-}	t_node_type;
-
-
 typedef	enum e_redirection_mode
 {
 	M_INPUT = T_SMALLER,
@@ -57,6 +50,12 @@ typedef	struct s_redirection
 }	t_redirection;
 
 typedef	struct s_node	t_node;
+
+typedef	enum	e_node_type
+{
+	COMMAND_NODE,
+	PIPE_NODE
+}	t_node_type;
 
 struct s_node
 {

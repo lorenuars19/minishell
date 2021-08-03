@@ -1,5 +1,5 @@
-#include "parsing.h"
 #include <stdlib.h>
+#include "minishell.h"
 
 t_bool	should_next_tokens_be_merged(t_token *tokens)
 {

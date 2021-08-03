@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: aclose <marvin@42.fr>                      +#+  +:+       +#+         #
+#    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/07/14 23:24:10 by aclose           ###   ########.fr        #
+#    Updated: 2021/08/03 21:18:52 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,10 @@ NAME	= minishell
 
 # Compiler and compiling flags
 CC	= gcc
+
+ifneq ($(SOFT), 1)
 CFLAGS	= -Wall -Werror -Wextra
+endif
 
 # Debug, use with`make DEBUG=1`
 ifeq ($(DEBUG),1)
@@ -33,10 +36,15 @@ OBJDIR	= bin/
 CFLAGS	+= -I $(INCDIR)
 
 CFLAGS += -I ./lib/lib_utils/includes/
+
+ifeq ($(DBG),1)
+	CFLAGS += -g3 -fsanitize=address -fsanitize=leak
+endif
+
 # Linking stage flags
 LIB_UTILS = ./lib/lib_utils/libutils.a
 
-LDFLAGS = -lreadline $(LIB_UTILS)
+LDFLAGS = -lreadline -ltermcap $(LIB_UTILS)
 
 ###▼▼▼<src-updater-do-not-edit-or-remove>▼▼▼
 # **************************************************************************** #
@@ -44,18 +52,22 @@ LDFLAGS = -lreadline $(LIB_UTILS)
 # **************************************************************************** #
 
 SRCS = \
-	./src/merge_tokens.c \
-	./src/scanner.c \
-	./src/handle_heredoc.c \
-	./src/main.c \
 	./src/syntax_checker.c \
+	./src/variable_expansion.c \
 	./src/parser.c \
 	./src/scanner_utils.c \
-	./src/variable_expansion.c \
+	./src/builtins.c \
+	./src/exec.c \
+	./src/scanner.c \
+	./src/merge_tokens.c \
+	./src/main.c \
+	./src/handle_heredoc.c \
 
 HEADERS = \
-	./includes/parsing.h\
+	./includes/exec.h\
+	./includes/debug_utils.h\
 	./includes/minishell.h\
+	./includes/parsing.h\
 
 ###▲▲▲<src-updater-do-not-edit-or-remove>▲▲▲
 
@@ -76,10 +88,16 @@ VPATH := $(SRCDIR) $(OBJDIR) $(shell find $(SRCDIR) -type d)
 
 # ================================== RULES =================================== #
 
+ifneq ($(NOLIB), 1)
 define MAKE_LIB_UTILS =
-@printf "$(GR)=== Compile $(dir $(LIB_UTILS)) $(MAKECMDGOALS) $(RC)\n"
-@$(MAKE) -C $(dir $(LIB_UTILS)) $(MAKECMDGOALS)
+	@printf "$(GR)=== Compile $(dir $(LIB_UTILS)) $(MAKECMDGOALS) $(RC)\n"
+	@$(MAKE) -C $(dir $(LIB_UTILS)) $(MAKECMDGOALS)
 endef
+else
+define MAKE_LIB_UTILS =
+	@echo Compiled without library
+endef
+endif
 
 all : $(LIB_UTILS) $(NAME)
 
