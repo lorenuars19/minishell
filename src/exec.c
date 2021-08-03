@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "minishell.h"
 
-int	execution(t_node *node, char *envp[])
+int execution(t_node *node, char *envp[])
 {
 	t_ctx ctx;
 
@@ -11,11 +11,11 @@ int	execution(t_node *node, char *envp[])
 	return (0);
 }
 
-int exec_nodes(t_node *node, t_ctx * ctx, char *envp[])
+int exec_nodes(t_node *node, t_ctx *ctx, char *envp[])
 {
 	if (node->type == COMMAND_NODE)
 	{
-		if (exec_command(node))
+		if (exec_command(node, envp))
 			return (1);
 	}
 	else if (node->type == PIPE_NODE)
@@ -39,22 +39,63 @@ int find_and_execute(t_node *node)
 
 	tab = str_split(path, ":");
 
-	for (int i = 0 ; tab && tab[i]; i++)
+	for (int i = 0; tab && tab[i]; i++)
 	{
 		printf("paths tab[i %d] \"%s\"\n", i, tab[i]);
 	}
 
 	(void)node;
 
+	// 		   V-> getcwd() CWD . ./
+	// 1. execve(path, argv, envp)
+
+	// >>
+
+	// while (
+	// 	exec (join(tab[i], ))
+	// )
+
 	return (0);
 }
 
-int exec_command(t_node *node)
+int check_for_builtins(t_node *node, char *envp[])
 {
-	int		cpid;
+	static char *builtins[] = {
+		"echo",
+		"cd",
+		"pwd",
+		"export",
+		"env",
+		"exit",
+		NULL
+	};
 
-	if (node->type != COMMAND_NODE)
+	int i;
+DE(node->args[0])
+	i = 0;
+	while (node->args && node->args[0] &&  builtins[i]
+		&& str_cmp(node->args[0], builtins[0]))
+		i++;
+	if (exec_builtin(node, envp))
 		return (1);
+}
+
+int	exec_builtin(t_node *node, char *envp[])
+{
+	static (int builtins[])(char **argv) = {
+		builtin_echo,
+		builtin_cd,
+		builtin_pwd,
+		builtin_export,
+		builtin_env,
+		builtin_exit
+	};
+}
+
+int exec_command(t_node *node, char *envp[])
+{
+	int		status;
+	pid_t	cpid;
 
 	cpid = fork();
 	if (cpid < 0)
@@ -63,24 +104,52 @@ int exec_command(t_node *node)
 	}
 	else if (cpid == FORKED_CHILD)
 	{
-		if (find_and_execute(node))
+		if (check_for_builtins(node))
 			return (1);
 	}
 	else
 	{
 		//TODO parent stuff
+		status = wait_for_child(cpid);
+
 		//TODO close pipe ? or other sutff maybe IDK
 	}
-	return(0);
+	return (0);
 }
 
+int wait_for_child(pid_t cpid)
+{
+	int wstatus;
+	pid_t w;
 
-int exec_piped(t_node * node, t_ctx *ctx, char *envp[])
+	w = waitpid(cpid, &wstatus, WUNTRACED | WCONTINUED);
+	if (w == -1)
+	{
+		perror("waitpid");
+		exit(EXIT_FAILURE);
+		while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus))
+		{
+			w = waitpid(cpid, &wstatus, WUNTRACED | WCONTINUED);
+		}
+		if (WIFEXITED(wstatus))
+			return (EXITSTATUS(wstatus));
+		else if (WIFSIGNALED(wstatus))
+			return (WTERMSIG(wstatus));
+		else if (WIFSTOPPED(wstatus))
+			return (WSTOPSIG(wstatus));
+		else if (WIFCONTINUED(wstatus))
+		{
+			printf("continued\n");
+		}
+	}
+}
+
+int exec_piped(t_node *node, t_ctx *ctx, char *envp[])
 {
 	if (node->type != PIPE_NODE)
-		return(1);
+		return (1);
 
-DBM(EX_PIPE, node, ctx, ctx->fd[0], ctx->fd[1], ctx->close_fd, envp)
+	DBM(exec_piped, node, ctx, ctx->fd[0], ctx->fd[1], ctx->close_fd, envp)
 
 	return (0);
 }
