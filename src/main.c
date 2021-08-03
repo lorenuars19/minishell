@@ -29,7 +29,7 @@ int main(int argc, char **argv, char **envp)
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);
 		// exec
-		execution(nodes, NULL);
+		execution(nodes);
 
 
 		free_tokens(tokens);
