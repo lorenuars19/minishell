@@ -25,6 +25,8 @@ int builtin_cd(char *argv[], char *envp[])
 
 int builtin_pwd(char *argv[], char *envp[])
 {
+	(void)argv;
+	(void)envp;
 	char buf[BUFF_SIZ + 1];
 
 	if (!getcwd(buf, BUFF_SIZ))
