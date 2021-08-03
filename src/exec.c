@@ -73,12 +73,8 @@ int check_for_builtins(t_node *node, char *envp[])
 	};
 	i = 0;
 	while (node->args && node->args[0] && builtins[i]
-		&& str_cmp(node->args[0], builtins[0]))
+		&& str_cmp(node->args[0], builtins[i]))
 		i++;
-DM(builtin, builtins[i]);
-DE(i);
-D_STR_DETAILS(node->args[0])
-
 	if (exec_builtin(node, envp, i))
 		return (1);
 	return (0);

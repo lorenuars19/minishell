@@ -27,8 +27,6 @@ int builtin_pwd(char *argv[], char *envp[])
 {
 	char buf[BUFF_SIZ + 1];
 
-DM(builtin_pwd, buf);
-
 	if (!getcwd(buf, BUFF_SIZ))
 		return (1);
 	put_str_nl(buf);
