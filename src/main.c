@@ -10,7 +10,7 @@ int main(int argc, char **argv, char **envp)
 
 	while (1)
 	{
-		line = readline("$>");
+		line = readline("$ >");
 		if (line)
 			printf("Here is the line: <%s>\n", line);
 		else
