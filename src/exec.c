@@ -167,23 +167,14 @@ char	*find_path(t_node *node)
 
 	path = getenv("PATH");
 
+	printf("PATH \"%s\"\n", path);
+
 	tab = str_split(path, ":");
 
 	for (int i = 0; tab && tab[i]; i++)
 	{
 		printf("paths tab[i %d] \"%s\"\n", i, tab[i]);
 	}
-
-	(void)node;
-
-	// 		   V-> getcwd() CWD . ./
-	// 1. execve(path, argv, envp)
-
-	// >>
-
-	// while (
-	// 	exec (join(tab[i], ))
-	// )
 
 	return (NULL);
 }
