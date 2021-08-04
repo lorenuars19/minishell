@@ -46,14 +46,15 @@ int builtin_cd(char *argv[], char *envp[])
 
 int builtin_pwd(char *argv[], char *envp[])
 {
-	(void)envp;
+	char	*pwd;
+
 	(void)argv;
-
-	char buf[BUFF_SIZ + 1];
-
-	if (!getcwd(buf, BUFF_SIZ))
+	(void)envp;
+	pwd = getcwd(NULL, 0);
+	if (!pwd)
 		return (1);
-	printf("%s\n", buf);
+	printf("%s\n", pwd);
+	free(pwd);
 	return (0);
 }
 
@@ -79,7 +80,7 @@ int builtin_env(char *argv[], char *envp[])
 	i = 0;
 	while (envp && envp[i])
 	{
-		put_str_nl(envp[i]);
+		printf("%s\n", envp[i]);
 		i++;
 	}
 	return (0);
