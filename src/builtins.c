@@ -30,7 +30,14 @@ int builtin_echo(char *argv[], char *envp[])
 int builtin_cd(char *argv[], char *envp[])
 {
 	(void)envp;
-	if (argv && chdir(argv[1]))
+
+	char *path;
+
+	if (argv && !argv[1])
+		path = getenv("HOME");
+	else if (argv && argv[1])
+		path = argv[1];
+	if (chdir(path))
 	{
 		return (error_sys_put(errno));
 	}
