@@ -150,41 +150,55 @@ int	exec_binary(t_node *node, char *envp[])
 	if (!path)
 		return (error_put(1, "path is \033[7mNULL"));
 
-	printf("path \"%s\"\n", path);
+
+	printf("\033[32;1mexecve\033[0m(path \"%s\", node->args <%p>, envp <%p>) \n\033[34m>->->->->->->->->\033[0m\n", path, node->args, envp);
+
 
 	status = execve(path, node->args, envp);
+
+	free(path);
 
 	return (status);
 }
 
 char	*find_path(t_node *node)
 {
-	char *path;
-	char **tab;
+	char	*path;
+	char	**tab;
+	int		i;
 
 	if (node->args && node->args[0] && is_path_executable(node->args[0]))
 		return (node->args[0]);
-
 	path = getenv("PATH");
-
-	printf("PATH \"%s\"\n", path);
-
 	tab = str_split(path, ":");
-
-	for (int i = 0; tab && tab[i]; i++)
+	i = 0;
+	while (tab && tab[i] && node->args && node->args[0])
 	{
-		printf("paths tab[i %d] \"%s\"\n", i, tab[i]);
+		path = str_jointo(tab[i], "/", NULL);
+		path = str_jointo(path, node->args[0], &path);
+		if (is_path_executable(path))
+		{
+			return (path);
+		}
+		free(path);
+		i++;
 	}
-
 	return (NULL);
 }
 
 int	is_path_executable(char *path)
 {
+	struct stat	sb;
+
 	if (!path)
 		return (0);
 
 	// TODO test if path is an executable file
-
+	if (stat(path, &sb))
+		return (0);
+	if (S_ISREG(sb.st_mode) && sb.st_mode & 0111)
+	{
+		return (1);
+	}
 	return (0);
 }
