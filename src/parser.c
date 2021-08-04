@@ -249,7 +249,7 @@ void	print_nodes(t_node *nodes, int spaces)
 	if (nodes->type == COMMAND_NODE)
 	{
 		indent(spaces);
-		printf("COMMAND(");
+		printf("\033[32mCOMMAND\033[0m(");
 		printf("ARGS: ");
 		print_args(nodes);
 		printf("; REDIRECTIONS: ");
@@ -259,13 +259,12 @@ void	print_nodes(t_node *nodes, int spaces)
 	else if (nodes->type == PIPE_NODE)
 	{
 		indent(spaces);
-		printf("PIPE(\n");
+		printf("\033[33mPIPE\033[0m(\n");
 		print_nodes(nodes->left, spaces + 2);
 		print_nodes(nodes->right, spaces + 2);
 		indent(spaces);
 		printf(")\n");
 	}
-	printf("\n=== RESULT ===\n\n");
 }
 
 static void	free_args(char **args)

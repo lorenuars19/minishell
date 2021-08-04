@@ -53,7 +53,7 @@ int builtin_pwd(char *argv[], char *envp[])
 
 	if (!getcwd(buf, BUFF_SIZ))
 		return (1);
-	put_str_nl(buf);
+	printf("%s\n", buf);
 	return (0);
 }
 

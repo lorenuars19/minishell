@@ -10,16 +10,16 @@ int main(int argc, char **argv, char **envp)
 
 	while (1)
 	{
+		printf("\033[34m");
 		builtin_pwd(argv, envp);
-		line = readline("\033[32;1m>\033[0m ");
-		if (line)
-			printf("\nline: \"%s\"\n", line);
-		else
+		line = readline("$ \033[32m>\033[0m ");
+		if (!line)
 		{
 			printf("Readline is \033[31;1mNULL\033[0m\n");
-			//free everything before exiting
+			//TODO free everything before exiting
 			exit(EXIT_FAILURE);
 		}
+		printf("\nline: \"%s\"\n", line);
 		if (line && *line)
 			add_history(line);
 		t_token *tokens = scanner(line);
