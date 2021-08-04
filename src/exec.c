@@ -150,9 +150,8 @@ int	exec_binary(t_node *node, char *envp[])
 	if (!path)
 		return (error_put(1, "path is \033[7mNULL"));
 
-
+	//TODO remove debug
 	printf("\033[32;1mexecve\033[0m(path \"%s\", node->args <%p>, envp <%p>) \n\033[34m>->->->->->->->->\033[0m\n", path, node->args, envp);
-
 
 	status = execve(path, node->args, envp);
 
