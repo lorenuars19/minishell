@@ -115,7 +115,6 @@ int exec_command(t_node *node, char *envp[])
 	{
 		if (check_for_builtins(node, envp))
 		{
-			BM(ERROR BUILTIN)
 			exit(1);
 		}
 		exit(0);
@@ -176,8 +175,6 @@ int exec_piped(t_node *node, t_ctx *ctx, char *envp[])
 {
 	if (node->type != PIPE_NODE)
 		return (1);
-
-	DBM(exec_piped, node, ctx, ctx->fd[0], ctx->fd[1], ctx->close_fd, envp)
 
 	return (0);
 }
