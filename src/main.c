@@ -35,7 +35,6 @@ int main(int argc, char **argv, char **envp)
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);
 
-		//TODO Excution
 		execution(nodes, envp);
 
 		free_tokens_without_data(tokens);
