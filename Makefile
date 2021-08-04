@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/08/03 13:57:29 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/08/03 21:18:52 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,10 @@ NAME	= minishell
 
 # Compiler and compiling flags
 CC	= gcc
+
+ifneq ($(SOFT), 1)
 CFLAGS	= -Wall -Werror -Wextra
+endif
 
 # Debug, use with`make DEBUG=1`
 ifeq ($(DEBUG),1)
@@ -53,13 +56,16 @@ SRCS = \
 	./src/variable_expansion.c \
 	./src/parser.c \
 	./src/scanner_utils.c \
+	./src/builtins.c \
 	./src/exec.c \
 	./src/scanner.c \
 	./src/merge_tokens.c \
 	./src/main.c \
+	./src/handle_heredoc.c \
 
 HEADERS = \
 	./includes/exec.h\
+	./includes/debug_utils.h\
 	./includes/minishell.h\
 	./includes/parsing.h\
 
@@ -82,10 +88,16 @@ VPATH := $(SRCDIR) $(OBJDIR) $(shell find $(SRCDIR) -type d)
 
 # ================================== RULES =================================== #
 
+ifneq ($(NOLIB), 1)
 define MAKE_LIB_UTILS =
-@printf "$(GR)=== Compile $(dir $(LIB_UTILS)) $(MAKECMDGOALS) $(RC)\n"
-@$(MAKE) -C $(dir $(LIB_UTILS)) $(MAKECMDGOALS)
+	@printf "$(GR)=== Compile $(dir $(LIB_UTILS)) $(MAKECMDGOALS) $(RC)\n"
+	@$(MAKE) -C $(dir $(LIB_UTILS)) $(MAKECMDGOALS)
 endef
+else
+define MAKE_LIB_UTILS =
+	@echo Compiled without library
+endef
+endif
 
 all : $(LIB_UTILS) $(NAME)
 

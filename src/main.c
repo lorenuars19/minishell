@@ -10,7 +10,8 @@ int main(int argc, char **argv, char **envp)
 
 	while (1)
 	{
-		line = readline("$>");
+		builtin_pwd(argv, envp);
+		line = readline("\033[32;1m>\033[0m ");
 		if (line)
 			printf("Here is the line: <%s>\n", line);
 		else

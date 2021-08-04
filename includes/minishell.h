@@ -2,6 +2,7 @@
 # define MINISHELL_H
 
 # include <stdio.h>
+# include <stdlib.h>
 # include <unistd.h>
 # include <errno.h>
 # include <readline/readline.h>
@@ -13,6 +14,8 @@
 
 # include "parsing.h"
 # include "exec.h"
+
+# include "debug_utils.h" // Debugging Helper
 
 # define HEREDOC_FILENAME "/tmp/.minishell_heredoc.txt"
 
