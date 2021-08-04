@@ -76,7 +76,7 @@ void print_tokens(t_token *tokens)
 	current_token = tokens;
 	while (current_token)
 	{
-		printf("\033[34;1m[TOKEN]\033[0m type <%c>, data <%s>\n", current_token->type, current_token->data);
+		printf("\033[34mTOKEN\033[0m type <%c>, data <%s>\n", current_token->type, current_token->data);
 		current_token = current_token->next;
 	}
 }
