@@ -28,6 +28,11 @@ int exec_nodes(t_node *node, t_ctx * ctx, char *envp[]);
 
 int exec_command(t_node *node, char *envp[]);
 int wait_for_child(pid_t cpid);
+
+int	exec_binary(t_node *node, char *envp[]);
+char *find_path(t_node *node);
+int	is_path_executable(char *path);
+
 int check_for_builtins(t_node *node, char *envp[]);
 int	exec_builtin(t_node *node, char *envp[], int index);
 
@@ -38,8 +43,6 @@ int builtin_export(char *argv[], char *envp[]);
 int builtin_unset(char *argv[], char *envp[]);
 int builtin_env(char *argv[], char *envp[]);
 int builtin_exit(char *argv[], char *envp[]);
-
-
 
 int exec_piped(t_node * node, t_ctx *ctx, char *envp[]);
 

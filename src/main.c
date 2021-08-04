@@ -1,7 +1,6 @@
 #include "minishell.h"
 #include <stdlib.h>
 
-
 int main(int argc, char **argv, char **envp)
 {
 	(void)argc;
@@ -14,7 +13,7 @@ int main(int argc, char **argv, char **envp)
 		if (!line)
 		{
 			printf("Readline is NULL\n");
-			//free everything before exiting
+			//TODO free everything before exiting
 			exit(EXIT_FAILURE);
 		}
 		if (line && *line)
@@ -31,8 +30,7 @@ int main(int argc, char **argv, char **envp)
 		print_tokens(tokens);
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);
-		if (nodes->type == COMMAND_NODE)
-			exec_command(nodes, envp);
+		execution(nodes, envp);
 
 		free_tokens_without_data(tokens);
 		free_nodes(nodes);
