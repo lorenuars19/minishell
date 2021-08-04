@@ -85,6 +85,7 @@ int	exec_command(t_node *node, char *envp[])
 	else
 	{
 		//TODO parent stuff
+		printf("Child PID : %d\n", cpid);
 		status = wait_for_child(cpid);
 		if (status)
 		{
@@ -145,14 +146,24 @@ int	exec_binary(t_node *node, char *envp[])
 	int		status;
 
 	status = 0;
+	path = find_path(node);
+	if (!path)
+		return (error_put(1, "path is \033[7mNULL"));
+
+	printf("path \"%s\"\n", path);
+
+	status = execve(path, node->args, envp);
 
 	return (status);
 }
 
-int find_path(t_node *node)
+char	*find_path(t_node *node)
 {
 	char *path;
 	char **tab;
+
+	if (node->args && node->args[0] && is_path_executable(node->args[0]))
+		return (node->args[0]);
 
 	path = getenv("PATH");
 
@@ -173,6 +184,16 @@ int find_path(t_node *node)
 	// while (
 	// 	exec (join(tab[i], ))
 	// )
+
+	return (NULL);
+}
+
+int	is_path_executable(char *path)
+{
+	if (!path)
+		return (0);
+
+	// TODO test if path is an executable file
 
 	return (0);
 }

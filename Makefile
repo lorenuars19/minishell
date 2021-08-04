@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/08/03 21:18:52 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/08/04 17:09:47 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,8 +37,15 @@ CFLAGS	+= -I $(INCDIR)
 
 CFLAGS += -I ./lib/lib_utils/includes/
 
-ifeq ($(DBG),1)
-	CFLAGS += -g3 -fsanitize=address -fsanitize=leak
+# Debug, use with`make DEBUG=1`
+ifeq ($(DEBUG),1)
+CFLAGS	+= -g3
+endif
+ifeq ($(DEBUG),2)
+CFLAGS	+= -g3 -fsanitize=address
+endif
+ifeq ($(DEBUG),3)
+CFLAGS	+= -g3 -fsanitize=address -fsanitize=leak
 endif
 
 # Linking stage flags
