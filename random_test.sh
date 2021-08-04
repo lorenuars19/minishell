@@ -6,7 +6,7 @@ then
 	exit 0
 fi
 
-cat /dev/urandom | head -n $1 | tr -cd '[:print:]' > random.txt
+cat /dev/urandom | head -n $1 | tr -cd "a |" > random.txt
 
 printf "\nexit\n" >> random.txt
 
