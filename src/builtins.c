@@ -1,18 +1,29 @@
 #include "minishell.h"
+#include <unistd.h>
+#include <stdlib.h>
 
 int builtin_echo(char *argv[], char *envp[])
 {
+	int		i;
+	t_bool	should_print_trailing_nl;
+
 	(void)envp;
-	int i;
-
 	i = 1;
-
-	while (argv && argv[i])
+	should_print_trailing_nl = TRUE;
+	if (*argv && argv[1] && str_cmp(argv[1], "-n") == 0)
 	{
-		put_str(argv[i]);
+		should_print_trailing_nl = FALSE;
+		i = 2;
+	}
+	while (argv[i])
+	{
+		printf("%s", argv[i]);
+		if (argv[i + 1])
+			printf(" ");
 		i++;
 	}
-	put_chr('\n');
+	if (should_print_trailing_nl)
+		printf("\n");
 	return (0);
 }
 
@@ -57,14 +68,13 @@ int builtin_env(char *argv[], char *envp[])
 {
 	int i;
 
+	(void)argv;
 	i = 0;
 	while (envp && envp[i])
 	{
 		put_str_nl(envp[i]);
 		i++;
 	}
-	(void)envp;
-	(void)argv;
 	return (0);
 }
 

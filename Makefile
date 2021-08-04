@@ -52,22 +52,21 @@ LDFLAGS = -lreadline -ltermcap $(LIB_UTILS)
 # **************************************************************************** #
 
 SRCS = \
-	./src/syntax_checker.c \
-	./src/variable_expansion.c \
-	./src/parser.c \
-	./src/scanner_utils.c \
-	./src/builtins.c \
 	./src/exec.c \
-	./src/scanner.c \
 	./src/merge_tokens.c \
-	./src/main.c \
+	./src/scanner.c \
 	./src/handle_heredoc.c \
+	./src/main.c \
+	./src/syntax_checker.c \
+	./src/parser.c \
+	./src/builtins.c \
+	./src/scanner_utils.c \
+	./src/variable_expansion.c \
 
 HEADERS = \
-	./includes/exec.h\
-	./includes/debug_utils.h\
-	./includes/minishell.h\
 	./includes/parsing.h\
+	./includes/minishell.h\
+	./includes/exec.h\
 
 ###▲▲▲<src-updater-do-not-edit-or-remove>▲▲▲
 
