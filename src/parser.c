@@ -265,6 +265,7 @@ void	print_nodes(t_node *nodes, int spaces)
 		indent(spaces);
 		printf(")\n");
 	}
+	printf("\n=== RESULT ===\n\n");
 }
 
 static void	free_args(char **args)
