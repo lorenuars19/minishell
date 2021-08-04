@@ -106,6 +106,12 @@ int exec_command(t_node *node, char *envp[])
 	int status;
 	pid_t cpid;
 
+
+	if (check_for_builtins(node, envp))
+	{
+		return (1);
+	}
+
 	cpid = fork();
 	if (cpid < 0)
 	{
@@ -113,11 +119,8 @@ int exec_command(t_node *node, char *envp[])
 	}
 	else if (cpid == FORKED_CHILD)
 	{
-		if (check_for_builtins(node, envp))
-		{
-			exit(1);
-		}
-		exit(0);
+
+		return (0);
 	}
 	else
 	{
@@ -175,6 +178,9 @@ int exec_piped(t_node *node, t_ctx *ctx, char *envp[])
 {
 	if (node->type != PIPE_NODE)
 		return (1);
+
+	(void)ctx;
+	(void)envp;
 
 	return (0);
 }
