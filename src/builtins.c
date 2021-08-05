@@ -93,3 +93,11 @@ int builtin_exit(char *argv[], char *envp[])
 	exit(0);
 	return (0);
 }
+
+int	builtin_dummy(char *argv[], char *envp[])
+{
+	(void)argv;
+	(void)envp;
+	printf("\nbuiltin_dummy *SHOULD NOT BE EXECUTED*\n");
+	return (0);
+}

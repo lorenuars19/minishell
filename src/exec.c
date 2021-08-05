@@ -44,15 +44,7 @@ int	exec_nodes(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[])
 ** BUILTINS
 */
 
-int	builtin_dummy(char *argv[], char *envp[])
-{
-	(void)argv;
-	(void)envp;
-	printf("\nbuiltin_dummy\n");
-	return (0);
-}
-
-t_builtin_f get_builtin(int index)
+static t_builtin_f get_builtin(int index)
 {
 	static t_builtin_f	builtins[] = {
 		builtin_echo,
@@ -70,7 +62,7 @@ t_builtin_f get_builtin(int index)
 	return (builtin_dummy);
 }
 
-int	check_for_builtins(t_exdat *ed, t_node *node, char *envp[])
+static int	check_for_builtins(t_exdat *ed, t_node *node)
 {
 	int i;
 	static char *builtins[] = {
@@ -97,9 +89,12 @@ int	check_for_builtins(t_exdat *ed, t_node *node, char *envp[])
 	return (0);
 }
 
-/*
-** COMMAND EXECUTION
-*/
+
+#define DEBUG_ED \
+printf("\033[32;1mexec_command\033[0m : ed builtin_mode %s\033[0m fork_or_not %s\033[0m f_to_call <%p>\n", \
+		(ed->builtin_mode == YES_BUILTIN) ? ("\033[32mBUILTIN") : ("\033[31mBINARY"),\
+		(ed->fork_or_not == YES_FORK) ? ("\033[32mFORKED") : ("\033[31mNOT FORKED"), \
+		ed->f_to_call);
 
 int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
@@ -108,8 +103,10 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 
 	*ed = (t_exdat){NOT_BUILTIN, YES_FORK, builtin_dummy};
 
-	if (check_for_builtins(ed, node, envp))
+	if (check_for_builtins(ed, node))
 		return (1);
+
+DEBUG_ED;
 
 	cpid = 0;
 	if (ed->fork_or_not == YES_FORK)
@@ -119,6 +116,10 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 		return (error_sys_put(errno));
 	else if (cpid == FORKED_CHILD)
 	{
+
+DEBUG_ED;
+
+
 		if (ed->builtin_mode == YES_BUILTIN)
 			return (ed->f_to_call(node->args, envp));
 		return (exec_binary(node, envp));
@@ -175,20 +176,6 @@ int	wait_for_child(pid_t cpid)
 	return (ret);
 }
 
-/*
-** PIPES EXEC
-*/
-
-int	exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[])
-{
-	if (node->type != PIPE_NODE)
-		return (1);
-
-	(void)ctx;
-	(void)envp;
-
-	return (0);
-}
 
 /*
 ** Finding Binary in $PATH
@@ -254,4 +241,19 @@ int	exec_binary(t_node *node, char *envp[])
 	free(path);
 
 	return (status);
+}
+
+/*
+** PIPES EXEC
+*/
+
+int	exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[])
+{
+
+	(void)ed;
+	(void)node;
+	(void)ctx;
+	(void)envp;
+
+	return (0);
 }
