@@ -86,14 +86,6 @@ int builtin_env(char *argv[], char *envp[])
 	return (0);
 }
 
-int builtin_exit(char *argv[], char *envp[])
-{
-	(void)envp;
-	(void)argv;
-	exit(0);
-	return (0);
-}
-
 int	builtin_dummy(char *argv[], char *envp[])
 {
 	(void)argv;

@@ -1,7 +1,6 @@
 #include "minishell.h"
 #include <stdlib.h>
 
-
 int main(int argc, char **argv, char **envp)
 {
 	(void)argc;
@@ -43,8 +42,9 @@ int main(int argc, char **argv, char **envp)
 		{
 			free(line);
 printf("\033[32;1mMINISHELL KILLED FROM MAIN\033[0m\n");
-			exit(EXIT_SUCCESS);
+			return (EXIT_SUCCESS);
 		}
 		free(line);
 	}
+	return (0);
 }

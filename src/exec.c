@@ -53,7 +53,7 @@ static t_builtin_f get_builtin(int index)
 		builtin_export,
 		builtin_unset,
 		builtin_env,
-		builtin_exit
+		builtin_dummy
 		};
 	if (index >= 0 && index < BUILTIN_MAX)
 	{
