@@ -97,7 +97,7 @@ void	sig_handle(int signum)
 
 int	setup_signals(t_revert revert_to_default)
 {
-	if (revert_to_default == YES_REVERT)
+	if (revert_to_default == REVERT_TO_DEFAULT)
 	{
 		if (signal(SIGINT, SIG_DFL) == SIG_ERR)
 			return (error_sys_put(errno));
@@ -117,7 +117,7 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 	g_cpid = 0;
 	if (ed->fork_or_not == YES_FORK)
 	{
-		if (setup_signals(NOT_REVERT))
+		if (setup_signals(DEFER_SIGNAL))
 			return (error_sys_put(errno));
 		g_cpid = fork();
 	}
@@ -142,6 +142,8 @@ printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not 
 		//TODO parent stuff
 		printf("Child PID : %d\n", g_cpid);
 		status = wait_for_child(g_cpid);
+		if (setup_signals(REVERT_TO_DEFAULT))
+			return (error_sys_put(errno));
 		if (status)
 		{
 			return (error_printf(status, "child exit code : %d\n", status));
