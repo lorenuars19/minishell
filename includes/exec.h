@@ -55,7 +55,6 @@ int wait_for_child(pid_t cpid);
 int	exec_binary(t_node *node, char *envp[]);
 
 int	exec_builtin(t_node *node, char *envp[], int index);
-t_builtin_f get_builtin(int index);
 
 /*
 ** BUILTINS
