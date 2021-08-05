@@ -62,7 +62,7 @@ static t_builtin_f get_builtin(int index)
 	return (builtin_dummy);
 }
 
-static int	check_for_builtins(t_exdat *ed, t_node *node)
+static void	check_for_builtins(t_exdat *ed, t_node *node)
 {
 	int i;
 	static char *builtins[] = {
@@ -79,19 +79,18 @@ static int	check_for_builtins(t_exdat *ed, t_node *node)
 		&& str_cmp(node->args[0], builtins[i]))
 		i++;
 
-	if (i == BUILTIN_CD || i == BUILTIN_EXPORT || i == BUILTIN_UNSET || i == BUILTIN_EXIT)
+	if (i == BUILTIN_CD || i == BUILTIN_EXPORT || i == BUILTIN_UNSET)
 		ed->fork_or_not = NOT_FORK;
 
 	ed->f_to_call = get_builtin(i);
-	if (ed->f_to_call == builtin_dummy)
-		return (1);
-	ed->builtin_mode = YES_BUILTIN;
-	return (0);
+
+	if (ed->f_to_call != builtin_dummy)
+		ed->builtin_mode = YES_BUILTIN;
 }
 
 
 #define DEBUG_ED \
-printf("\033[32;1mexec_command\033[0m : ed builtin_mode %s\033[0m fork_or_not %s\033[0m f_to_call <%p>\n", \
+printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not %s\033[0m ed->f_to_call <%p>\n", \
 		(ed->builtin_mode == YES_BUILTIN) ? ("\033[32mBUILTIN") : ("\033[31mBINARY"),\
 		(ed->fork_or_not == YES_FORK) ? ("\033[32mFORKED") : ("\033[31mNOT FORKED"), \
 		ed->f_to_call);
@@ -103,10 +102,7 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 
 	*ed = (t_exdat){NOT_BUILTIN, YES_FORK, builtin_dummy};
 
-	if (check_for_builtins(ed, node))
-		return (1);
-
-DEBUG_ED;
+	check_for_builtins(ed, node);
 
 	cpid = 0;
 	if (ed->fork_or_not == YES_FORK)
@@ -118,7 +114,6 @@ DEBUG_ED;
 	{
 
 DEBUG_ED;
-
 
 		if (ed->builtin_mode == YES_BUILTIN)
 			return (ed->f_to_call(node->args, envp));

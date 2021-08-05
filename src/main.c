@@ -16,7 +16,7 @@ int main(int argc, char **argv, char **envp)
 		if (!line)
 		{
 			printf("Readline is \033[31;1mNULL\033[0m\n");
-			//TODO free everything before exiting
+			free(line);
 			exit(EXIT_FAILURE);
 		}
 		printf("\nline: \"%s\"\n", line);
@@ -42,6 +42,7 @@ int main(int argc, char **argv, char **envp)
 		if (str_cmp("exit", line) == 0)
 		{
 			free(line);
+printf("\033[32;1mMINISHELL KILLED FROM MAIN\033[0m\n");
 			exit(EXIT_SUCCESS);
 		}
 		free(line);
