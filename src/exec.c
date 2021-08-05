@@ -88,32 +88,50 @@ static void	check_for_builtins(t_exdat *ed, t_node *node)
 		ed->builtin_mode = YES_BUILTIN;
 }
 
+static pid_t g_cpid;
 
-#define DEBUG_ED \
-printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not %s\033[0m ed->f_to_call <%p>\n", \
-		(ed->builtin_mode == YES_BUILTIN) ? ("\033[32mBUILTIN") : ("\033[31mBINARY"),\
-		(ed->fork_or_not == YES_FORK) ? ("\033[32mFORKED") : ("\033[31mNOT FORKED"), \
-		ed->f_to_call);
+void	sig_handle(int signum)
+{
+	kill(g_cpid, signum);
+}
+
+int	setup_signals(t_revert revert_to_default)
+{
+	if (revert_to_default == YES_REVERT)
+	{
+		if (signal(SIGINT, SIG_DFL) == SIG_ERR)
+			return (error_sys_put(errno));
+	}
+	if (signal(SIGINT, sig_handle) == SIG_ERR)
+		return (error_sys_put(errno));
+	return (0);
+}
 
 int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
 	int status;
-	pid_t cpid;
 
 	*ed = (t_exdat){NOT_BUILTIN, YES_FORK, builtin_dummy};
-
 	check_for_builtins(ed, node);
 
-	cpid = 0;
+	g_cpid = 0;
 	if (ed->fork_or_not == YES_FORK)
-		cpid = fork();
+	{
+		if (setup_signals(NOT_REVERT))
+			return (error_sys_put(errno));
+		g_cpid = fork();
+	}
 
-	if (cpid < 0)
+	if (g_cpid < 0)
 		return (error_sys_put(errno));
-	else if (cpid == FORKED_CHILD)
+	else if (g_cpid == FORKED_CHILD)
 	{
 
-DEBUG_ED;
+//TODO REMOVE DEBUG
+printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not %s\033[0m ed->f_to_call <%p>\n", \
+		(ed->builtin_mode == YES_BUILTIN) ? ("\033[32mBUILTIN") : ("\033[31mBINARY"),\
+		(ed->fork_or_not == YES_FORK) ? ("\033[32mFORKED") : ("\033[31mNOT FORKED"), \
+		ed->f_to_call);
 
 		if (ed->builtin_mode == YES_BUILTIN)
 			return (ed->f_to_call(node->args, envp));
@@ -122,8 +140,8 @@ DEBUG_ED;
 	else
 	{
 		//TODO parent stuff
-		printf("Child PID : %d\n", cpid);
-		status = wait_for_child(cpid);
+		printf("Child PID : %d\n", g_cpid);
+		status = wait_for_child(g_cpid);
 		if (status)
 		{
 			return (error_printf(status, "child exit code : %d\n", status));
@@ -132,7 +150,6 @@ DEBUG_ED;
 	}
 	return (0);
 }
-
 
 /*
 ** CHILD PROCESS MANAGEMENT
@@ -151,9 +168,9 @@ int	sub_wait_for_child(int wstatus)
 
 int	wait_for_child(pid_t cpid)
 {
-	int ret;
-	int wstatus;
-	pid_t w;
+	pid_t	w;
+	int		ret;
+	int		wstatus;
 
 	w = waitpid(cpid, &wstatus, WUNTRACED);
 	if (w == -1)
@@ -171,7 +188,6 @@ int	wait_for_child(pid_t cpid)
 	return (ret);
 }
 
-
 /*
 ** Finding Binary in $PATH
 */
@@ -182,8 +198,6 @@ static int	is_path_executable(char *path)
 
 	if (!path)
 		return (0);
-
-	// TODO test if path is an executable file
 	if (stat(path, &sb))
 		return (0);
 	if (S_ISREG(sb.st_mode) && sb.st_mode & 0111)

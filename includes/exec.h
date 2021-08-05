@@ -42,6 +42,11 @@ typedef struct s_exec_data
 	t_builtin_f		f_to_call;
 }	t_exdat;
 
+typedef enum e_revert_signal_or_not
+{
+	NOT_REVERT,
+	YES_REVERT
+}	t_revert;
 
 
 int	execution(t_node *node, char *envp[]);
