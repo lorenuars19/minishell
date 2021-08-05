@@ -79,12 +79,12 @@ static void	check_for_builtins(t_exdat *ed, t_node *node)
 		&& str_cmp(node->args[0], builtins[i]))
 		i++;
 
-	if (i == BUILTIN_CD || i == BUILTIN_EXPORT || i == BUILTIN_UNSET)
+	if (i == BUILTIN_CD || i == BUILTIN_EXPORT || i == BUILTIN_UNSET || i == BUILTIN_EXIT)
 		ed->fork_or_not = NOT_FORK;
 
 	ed->f_to_call = get_builtin(i);
 
-	if (ed->f_to_call != builtin_dummy)
+	if (i >= 0 && i < BUILTIN_MAX)
 		ed->builtin_mode = YES_BUILTIN;
 }
 
@@ -106,6 +106,7 @@ int	setup_signals(t_revert revert_to_default)
 		return (error_sys_put(errno));
 	return (0);
 }
+
 
 int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
@@ -146,7 +147,7 @@ printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not 
 			return (error_sys_put(errno));
 		if (status)
 		{
-			return (error_printf(status, "child exit code : %d\n", status));
+			return (status);
 		}
 		//TODO close pipe ? or other sutff maybe IDK
 	}

@@ -1,11 +1,15 @@
 #include "minishell.h"
 #include <stdlib.h>
 
+
 int main(int argc, char **argv, char **envp)
 {
 	(void)argc;
 	(void)argv;
 	char *line = NULL;
+
+	if (setup_signals(REVERT_TO_DEFAULT))
+			return (error_sys_put(errno));
 
 	while (1)
 	{
@@ -16,7 +20,7 @@ int main(int argc, char **argv, char **envp)
 		{
 			printf("Readline is \033[31;1mNULL\033[0m\n");
 			free(line);
-			exit(EXIT_FAILURE);
+			return (0);
 		}
 		printf("\nline: \"%s\"\n", line);
 		if (line && *line)

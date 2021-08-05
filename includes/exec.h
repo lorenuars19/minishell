@@ -26,8 +26,8 @@ typedef	int (*t_builtin_f)(char *argv[], char *envp[]);
 
 typedef enum e_builtin_mode
 {
-	NOT_BUILTIN,
-	YES_BUILTIN
+	BINARY,
+	BUILTIN
 }	t_builtin_mode;
 typedef enum e_fork_or_not
 {
@@ -44,8 +44,8 @@ typedef struct s_exec_data
 
 typedef enum e_revert_signal_or_not
 {
-	NOT_REVERT,
-	YES_REVERT
+	DEFER_SIGNAL,
+	REVERT_TO_DEFAULT
 }	t_revert;
 
 
@@ -74,5 +74,7 @@ int builtin_env(char *argv[], char *envp[]);
 int	builtin_dummy(char *argv[], char *envp[]);
 
 int	exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[]);
+
+int	setup_signals(t_revert revert_to_default);
 
 #endif
