@@ -1,26 +1,37 @@
 #include <stdlib.h>
 #include "minishell.h"
 
+/*
+** WRAPPER to facilitate memory management
+*/
+
 int	execution(t_node *node, char *envp[])
 {
-	t_ctx ctx;
+	t_exdat	ed;
+	t_ctx	ctx;
 
-	if (exec_nodes(node, &ctx, envp))
+	ed = (t_exdat){NOT_BUILTIN, YES_FORK, builtin_dummy};
+
+	if (exec_nodes(&ed, node, &ctx, envp))
 		return (1);
 
 	return (0);
 }
 
-int	exec_nodes(t_node *node, t_ctx *ctx, char *envp[])
+/*
+** The actual starting point that will be called recursively
+*/
+
+int	exec_nodes(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[])
 {
 	if (node->type == COMMAND_NODE)
 	{
-		if (exec_command(node, envp))
+		if (exec_command(ed, node, envp))
 			return (1);
 	}
 	else if (node->type == PIPE_NODE)
 	{
-		if (exec_piped(node, ctx, envp))
+		if (exec_piped(ed, node, ctx, envp))
 			return (1);
 	}
 	else
@@ -29,8 +40,37 @@ int	exec_nodes(t_node *node, t_ctx *ctx, char *envp[])
 	}
 	return (0);
 }
+/*
+** BUILTINS
+*/
 
-int	check_for_builtins(t_node *node, char *envp[])
+int	builtin_dummy(char *argv[], char *envp[])
+{
+	(void)argv;
+	(void)envp;
+	printf("\nbuiltin_dummy\n");
+	return (0);
+}
+
+t_builtin_f get_builtin(int index)
+{
+	static t_builtin_f	builtins[] = {
+		builtin_echo,
+		builtin_cd,
+		builtin_pwd,
+		builtin_export,
+		builtin_unset,
+		builtin_env,
+		builtin_exit
+		};
+	if (index >= 0 && index < BUILTIN_MAX)
+	{
+		return(builtins[index]);
+	}
+	return (builtin_dummy);
+}
+
+int	check_for_builtins(t_exdat *ed, t_node *node, char *envp[])
 {
 	int i;
 	static char *builtins[] = {
@@ -43,45 +83,46 @@ int	check_for_builtins(t_node *node, char *envp[])
 		"exit",
 		NULL};
 	i = 0;
-	while (node->args && node->args[0] && builtins[i] && str_cmp(node->args[0], builtins[i]))
+	while (node->args && node->args[0] && builtins[i] \
+		&& str_cmp(node->args[0], builtins[i]))
 		i++;
-	if (exec_builtin(node, envp, i))
+
+	if (i == BUILTIN_CD || i == BUILTIN_EXPORT || i == BUILTIN_UNSET || i == BUILTIN_EXIT)
+		ed->fork_or_not = NOT_FORK;
+
+	ed->f_to_call = get_builtin(i);
+	if (ed->f_to_call == builtin_dummy)
 		return (1);
+	ed->builtin_mode = YES_BUILTIN;
 	return (0);
 }
 
-int	exec_builtin(t_node *node, char *envp[], int index)
-{
-	static int (*builtins[])(char *argv[], char *envp[]) = {
-		builtin_echo,
-		builtin_cd,
-		builtin_pwd,
-		builtin_export,
-		builtin_unset,
-		builtin_env,
-		builtin_exit};
-	if (index >= 0 && index < BUILTIN_END)
-	{
-		if (builtins[index](node->args, envp))
-		{
-			return (1);
-		}
-	}
-	return (0);
-}
+/*
+** COMMAND EXECUTION
+*/
 
-int	exec_command(t_node *node, char *envp[])
+int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
 	int status;
 	pid_t cpid;
 
-	if (check_for_builtins(node, envp))
+	*ed = (t_exdat){NOT_BUILTIN, YES_FORK, builtin_dummy};
+
+	if (check_for_builtins(ed, node, envp))
 		return (1);
-	cpid = fork();
+
+	cpid = 0;
+	if (ed->fork_or_not == YES_FORK)
+		cpid = fork();
+
 	if (cpid < 0)
 		return (error_sys_put(errno));
 	else if (cpid == FORKED_CHILD)
+	{
+		if (ed->builtin_mode == YES_BUILTIN)
+			return (ed->f_to_call(node->args, envp));
 		return (exec_binary(node, envp));
+	}
 	else
 	{
 		//TODO parent stuff
@@ -95,6 +136,11 @@ int	exec_command(t_node *node, char *envp[])
 	}
 	return (0);
 }
+
+
+/*
+** CHILD PROCESS MANAGEMENT
+*/
 
 int	sub_wait_for_child(int wstatus)
 {
@@ -129,7 +175,11 @@ int	wait_for_child(pid_t cpid)
 	return (ret);
 }
 
-int	exec_piped(t_node *node, t_ctx *ctx, char *envp[])
+/*
+** PIPES EXEC
+*/
+
+int	exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[])
 {
 	if (node->type != PIPE_NODE)
 		return (1);
@@ -140,27 +190,28 @@ int	exec_piped(t_node *node, t_ctx *ctx, char *envp[])
 	return (0);
 }
 
-int	exec_binary(t_node *node, char *envp[])
+/*
+** Finding Binary in $PATH
+*/
+
+static int	is_path_executable(char *path)
 {
-	char	*path;
-	int		status;
+	struct stat	sb;
 
-	status = 0;
-	path = find_path(node);
 	if (!path)
-		return (error_put(1, "path is \033[7mNULL"));
+		return (0);
 
-	//TODO remove debug
-	printf("\033[32;1mexecve\033[0m(path \"%s\", node->args <%p>, envp <%p>) \n\033[34m>->->->->->->->->\033[0m\n", path, node->args, envp);
-
-	status = execve(path, node->args, envp);
-
-	free(path);
-
-	return (status);
+	// TODO test if path is an executable file
+	if (stat(path, &sb))
+		return (0);
+	if (S_ISREG(sb.st_mode) && sb.st_mode & 0111)
+	{
+		return (1);
+	}
+	return (0);
 }
 
-char	*find_path(t_node *node)
+static char	*find_path(t_node *node)
 {
 	char	*path;
 	char	**tab;
@@ -185,19 +236,22 @@ char	*find_path(t_node *node)
 	return (NULL);
 }
 
-int	is_path_executable(char *path)
+int	exec_binary(t_node *node, char *envp[])
 {
-	struct stat	sb;
+	char	*path;
+	int		status;
 
+	status = 0;
+	path = find_path(node);
 	if (!path)
-		return (0);
+		return (error_put(1, "path is \033[7mNULL"));
 
-	// TODO test if path is an executable file
-	if (stat(path, &sb))
-		return (0);
-	if (S_ISREG(sb.st_mode) && sb.st_mode & 0111)
-	{
-		return (1);
-	}
-	return (0);
+	//TODO remove debug
+	printf("\033[32;1mexecve\033[0m(path \"%s\", node->args <%p>, envp <%p>) \n\033[34m>->->->->->->->->\033[0m\n", path, node->args, envp);
+
+	status = execve(path, node->args, envp);
+
+	free(path);
+
+	return (status);
 }

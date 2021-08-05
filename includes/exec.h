@@ -13,7 +13,7 @@ typedef enum e_builtin_commands
 	BUILTIN_UNSET,
 	BUILTIN_ENV,
 	BUILTIN_EXIT,
-	BUILTIN_END
+	BUILTIN_MAX
 }	t_builtins;
 
 typedef struct s_pipe_context
@@ -22,19 +22,44 @@ typedef struct s_pipe_context
 	int	close_fd;
 }	t_ctx;
 
+typedef	int (*t_builtin_f)(char *argv[], char *envp[]);
+
+typedef enum e_builtin_mode
+{
+	NOT_BUILTIN,
+	YES_BUILTIN
+}	t_builtin_mode;
+typedef enum e_fork_or_not
+{
+	NOT_FORK,
+	YES_FORK
+}	t_fork_or_not;
+
+typedef struct s_exec_data
+{
+	t_builtin_mode	builtin_mode;
+	t_fork_or_not	fork_or_not;
+	t_builtin_f		f_to_call;
+}	t_exdat;
+
+
+
 int	execution(t_node *node, char *envp[]);
 
-int exec_nodes(t_node *node, t_ctx * ctx, char *envp[]);
+int	exec_nodes(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[]);
 
-int exec_command(t_node *node, char *envp[]);
+
+int	exec_command(t_exdat *ed, t_node *node, char *envp[]);
 int wait_for_child(pid_t cpid);
 
 int	exec_binary(t_node *node, char *envp[]);
-char *find_path(t_node *node);
-int	is_path_executable(char *path);
 
-int check_for_builtins(t_node *node, char *envp[]);
 int	exec_builtin(t_node *node, char *envp[], int index);
+t_builtin_f get_builtin(int index);
+
+/*
+** BUILTINS
+*/
 
 int builtin_echo(char *argv[], char *envp[]);
 int builtin_cd(char *argv[], char *envp[]);
@@ -43,7 +68,8 @@ int builtin_export(char *argv[], char *envp[]);
 int builtin_unset(char *argv[], char *envp[]);
 int builtin_env(char *argv[], char *envp[]);
 int builtin_exit(char *argv[], char *envp[]);
+int	builtin_dummy(char *argv[], char *envp[]);
 
-int exec_piped(t_node * node, t_ctx *ctx, char *envp[]);
+int	exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[]);
 
 #endif
