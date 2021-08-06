@@ -79,7 +79,25 @@ int builtin_echo(char *argv[], char *envp[])
 int builtin_cd(char *argv[], char *envp[])
 {
 	(void)envp;
-	(void)argv;
+	if (!argv)
+		return (1);
+	if (!argv[1])
+	{
+		put_str_fd(STDERR_FILENO, "minishell: cd: not enough arguments\n");
+		return (1);
+	}
+	if (argv[2])
+	{
+		put_str_fd(STDERR_FILENO, "minishell: cd: too many arguments\n");
+		return (1);
+	}
+	if (chdir(argv[1]) == -1)
+	{
+		put_str_fd(STDERR_FILENO, "minishell: cd: ");
+		put_str_fd(STDERR_FILENO, strerror(errno));
+		put_str_fd(STDERR_FILENO, "\n");
+		return (1);
+	}
 	return (0);
 }
 
