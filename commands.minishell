@@ -1,1 +1,5 @@
-cat < Makefile
+cd ../test
+echo hello > a
+cat a
+echo bye > b > c > d
+head a b c d

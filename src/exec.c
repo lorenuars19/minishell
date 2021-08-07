@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include "minishell.h"
+#include <stdlib.h>
 
 /*
 ** WRAPPER to facilitate memory management
@@ -131,8 +131,9 @@ int	sub_set_redir(t_exdat *ed, t_node *node)
 	redir = node->redirections;
 	while (redir)
 	{
-		if (redir && redir->next && close(ed->fd_to_close))
-			return (error_printf("close : %d %s\n",
+		if (redir && redir->next && ed->fd_to_close >= 0
+			&& close(ed->fd_to_close))
+			return (error_printf(errno, "close : %d %s\n",
 				ed->fd_to_close, strerror(errno)));
 		o_flags = 0;
 		dup_fd = STDOUT_FILENO;
@@ -142,14 +143,19 @@ int	sub_set_redir(t_exdat *ed, t_node *node)
 			dup_fd = STDIN_FILENO;
 		}
 		else if (redir->mode == M_TRUNCATE)
-			o_flags = O_TRUNC | O_WRONLY | O_CREAT;
+			o_flags = O_TRUNC | O_WRONLY | O_CREAT | S_IRWXU | S_IRWXG | S_IROTH;
 		else if (redir->mode == M_APPEND)
-			o_flags = O_APPEND | O_WRONLY | O_CREAT;
+			o_flags = O_APPEND | O_WRONLY | O_CREAT | S_IRWXU | S_IRWXG | S_IROTH;
 		ed->fd_to_close = open(redir->filename, o_flags);
+
+printf("filename %s\n", redir->filename);
+
 		if (ed->fd_to_close < 0)
-			return (error_sys_put("open"));
+			return (error_printf(errno, "sub_set_redir : open : \"%s\" %d %s",
+				redir->filename, ed->fd_to_close, strerror(errno)));
 		if (dup2(ed->fd_to_close, dup_fd) < 0)
-			return (error_sys_put("dup2"));
+			return (error_printf(errno, "sub_set_redir : dup2 : %d %s",
+				ed->fd_to_close, strerror(errno)));
 		redir = redir->next;
 	}
 	return (0);
@@ -199,7 +205,7 @@ printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not 
 		(ed->fork_or_not == YES_FORK) ? ("\033[33mFORKED") : ("\033[33mNOT FORKED"), \
 		ed->f_to_call);
 		if (set_redirection(ed, node))
-			return (error_sys_put("set_redirection"));
+			exit((error_sys_put("set_redirection")));
 
 		if (ed->builtin_mode == BUILTIN)
 		{
@@ -209,6 +215,8 @@ printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not 
 		{
 			ed->status = exec_binary(node, envp);
 		}
+		if (ed->fork_or_not == YES_FORK)
+			exit(ed->status);
 		return (ed->status);
 	}
 	else
@@ -279,18 +287,6 @@ static int	is_path_executable(char *path)
 	return (0);
 }
 
-static void	free_find_path(char	***tab)
-{
-	int	i;
-
-	i = 0;
-	while (tab && *tab && **tab && **tab[i])
-	{
-		free(**tab[i]);
-	}
-	free(*tab);
-}
-
 static char	*find_path(t_node *node)
 {
 	char	*path;
@@ -308,13 +304,13 @@ static char	*find_path(t_node *node)
 		path = str_jointo(path, node->args[0], &path);
 		if (is_path_executable(path))
 		{
-			free_find_path(&tab);
+			// tab_free(&tab);
 			return (path);
 		}
 		free(path);
 		i++;
 	}
-	free_find_path(&tab);
+	// tab_free(&tab);
 	return (NULL);
 }
 

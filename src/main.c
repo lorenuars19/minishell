@@ -22,8 +22,15 @@ int main(int argc, char **argv, char **envp)
 		cwd = NULL;
 
 		cwd = getcwd(NULL, 0);
-		cwd = str_jointo("\033[32m", cwd, &cwd);
-		prompt = str_jointo(cwd, " \033[34m$\033[0m ", &cwd);
+		cwd = str_jointo("\033[34m", cwd, &cwd);
+		if (status)
+		{
+			prompt = str_jointo(cwd, " \033[31;1m$\033[0m ", &cwd);
+		}
+		else
+		{
+			prompt = str_jointo(cwd, " \033[32;1m$\033[0m ", &cwd);
+		}
 		line = readline(prompt);
 		free(prompt);
 		if (!line)
