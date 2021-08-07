@@ -15,14 +15,14 @@ int main(int argc, char **argv, char **envp)
 	{
 		printf("\033[34m");
 		builtin_pwd(argv, envp);
-		line = readline("$ \033[32m>\033[0m ");
+		line = readline("\033[34m$ \033[32m>\033[0m ");
 		if (!line)
 		{
-			printf("Readline is \033[31;1mNULL\033[0m\n");
+			printf("exit\n");
 			free(line);
 			return (0);
 		}
-		printf("\nline: \"%s\"\n", line);
+		printf("\nline : \"%s\"\n", line);
 		if (line && *line)
 			add_history(line);
 		t_token *tokens = scanner(line);

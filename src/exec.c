@@ -90,20 +90,35 @@ static void	check_for_builtins(t_exdat *ed, t_node *node)
 
 static pid_t g_cpid;
 
-void	sig_handle(int signum)
+void	sig_handle_child(int signum)
 {
 	kill(g_cpid, signum);
 }
 
+void	sig_handle_parent(int signum)
+{
+	(void)signum;
+	write(1, "\n", 1);
+	rl_replace_line("", 0);
+	rl_on_new_line();
+	rl_redisplay();
+}
+
 int	setup_signals(t_revert revert_to_default)
 {
+	if (signal(SIGQUIT, SIG_IGN) == SIG_ERR)
+			return (error_sys_put(errno));
 	if (revert_to_default == REVERT_TO_DEFAULT)
 	{
-		if (signal(SIGINT, SIG_DFL) == SIG_ERR)
+		if (signal(SIGINT, sig_handle_parent) == SIG_ERR)
+			return (error_sys_put(errno));
+
+	}
+	else
+	{
+		if (signal(SIGINT, sig_handle_child) == SIG_ERR)
 			return (error_sys_put(errno));
 	}
-	if (signal(SIGINT, sig_handle) == SIG_ERR)
-		return (error_sys_put(errno));
 	return (0);
 }
 
@@ -130,8 +145,8 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 
 //TODO REMOVE DEBUG
 printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not %s\033[0m ed->f_to_call <%p>\n", \
-		(ed->builtin_mode == BUILTIN) ? ("\033[32mBUILTIN") : ("\033[31mBINARY"),\
-		(ed->fork_or_not == YES_FORK) ? ("\033[32mFORKED") : ("\033[31mNOT FORKED"), \
+		(ed->builtin_mode == BUILTIN) ? ("\033[33mBUILTIN") : ("\033[33mBINARY"),\
+		(ed->fork_or_not == YES_FORK) ? ("\033[33mFORKED") : ("\033[33mNOT FORKED"), \
 		ed->f_to_call);
 
 		if (ed->builtin_mode == BUILTIN)
@@ -261,6 +276,21 @@ int	exec_binary(t_node *node, char *envp[])
 
 int	exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[])
 {
+	if(pipe(ctx->p))
+		return (error_sys_put(errno));
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	(void)ed;
 	(void)node;

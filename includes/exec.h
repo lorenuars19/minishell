@@ -18,7 +18,7 @@ typedef enum e_builtin_commands
 
 typedef struct s_pipe_context
 {
-	int	fd[2];
+	int	p[2];
 	int	close_fd;
 }	t_ctx;
 
