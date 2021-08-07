@@ -7,9 +7,12 @@ int main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	char *line = NULL;
+	int status;
+
+	status = 0;
 
 	if (setup_signals(REVERT_TO_DEFAULT))
-			return (error_sys_put(errno));
+			return (error_sys_put("setup_signals"));
 
 	while (1)
 	{
@@ -20,7 +23,7 @@ int main(int argc, char **argv, char **envp)
 		{
 			printf("exit\n");
 			free(line);
-			return (0);
+			return (EXIT_SUCCESS);
 		}
 		printf("\nline : \"%s\"\n", line);
 		if (line && *line)
@@ -38,14 +41,15 @@ int main(int argc, char **argv, char **envp)
 		t_node *nodes = parser(tokens);
 		print_nodes(nodes, 0);
 
-		execution(nodes, envp);
+		status = execution(nodes, envp);
+
+printf("Last command status : %d\n", status);
 
 		free_tokens_without_data(tokens);
 		free_nodes(nodes);
 		if (str_cmp("exit", line) == 0)
 		{
 			free(line);
-printf("\033[32;1mMINISHELL KILLED FROM MAIN\033[0m\n");
 			return (EXIT_SUCCESS);
 		}
 		free(line);

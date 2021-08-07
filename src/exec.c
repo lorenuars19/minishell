@@ -7,14 +7,15 @@
 
 int	execution(t_node *node, char *envp[])
 {
+	int		status;
 	t_exdat	ed;
-	t_ctx	ctx;
 
-	ed = (t_exdat){BINARY, YES_FORK, builtin_dummy};
+	status = 0;
+	ed = mem_set();
 
-	if (exec_nodes(&ed, node, &ctx, envp))
-		return (1);
-
+	ed.status = exec_nodes(&ed, node, envp);
+	if (ed.status)
+		return (ed.status);
 	return (0);
 }
 
@@ -22,17 +23,19 @@ int	execution(t_node *node, char *envp[])
 ** The actual starting point that will be called recursively
 */
 
-int	exec_nodes(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[])
+int	exec_nodes(t_exdat *ed, t_node *node, char *envp[])
 {
 	if (node->type == COMMAND_NODE)
 	{
-		if (exec_command(ed, node, envp))
-			return (1);
+		ed.status = exec_command(ed, node, envp);
+		if (ed.status)
+			return (ed.status);
 	}
 	else if (node->type == PIPE_NODE)
 	{
-		if (exec_piped(ed, node, ctx, envp))
-			return (1);
+		ed.status = exec_piped(ed, node, envp);
+		if (ed.status)
+			return (ed.status);
 	}
 	else
 	{
@@ -107,21 +110,21 @@ void	sig_handle_parent(int signum)
 int	setup_signals(t_revert revert_to_default)
 {
 	if (signal(SIGQUIT, SIG_IGN) == SIG_ERR)
-			return (error_sys_put(errno));
+			return (error_sys_put("signal"));
 	if (revert_to_default == REVERT_TO_DEFAULT)
 	{
+puts("\nSIGNALS SET BACK TO DEFAULT\n");
 		if (signal(SIGINT, sig_handle_parent) == SIG_ERR)
-			return (error_sys_put(errno));
-
+			return (error_sys_put("signal"));
 	}
 	else
 	{
+puts("\nSIGNALS SET FOR CHILD\n");
 		if (signal(SIGINT, sig_handle_child) == SIG_ERR)
-			return (error_sys_put(errno));
+			return (error_sys_put("signal"));
 	}
 	return (0);
 }
-
 
 int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
@@ -133,13 +136,12 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 	g_cpid = 0;
 	if (ed->fork_or_not == YES_FORK)
 	{
-		if (setup_signals(DEFER_SIGNAL))
-			return (error_sys_put(errno));
+
 		g_cpid = fork();
 	}
 
 	if (g_cpid < 0)
-		return (error_sys_put(errno));
+		return (error_sys_put("fork"));
 	else if (g_cpid == FORKED_CHILD)
 	{
 
@@ -156,14 +158,13 @@ printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not 
 	else
 	{
 		//TODO parent stuff
-		printf("Child PID : %d\n", g_cpid);
-		status = wait_for_child(g_cpid);
 		if (setup_signals(REVERT_TO_DEFAULT))
-			return (error_sys_put(errno));
-		if (status)
-		{
-			return (status);
-		}
+			return (error_sys_put("setup_signals"));
+		printf("Child PID : %d\n", g_cpid);
+		ed.status = wait_for_child(g_cpid);
+
+		if (ed.status)
+			return (ed.status);
 		//TODO close pipe ? or other sutff maybe IDK
 	}
 	return (0);
@@ -191,8 +192,8 @@ int	wait_for_child(pid_t cpid)
 	int		wstatus;
 
 	w = waitpid(cpid, &wstatus, WUNTRACED);
-	if (w == -1)
-		return (-1);
+	if (w < 0)
+		return (error_sys_put("wait"));
 	ret = sub_wait_for_child(wstatus);
 	if (ret)
 		return (ret);
@@ -257,11 +258,14 @@ int	exec_binary(t_node *node, char *envp[])
 
 	status = 0;
 	path = find_path(node);
-	if (!path)
-		return (error_put(1, "path is \033[7mNULL"));
+	if (!path && node->args)
+		return (error_printf(1, "command \"%s\" not found", node->args[0]));
 
 	//TODO remove debug
 	printf("\033[32;1mexecve\033[0m(path \"%s\", node->args <%p>, envp <%p>) \n\033[34m>->->->->->->->->\033[0m\n", path, node->args, envp);
+
+	if (setup_signals(DEFER_SIGNAL))
+			return (error_sys_put("setup_signals"));
 
 	status = execve(path, node->args, envp);
 
@@ -274,13 +278,18 @@ int	exec_binary(t_node *node, char *envp[])
 ** PIPES EXEC
 */
 
-int	exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx, char *envp[])
+int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 {
-	if(pipe(ctx->p))
-		return (error_sys_put(errno));
+	t_node	*lhs;
+	t_node	*rhs;
+
+	if(pipe(ed->p))
+		return (error_sys_put("pipe"));
+
+	printf("PIPES yay \n");
 
 
-
+	lhs = node->left
 
 
 

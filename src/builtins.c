@@ -39,7 +39,7 @@ int builtin_cd(char *argv[], char *envp[])
 		path = argv[1];
 	if (chdir(path))
 	{
-		return (error_sys_put(errno));
+		return (error_sys_put("chdir"));
 	}
 	return (0);
 }
