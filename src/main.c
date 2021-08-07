@@ -1,13 +1,14 @@
 #include "minishell.h"
 #include <stdlib.h>
 
-
 int main(int argc, char **argv, char **envp)
 {
 	(void)argc;
 	(void)argv;
-	char *line = NULL;
-	int status;
+	int 	status;
+	char 	*line;
+	char	*prompt;
+	char	*cwd;
 
 	status = 0;
 
@@ -16,9 +17,15 @@ int main(int argc, char **argv, char **envp)
 
 	while (1)
 	{
-		printf("\033[34m");
-		builtin_pwd(argv, envp);
-		line = readline("\033[34m$ \033[32m>\033[0m ");
+		line = NULL;
+		prompt = NULL;
+		cwd = NULL;
+
+		cwd = getcwd(NULL, 0);
+		cwd = str_jointo("\033[32m", cwd, &cwd);
+		prompt = str_jointo(cwd, " \033[34m$\033[0m ", &cwd);
+		line = readline(prompt);
+		free(prompt);
 		if (!line)
 		{
 			printf("exit\n");

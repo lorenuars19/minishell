@@ -7,12 +7,9 @@
 
 int	execution(t_node *node, char *envp[])
 {
-	int		status;
 	t_exdat	ed;
 
-	status = 0;
-	ed = mem_set();
-
+	ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, NOT_PIPE, {0, 0}, 0};
 	ed.status = exec_nodes(&ed, node, envp);
 	if (ed.status)
 		return (ed.status);
@@ -27,15 +24,15 @@ int	exec_nodes(t_exdat *ed, t_node *node, char *envp[])
 {
 	if (node->type == COMMAND_NODE)
 	{
-		ed.status = exec_command(ed, node, envp);
-		if (ed.status)
-			return (ed.status);
+		ed->status = exec_command(ed, node, envp);
+		if (ed->status)
+			return (ed->status);
 	}
 	else if (node->type == PIPE_NODE)
 	{
-		ed.status = exec_piped(ed, node, envp);
-		if (ed.status)
-			return (ed.status);
+		ed->status = exec_piped(ed, node, envp);
+		if (ed->status)
+			return (ed->status);
 	}
 	else
 	{
@@ -102,6 +99,7 @@ void	sig_handle_parent(int signum)
 {
 	(void)signum;
 	write(1, "\n", 1);
+	printf("\033[34m");
 	rl_replace_line("", 0);
 	rl_on_new_line();
 	rl_redisplay();
@@ -113,12 +111,14 @@ int	setup_signals(t_revert revert_to_default)
 			return (error_sys_put("signal"));
 	if (revert_to_default == REVERT_TO_DEFAULT)
 	{
+//TODO REMOVE DEBUG
 puts("\nSIGNALS SET BACK TO DEFAULT\n");
 		if (signal(SIGINT, sig_handle_parent) == SIG_ERR)
 			return (error_sys_put("signal"));
 	}
 	else
 	{
+//TODO REMOVE DEBUG
 puts("\nSIGNALS SET FOR CHILD\n");
 		if (signal(SIGINT, sig_handle_child) == SIG_ERR)
 			return (error_sys_put("signal"));
@@ -126,20 +126,36 @@ puts("\nSIGNALS SET FOR CHILD\n");
 	return (0);
 }
 
+int	set_redirection(t_exdat *ed, t_node *node)
+{
+	if (!ed || !node)
+		return (1);
+	if (dup2(ed->p[STDIN_FILENO], STDIN_FILENO))
+		return (error_sys_put("dup2"));
+	if (dup2(ed->p[STDOUT_FILENO], STDOUT_FILENO))
+		return (error_sys_put("dup2"));
+	if (ed->fd_to_close >= 0)
+	{
+		if (close(ed->fd_to_close))
+			return (error_sys_put("close"));
+	}
+
+
+	return (0);
+}
+
 int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
-	int status;
 
-	*ed = (t_exdat){BINARY, YES_FORK, builtin_dummy};
+	*ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, NOT_PIPE,
+		{ed->p[0], ed->p[1]}, ed->fd_to_close};
 	check_for_builtins(ed, node);
 
 	g_cpid = 0;
 	if (ed->fork_or_not == YES_FORK)
 	{
-
 		g_cpid = fork();
 	}
-
 	if (g_cpid < 0)
 		return (error_sys_put("fork"));
 	else if (g_cpid == FORKED_CHILD)
@@ -157,15 +173,12 @@ printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not 
 	}
 	else
 	{
-		//TODO parent stuff
 		if (setup_signals(REVERT_TO_DEFAULT))
 			return (error_sys_put("setup_signals"));
 		printf("Child PID : %d\n", g_cpid);
-		ed.status = wait_for_child(g_cpid);
-
-		if (ed.status)
-			return (ed.status);
-		//TODO close pipe ? or other sutff maybe IDK
+		ed->status = wait_for_child(g_cpid);
+		if (ed->status)
+			return (ed->status);
 	}
 	return (0);
 }
@@ -280,31 +293,15 @@ int	exec_binary(t_node *node, char *envp[])
 
 int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 {
-	t_node	*lhs;
-	t_node	*rhs;
-
 	if(pipe(ed->p))
 		return (error_sys_put("pipe"));
-
-	printf("PIPES yay \n");
-
-
-	lhs = node->left
-
-
-
-
-
-
-
-
-
-
-
-	(void)ed;
-	(void)node;
-	(void)ctx;
-	(void)envp;
-
-	return (0);
+	ed->fd_to_close = ed->p[STDIN_FILENO];
+	ed->status = exec_nodes(ed, node->left, envp);
+	if (ed->status)
+		return (ed->status);
+	ed->fd_to_close = ed->p[STDOUT_FILENO];
+	ed->status = exec_nodes(ed, node->right, envp);
+	if (ed->status)
+		return (ed->status);
+	return (ed->status);
 }
