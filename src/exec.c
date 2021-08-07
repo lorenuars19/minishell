@@ -9,7 +9,7 @@ int	execution(t_node *node, char *envp[])
 {
 	t_exdat	ed;
 
-	ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, NOT_PIPE, {0, 0}, 0};
+	ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, NOT_PIPE, {0, 0}, -1};
 	ed.status = exec_nodes(&ed, node, envp);
 	if (ed.status)
 		return (ed.status);
@@ -111,17 +111,46 @@ int	setup_signals(t_revert revert_to_default)
 			return (error_sys_put("signal"));
 	if (revert_to_default == REVERT_TO_DEFAULT)
 	{
-//TODO REMOVE DEBUG
-puts("\nSIGNALS SET BACK TO DEFAULT\n");
 		if (signal(SIGINT, sig_handle_parent) == SIG_ERR)
 			return (error_sys_put("signal"));
 	}
 	else
 	{
-//TODO REMOVE DEBUG
-puts("\nSIGNALS SET FOR CHILD\n");
 		if (signal(SIGINT, sig_handle_child) == SIG_ERR)
 			return (error_sys_put("signal"));
+	}
+	return (0);
+}
+
+int	sub_set_redir(t_exdat *ed, t_node *node)
+{
+	t_redirection	*redir;
+	int				o_flags;
+	int				dup_fd;
+
+	redir = node->redirections;
+	while (redir)
+	{
+		if (redir && redir->next && close(ed->fd_to_close))
+			return (error_printf("close : %d %s\n",
+				ed->fd_to_close, strerror(errno)));
+		o_flags = 0;
+		dup_fd = STDOUT_FILENO;
+		if (redir->mode == M_INPUT)
+		{
+			o_flags = O_RDONLY;
+			dup_fd = STDIN_FILENO;
+		}
+		else if (redir->mode == M_TRUNCATE)
+			o_flags = O_TRUNC | O_WRONLY | O_CREAT;
+		else if (redir->mode == M_APPEND)
+			o_flags = O_APPEND | O_WRONLY | O_CREAT;
+		ed->fd_to_close = open(redir->filename, o_flags);
+		if (ed->fd_to_close < 0)
+			return (error_sys_put("open"));
+		if (dup2(ed->fd_to_close, dup_fd) < 0)
+			return (error_sys_put("dup2"));
+		redir = redir->next;
 	}
 	return (0);
 }
@@ -130,24 +159,26 @@ int	set_redirection(t_exdat *ed, t_node *node)
 {
 	if (!ed || !node)
 		return (1);
-	if (dup2(ed->p[STDIN_FILENO], STDIN_FILENO))
+	if (ed->need_pipe == YES_PIPE
+		&& dup2(ed->p[STDIN_FILENO], STDIN_FILENO) < 0)
 		return (error_sys_put("dup2"));
-	if (dup2(ed->p[STDOUT_FILENO], STDOUT_FILENO))
+	if (ed->need_pipe == YES_PIPE
+		&& dup2(ed->p[STDOUT_FILENO], STDOUT_FILENO) < 0)
 		return (error_sys_put("dup2"));
 	if (ed->fd_to_close >= 0)
 	{
 		if (close(ed->fd_to_close))
 			return (error_sys_put("close"));
 	}
-
-
+	if (sub_set_redir(ed, node))
+		return (error_sys_put("sub_set_redir"));
 	return (0);
 }
 
 int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
 
-	*ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, NOT_PIPE,
+	*ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, ed->need_pipe,
 		{ed->p[0], ed->p[1]}, ed->fd_to_close};
 	check_for_builtins(ed, node);
 
@@ -155,6 +186,7 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 	if (ed->fork_or_not == YES_FORK)
 	{
 		g_cpid = fork();
+
 	}
 	if (g_cpid < 0)
 		return (error_sys_put("fork"));
@@ -166,17 +198,25 @@ printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not 
 		(ed->builtin_mode == BUILTIN) ? ("\033[33mBUILTIN") : ("\033[33mBINARY"),\
 		(ed->fork_or_not == YES_FORK) ? ("\033[33mFORKED") : ("\033[33mNOT FORKED"), \
 		ed->f_to_call);
+		if (set_redirection(ed, node))
+			return (error_sys_put("set_redirection"));
 
 		if (ed->builtin_mode == BUILTIN)
-			return (ed->f_to_call(node->args, envp));
-		return (exec_binary(node, envp));
+		{
+			ed->status = ed->f_to_call(node->args, envp);
+		}
+		else
+		{
+			ed->status = exec_binary(node, envp);
+		}
+		return (ed->status);
 	}
 	else
 	{
+		ed->status = wait_for_child(g_cpid);
+		if (close(ed->fd_to_close))
 		if (setup_signals(REVERT_TO_DEFAULT))
 			return (error_sys_put("setup_signals"));
-		printf("Child PID : %d\n", g_cpid);
-		ed->status = wait_for_child(g_cpid);
 		if (ed->status)
 			return (ed->status);
 	}
@@ -239,6 +279,18 @@ static int	is_path_executable(char *path)
 	return (0);
 }
 
+static void	free_find_path(char	***tab)
+{
+	int	i;
+
+	i = 0;
+	while (tab && *tab && **tab && **tab[i])
+	{
+		free(**tab[i]);
+	}
+	free(*tab);
+}
+
 static char	*find_path(t_node *node)
 {
 	char	*path;
@@ -256,11 +308,13 @@ static char	*find_path(t_node *node)
 		path = str_jointo(path, node->args[0], &path);
 		if (is_path_executable(path))
 		{
+			free_find_path(&tab);
 			return (path);
 		}
 		free(path);
 		i++;
 	}
+	free_find_path(&tab);
 	return (NULL);
 }
 
@@ -295,6 +349,7 @@ int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 {
 	if(pipe(ed->p))
 		return (error_sys_put("pipe"));
+	ed->need_pipe = YES_PIPE;
 	ed->fd_to_close = ed->p[STDIN_FILENO];
 	ed->status = exec_nodes(ed, node->left, envp);
 	if (ed->status)
@@ -303,5 +358,9 @@ int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 	ed->status = exec_nodes(ed, node->right, envp);
 	if (ed->status)
 		return (ed->status);
+	if (close(ed->p[STDIN_FILENO]))
+		return (error_sys_put("close"));
+	if (close(ed->p[STDOUT_FILENO]))
+		return (error_sys_put("close"));
 	return (ed->status);
 }

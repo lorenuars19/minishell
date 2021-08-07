@@ -28,7 +28,7 @@ int main(int argc, char **argv, char **envp)
 		free(prompt);
 		if (!line)
 		{
-			printf("exit\n");
+			printf("\nexit\n");
 			free(line);
 			return (EXIT_SUCCESS);
 		}
