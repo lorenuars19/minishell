@@ -122,11 +122,27 @@ int	setup_signals(t_revert revert_to_default)
 	return (0);
 }
 
+int	is_path_regular_file(char *path)
+{
+	struct stat	sb;
+
+	if (!path)
+		return (0);
+	if (stat(path, &sb))
+		return (0);
+	if (S_ISREG(sb.st_mode))
+	{
+		return (1);
+	}
+	return (0);
+}
+
 int	sub_set_redir(t_exdat *ed, t_node *node)
 {
 	t_redirection	*redir;
 	int				o_flags;
 	int				dup_fd;
+	int				file_exists;
 
 	redir = node->redirections;
 	while (redir)
@@ -135,21 +151,25 @@ int	sub_set_redir(t_exdat *ed, t_node *node)
 			&& close(ed->fd_to_close))
 			return (error_printf(errno, "close : %d %s\n",
 				ed->fd_to_close, strerror(errno)));
-		o_flags = 0;
+		o_flags = O_RDONLY;
 		dup_fd = STDOUT_FILENO;
+
+		file_exists = is_path_regular_file(redir->filename);
 		if (redir->mode == M_INPUT)
 		{
 			o_flags = O_RDONLY;
 			dup_fd = STDIN_FILENO;
 		}
-		else if (redir->mode == M_TRUNCATE)
-			o_flags = O_TRUNC | O_WRONLY | O_CREAT | S_IRWXU | S_IRWXG | S_IROTH;
-		else if (redir->mode == M_APPEND)
-			o_flags = O_APPEND | O_WRONLY | O_CREAT | S_IRWXU | S_IRWXG | S_IROTH;
-		ed->fd_to_close = open(redir->filename, o_flags);
-
-printf("filename %s\n", redir->filename);
-
+		else if (redir->mode == M_TRUNCATE && !file_exists)
+			o_flags = O_WRONLY | O_TRUNC | O_CREAT;
+		else if (redir->mode == M_TRUNCATE && file_exists)
+			o_flags = O_WRONLY;
+		else if (redir->mode == M_APPEND && file_exists)
+			o_flags =  O_WRONLY | O_APPEND;
+		else if (redir->mode == M_APPEND && !file_exists)
+			o_flags = O_WRONLY | O_APPEND | O_CREAT;
+		ed->fd_to_close = open(redir->filename, o_flags, (S_IRUSR + S_IWUSR)
+			| (S_IRGRP + S_IWGRP) | S_IROTH);
 		if (ed->fd_to_close < 0)
 			return (error_printf(errno, "sub_set_redir : open : \"%s\" %d %s",
 				redir->filename, ed->fd_to_close, strerror(errno)));
