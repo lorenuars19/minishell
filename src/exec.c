@@ -18,7 +18,9 @@ int	execution(t_node *node, char *envp[])
 		wait(&(ed.status));
 		ed.n_children--;
 	}
-	return (0);
+	if (ed.need_pipe == YES_PIPE)
+		return (filter_wstatus(ed.status));
+	return (ed.status);
 }
 
 /*
@@ -27,8 +29,16 @@ int	execution(t_node *node, char *envp[])
 
 int	exec_nodes(t_exdat *ed, t_node *node, char *envp[])
 {
+//TODO REMOvE
+dprintf(2, "node->type %s | ed->p READ_P %d WRIT_P %d\n",
+	(node->type == COMMAND_NODE) ? ("COMMAND_NODE") : ("PIPE_NODE"),
+	ed->p[READ_P], ed->p[WRIT_P]);
+
+
 	if (node->type == COMMAND_NODE)
 	{
+
+
 		ed->status = exec_command(ed, node, envp);
 		if (ed->status)
 			return (ed->status);
@@ -94,11 +104,9 @@ static void	check_for_builtins(t_exdat *ed, t_node *node)
 		ed->builtin_mode = BUILTIN;
 }
 
-static pid_t g_cpid;
-
 void	sig_handle_child(int signum)
 {
-	kill(g_cpid, signum);
+	kill(0, signum);
 }
 
 void	sig_handle_parent(int signum)
@@ -192,13 +200,13 @@ int	set_redirection(t_exdat *ed, t_node *node)
 	if (!ed || !node)
 		return (1);
 	if (ed->need_pipe == YES_PIPE
-		&& dup2(ed->p[STDIN_FILENO], STDIN_FILENO) < 0)
+		&& dup2(ed->p[READ_P], STDIN_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDIN : %d %s",
-			ed->p[STDIN_FILENO], strerror(errno)));
+			ed->p[READ_P], strerror(errno)));
 	if (ed->need_pipe == YES_PIPE
-		&& dup2(ed->p[STDOUT_FILENO], STDOUT_FILENO) < 0)
+		&& dup2(ed->p[WRIT_P], STDOUT_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDOUT : %d %s",
-			ed->p[STDOUT_FILENO], strerror(errno)));
+			ed->p[WRIT_P], strerror(errno)));
 	if (ed->fd_to_close >= 0)
 	{
 		if (close(ed->fd_to_close))
@@ -211,20 +219,21 @@ int	set_redirection(t_exdat *ed, t_node *node)
 
 int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
+	int	cpid;
 
 	*ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, ed->need_pipe,
 		{ed->p[0], ed->p[1]}, ed->fd_to_close, 0};
 	check_for_builtins(ed, node);
 
-	g_cpid = 0;
+	cpid = 0;
 	if (ed->fork_or_not == YES_FORK)
 	{
-		g_cpid = fork();
+		cpid = fork();
 
 	}
-	if (g_cpid < 0)
+	if (cpid < 0)
 		return (error_sys_put("fork"));
-	else if (g_cpid == FORKED_CHILD)
+	else if (cpid == FORKED_CHILD)
 	{
 
 //TODO REMOVE DEBUG
@@ -251,7 +260,7 @@ dprintf(2, "\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_
 	{
 		if (ed->need_pipe == NOT_PIPE)
 		{
-			ed->status = wait_for_child(g_cpid);
+			ed->status = wait_for_child(cpid);
 		}
 		if (close(ed->fd_to_close))
 		if (setup_signals(REVERT_TO_DEFAULT))
@@ -268,7 +277,7 @@ dprintf(2, "\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_
 ** CHILD PROCESS MANAGEMENT
 */
 
-int	sub_wait_for_child(int wstatus)
+int	filter_wstatus(int wstatus)
 {
 	if (WIFEXITED(wstatus))
 		return (WEXITSTATUS(wstatus));
@@ -288,13 +297,13 @@ int	wait_for_child(pid_t cpid)
 	w = waitpid(cpid, &wstatus, WUNTRACED);
 	if (w < 0)
 		return (error_sys_put("wait"));
-	ret = sub_wait_for_child(wstatus);
+	ret = filter_wstatus(wstatus);
 	if (ret)
 		return (ret);
 	while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus))
 	{
 		w = waitpid(cpid, &wstatus, WUNTRACED);
-		ret = sub_wait_for_child(wstatus);
+		ret = filter_wstatus(wstatus);
 		if (ret)
 			return (ret);
 	}
@@ -320,6 +329,8 @@ static int	is_path_executable(char *path)
 	return (0);
 }
 
+#	  	include <debug_utils.h>
+
 static char	*find_path(t_node *node)
 {
 	char	*path;
@@ -334,10 +345,10 @@ static char	*find_path(t_node *node)
 	while (tab && tab[i] && node->args && node->args[0])
 	{
 		path = str_jointo(tab[i], "/", NULL);
+		// path = str_jointo(path, node->args[0], &path);
 		path = str_jointo(path, node->args[0], &path);
 		if (is_path_executable(path))
 		{
-			free(path);
 			tab_free(&tab);
 			return (path);
 		}
@@ -357,6 +368,8 @@ int	exec_binary(t_node *node, char *envp[])
 	path = find_path(node);
 	if (!path && node->args)
 		return (error_printf(1, "command \"%s\" not found", node->args[0]));
+	else if (!path)
+		return(error_put(1, "find_path : returned NULL"));
 
 	//TODO remove debug
 dprintf(2, "\033[32;1mexecve\033[0m(path \"%s\", node->args <%p>, envp <%p>) \n\033[34m>->->->->->->->->\033[0m\n", path, node->args, envp);
@@ -379,11 +392,15 @@ int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 {
 	if(pipe(ed->p))
 		return (error_sys_put("pipe"));
-	ed->fd_to_close = ed->p[STDIN_FILENO];
+
+//TODO REMOVE
+dprintf(2, "ed->p[0] %d ed->p[1] %d\n", ed->p[0], ed->p[1]);
+
+	ed->fd_to_close = ed->p[WRIT_P];
 	ed->status = exec_nodes(ed, node->left, envp);
 	if (ed->status)
 		return (ed->status);
-	ed->fd_to_close = ed->p[STDOUT_FILENO];
+	ed->fd_to_close = ed->p[READ_P];
 	ed->status = exec_nodes(ed, node->right, envp);
 	if (ed->status)
 		return (ed->status);

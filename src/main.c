@@ -32,10 +32,10 @@ int main(int argc, char **argv, char **envp)
 			prompt = str_jointo(cwd, " \033[32;1m$\033[0m ", &cwd);
 		}
 		line = readline(prompt);
-		free(prompt);
 		if (!line)
 		{
 			printf("\nexit\n");
+			free(prompt);
 			free(line);
 			return (EXIT_SUCCESS);
 		}
@@ -63,9 +63,11 @@ printf("Last command status : %d\n", status);
 		free_nodes(nodes);
 		if (str_cmp("exit", line) == 0)
 		{
+			free(prompt);
 			free(line);
 			return (EXIT_SUCCESS);
 		}
+		free(prompt);
 		free(line);
 	}
 	return (0);

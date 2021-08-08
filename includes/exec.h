@@ -3,6 +3,10 @@
 
 # define BUFF_SIZ	1024
 
+
+# define WRIT_P 1
+# define READ_P 0
+
 # define FORKED_CHILD 0
 typedef enum e_builtin_commands
 {
@@ -79,5 +83,7 @@ int	builtin_dummy(char *argv[], char *envp[]);
 int	exec_piped(t_exdat *ed, t_node *node, char *envp[]);
 
 int	setup_signals(t_revert revert_to_default);
+
+int	filter_wstatus(int wstatus);
 
 #endif
