@@ -1,6 +1,1 @@
-cd ../test
-echo hello > a
-cat a
-echo bye > a > b > c > d >> e
-head a b c d e
-ls -la
+cat < exec_test.c | cat

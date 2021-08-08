@@ -43,6 +43,7 @@ typedef struct s_exec_data
 	t_need_pipe		need_pipe;
 	int				p[2];
 	int				fd_to_close;
+	int				n_children;
 }	t_exdat;
 
 typedef enum e_revert_signal_or_not

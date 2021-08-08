@@ -9,10 +9,15 @@ int	execution(t_node *node, char *envp[])
 {
 	t_exdat	ed;
 
-	ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, NOT_PIPE, {0, 0}, -1};
+	ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, NOT_PIPE, {0, 0}, -1, 0};
 	ed.status = exec_nodes(&ed, node, envp);
 	if (ed.status)
 		return (ed.status);
+	while (ed.n_children)
+	{
+		wait(&(ed.status));
+		ed.n_children--;
+	}
 	return (0);
 }
 
@@ -30,6 +35,7 @@ int	exec_nodes(t_exdat *ed, t_node *node, char *envp[])
 	}
 	else if (node->type == PIPE_NODE)
 	{
+		ed->need_pipe = YES_PIPE;
 		ed->status = exec_piped(ed, node, envp);
 		if (ed->status)
 			return (ed->status);
@@ -187,10 +193,12 @@ int	set_redirection(t_exdat *ed, t_node *node)
 		return (1);
 	if (ed->need_pipe == YES_PIPE
 		&& dup2(ed->p[STDIN_FILENO], STDIN_FILENO) < 0)
-		return (error_sys_put("dup2"));
+		return (error_printf(errno, "set_redirection : dup2 STDIN : %d %s",
+			ed->p[STDIN_FILENO], strerror(errno)));
 	if (ed->need_pipe == YES_PIPE
 		&& dup2(ed->p[STDOUT_FILENO], STDOUT_FILENO) < 0)
-		return (error_sys_put("dup2"));
+		return (error_printf(errno, "set_redirection : dup2 STDOUT : %d %s",
+			ed->p[STDOUT_FILENO], strerror(errno)));
 	if (ed->fd_to_close >= 0)
 	{
 		if (close(ed->fd_to_close))
@@ -205,7 +213,7 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
 
 	*ed = (t_exdat){0, BINARY, YES_FORK, builtin_dummy, ed->need_pipe,
-		{ed->p[0], ed->p[1]}, ed->fd_to_close};
+		{ed->p[0], ed->p[1]}, ed->fd_to_close, 0};
 	check_for_builtins(ed, node);
 
 	g_cpid = 0;
@@ -220,7 +228,7 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 	{
 
 //TODO REMOVE DEBUG
-printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not %s\033[0m ed->f_to_call <%p>\n", \
+dprintf(2, "\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not %s\033[0m ed->f_to_call <%p>\n", \
 		(ed->builtin_mode == BUILTIN) ? ("\033[33mBUILTIN") : ("\033[33mBINARY"),\
 		(ed->fork_or_not == YES_FORK) ? ("\033[33mFORKED") : ("\033[33mNOT FORKED"), \
 		ed->f_to_call);
@@ -239,15 +247,20 @@ printf("\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not 
 			exit(ed->status);
 		return (ed->status);
 	}
-	else
+	else if (ed->need_pipe == NOT_PIPE)
 	{
-		ed->status = wait_for_child(g_cpid);
+		if (ed->need_pipe == NOT_PIPE)
+		{
+			ed->status = wait_for_child(g_cpid);
+		}
 		if (close(ed->fd_to_close))
 		if (setup_signals(REVERT_TO_DEFAULT))
 			return (error_sys_put("setup_signals"));
 		if (ed->status)
 			return (ed->status);
 	}
+	if (ed->need_pipe == YES_PIPE)
+		ed->n_children++;
 	return (0);
 }
 
@@ -324,13 +337,14 @@ static char	*find_path(t_node *node)
 		path = str_jointo(path, node->args[0], &path);
 		if (is_path_executable(path))
 		{
-			// tab_free(&tab);
+			free(path);
+			tab_free(&tab);
 			return (path);
 		}
 		free(path);
 		i++;
 	}
-	// tab_free(&tab);
+	tab_free(&tab);
 	return (NULL);
 }
 
@@ -345,7 +359,7 @@ int	exec_binary(t_node *node, char *envp[])
 		return (error_printf(1, "command \"%s\" not found", node->args[0]));
 
 	//TODO remove debug
-	printf("\033[32;1mexecve\033[0m(path \"%s\", node->args <%p>, envp <%p>) \n\033[34m>->->->->->->->->\033[0m\n", path, node->args, envp);
+dprintf(2, "\033[32;1mexecve\033[0m(path \"%s\", node->args <%p>, envp <%p>) \n\033[34m>->->->->->->->->\033[0m\n", path, node->args, envp);
 
 	if (setup_signals(DEFER_SIGNAL))
 			return (error_sys_put("setup_signals"));
@@ -365,7 +379,6 @@ int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 {
 	if(pipe(ed->p))
 		return (error_sys_put("pipe"));
-	ed->need_pipe = YES_PIPE;
 	ed->fd_to_close = ed->p[STDIN_FILENO];
 	ed->status = exec_nodes(ed, node->left, envp);
 	if (ed->status)
