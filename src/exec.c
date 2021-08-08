@@ -34,11 +34,8 @@ dprintf(2, "node->type %s | ed->p READ_P %d WRIT_P %d\n",
 	(node->type == COMMAND_NODE) ? ("COMMAND_NODE") : ("PIPE_NODE"),
 	ed->p[READ_P], ed->p[WRIT_P]);
 
-
 	if (node->type == COMMAND_NODE)
 	{
-
-
 		ed->status = exec_command(ed, node, envp);
 		if (ed->status)
 			return (ed->status);
@@ -161,7 +158,7 @@ int	sub_set_redir(t_exdat *ed, t_node *node)
 	redir = node->redirections;
 	while (redir)
 	{
-		if (redir && redir->next && ed->fd_to_close >= 0
+		if (redir && ed->fd_to_close >= 0
 			&& close(ed->fd_to_close))
 			return (error_printf(errno, "close : %d %s\n",
 				ed->fd_to_close, strerror(errno)));
@@ -199,6 +196,11 @@ int	set_redirection(t_exdat *ed, t_node *node)
 {
 	if (!ed || !node)
 		return (1);
+
+
+dprintf(2, "set_redirection : ed fd_to_close %d p[READ_P] %d p[WRITE_P] %d\n",
+ed->fd_to_close, ed->p[READ_P], ed->p[WRIT_P]);
+
 	if (ed->need_pipe == YES_PIPE
 		&& dup2(ed->p[READ_P], STDIN_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDIN : %d %s",
@@ -212,7 +214,7 @@ int	set_redirection(t_exdat *ed, t_node *node)
 		if (close(ed->fd_to_close))
 			return (error_sys_put("close"));
 	}
-	if (sub_set_redir(ed, node))
+	if (node->redirections && sub_set_redir(ed, node))
 		return (error_sys_put("sub_set_redir"));
 	return (0);
 }
@@ -256,13 +258,12 @@ dprintf(2, "\033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_
 			exit(ed->status);
 		return (ed->status);
 	}
-	else if (ed->need_pipe == NOT_PIPE)
+	else
 	{
 		if (ed->need_pipe == NOT_PIPE)
 		{
 			ed->status = wait_for_child(cpid);
 		}
-		if (close(ed->fd_to_close))
 		if (setup_signals(REVERT_TO_DEFAULT))
 			return (error_sys_put("setup_signals"));
 		if (ed->status)
@@ -396,11 +397,11 @@ int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 //TODO REMOVE
 dprintf(2, "ed->p[0] %d ed->p[1] %d\n", ed->p[0], ed->p[1]);
 
-	ed->fd_to_close = ed->p[WRIT_P];
+	ed->fd_to_close = ed->p[READ_P];
 	ed->status = exec_nodes(ed, node->left, envp);
 	if (ed->status)
 		return (ed->status);
-	ed->fd_to_close = ed->p[READ_P];
+	ed->fd_to_close = ed->p[WRIT_P];
 	ed->status = exec_nodes(ed, node->right, envp);
 	if (ed->status)
 		return (ed->status);

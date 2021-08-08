@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/08/04 17:09:47 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/08/08 16:15:35 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,11 +20,6 @@ CC	= gcc
 
 ifneq ($(SOFT), 1)
 CFLAGS	= -Wall -Werror -Wextra
-endif
-
-# Debug, use with`make DEBUG=1`
-ifeq ($(DEBUG),1)
-CFLAGS	+= -g3 -fsanitize=address
 endif
 
 # Folder name

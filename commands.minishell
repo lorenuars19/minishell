@@ -1,1 +1,1 @@
-ls -la --color=always | grep e --color=always
+ls | grep f
