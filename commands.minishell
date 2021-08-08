@@ -1,5 +1,6 @@
 cd ../test
 echo hello > a
 cat a
-echo bye > b > c > d
-head a b c d
+echo bye > a > b > c > d >> e
+head a b c d e
+ls -la
