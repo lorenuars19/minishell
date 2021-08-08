@@ -39,7 +39,7 @@ int builtin_cd(char *argv[], char *envp[])
 		path = argv[1];
 	if (chdir(path))
 	{
-		return (error_sys_put(errno));
+		return (error_sys_put("chdir"));
 	}
 	return (0);
 }
@@ -86,10 +86,9 @@ int builtin_env(char *argv[], char *envp[])
 	return (0);
 }
 
-int builtin_exit(char *argv[], char *envp[])
+int	builtin_dummy(char *argv[], char *envp[])
 {
-	(void)envp;
 	(void)argv;
-	exit(0);
+	(void)envp;
 	return (0);
 }
