@@ -115,11 +115,22 @@ int builtin_pwd(char *argv[], char *envp[])
 	return (0);
 }
 
-int builtin_export(char *argv[], char *envp[])
+t_bool	variable_already_exits_in_envp(char **envp, char *name)
 {
-	(void)envp;
-	(void)argv;
-	return (0);
+	int	i;
+	int	length;
+
+	if (!envp)
+		return (FALSE);
+	i = 0;
+	length = str_len(name);
+	while (envp[i])
+	{
+		if (str_cmp_n(name, envp[i], length) == 0 && envp[i][length] == '=')
+			return (TRUE);
+		i++;
+	}
+	return (FALSE);
 }
 
 static t_bool	is_a_valid_variable_name(char *name)
@@ -190,6 +201,90 @@ int builtin_unset(char *argv[], char *envp[])
 			delete_variable_from_envp(argv[i], envp);
 		i++;
 	}
+	if (has_met_an_error)
+		return (1);
+	return (0);
+}
+
+static void	sort_envp(char **envp)
+{
+	t_bool		has_a_swap_occured;
+	char		*tmp;
+	int			i;
+
+	if (!envp || !envp[0])
+		return ;
+	has_a_swap_occured = TRUE;
+	while (has_a_swap_occured)
+	{
+		has_a_swap_occured = FALSE;
+		i = 0;
+		while (envp[i + 1])
+		{
+			if (strcmp(envp[i], envp[i + 1]) > 0)
+			{
+				has_a_swap_occured = TRUE;
+				tmp = envp[i];
+				envp[i] = envp[i + 1];
+				envp[i + 1] = tmp;
+			}
+			i++;
+		}
+	}
+}
+
+static void	print_one_exported_variable(char *variable)
+{
+	int	i;
+
+	if (!variable)
+		return ;
+	if (!str_cmp_n("_=", variable, 2))
+		return ;
+	printf("declare -x ");
+	i = 0;
+	while (variable[i] && variable[i] != '=')
+	{
+		printf("%c", variable[i]);
+		i++;
+	}
+	if (variable[i] == '\0')
+		return ;
+	printf("=\"");
+	printf("%s", variable + i + 1);
+	printf("\"\n");
+}
+
+static int	print_sorted_envp(char **envp)
+{
+	char	**dup;
+	int		i;
+
+	dup = make_envp_copy(envp);
+	if (!dup)
+		return (1);
+	sort_envp(dup);
+	i = 0;
+	while (dup[i])
+	{
+		print_one_exported_variable(dup[i]);
+		i++;
+	}
+	free_envp(dup);
+	return (0);
+}
+
+int builtin_export(char *argv[], char *envp[])
+{
+	int		i;
+	t_bool	has_met_an_error;
+
+	if (!argv[1])
+		return (print_sorted_envp(envp));
+	has_met_an_error = FALSE;
+
+	i = 1;
+	(void)i;
 	if (has_met_an_error)
 		return (1);
 	return (0);
