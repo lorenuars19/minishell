@@ -56,7 +56,7 @@ int		exec_piped(t_exdat *ed, t_node *node, char *envp[]);
 int		set_redir_file(t_exdat *ed, t_node *node);
 int		set_redir_pipe(t_exdat *ed, t_node *node);
 
-int		filter_wstatus(int wstatus);
+int		get_exit_code(int wstatus);
 int		is_path_regular_file(char *path);
 int		is_path_executable(char *path);
 

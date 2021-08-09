@@ -6,7 +6,7 @@
 #    By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 13:37:24 by lorenuar          #+#    #+#              #
-#    Updated: 2021/08/08 16:15:35 by lorenuar         ###   ########.fr        #
+#    Updated: 2021/08/09 19:23:25 by lorenuar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -60,10 +60,12 @@ SRCS = \
 	./src/scanner_utils.c \
 	./src/exec/is_path_.c \
 	./src/exec/setup_signals.c \
+	./src/exec/execution.c \
 	./src/exec/builtins.c \
 	./src/exec/exec_binary.c \
 	./src/exec/exec_piped.c \
 	./src/exec/check_for_builtins.c \
+	./src/exec/get_exit_code.c \
 	./src/exec/set_redir_.c \
 	./src/exec/exec_command.c \
 	./src/exec/exec_nodes.c \

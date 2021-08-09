@@ -49,15 +49,15 @@ int	set_redir_pipe(t_exdat *ed, t_node *node)
 	if (!ed || !node)
 		return (1);
 
-
+//TODO remove
 dprintf(2, "set_redirection : ed fd_to_close %d p[READ_P] %d p[WRITE_P] %d\n",
 ed->fd_close, ed->p[READ_P], ed->p[WRIT_P]);
 
-	if (ed->is_pipe == YES_PIPE
+	if (ed->is_pipe == TRUE
 		&& dup2(ed->p[READ_P], STDIN_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDIN : %d %s",
 			ed->p[READ_P], strerror(errno)));
-	if (ed->is_pipe == YES_PIPE
+	if (ed->is_pipe == TRUE
 		&& dup2(ed->p[WRIT_P], STDOUT_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDOUT : %d %s",
 			ed->p[WRIT_P], strerror(errno)));
