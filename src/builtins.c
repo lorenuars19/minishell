@@ -277,6 +277,31 @@ static int	print_sorted_envp(char **envp)
 	return (0);
 }
 
+static t_bool is_a_valid_exported_name(char *name)
+{
+	int i;
+
+	if (!name)
+		return (FALSE);
+	if (name[0] != '_' && !is_alpha(name[0]))
+		return (FALSE);
+	i = 0;
+	while (name[i] && name[i] != '=')
+	{
+		if (!is_alnum(name[i]) && name[i] != '_')
+			return (FALSE);
+		i++;
+	}
+	return (TRUE);
+}
+
+static void	print_export_name_error(char *name)
+{
+	put_str_fd(STDERR_FILENO, "minishell: export: '");
+	put_str_fd(STDERR_FILENO, name);
+	put_str_fd(STDERR_FILENO, "': not a valid identifier\n");
+}
+
 int builtin_export(char *argv[], char *envp[])
 {
 	int		i;
@@ -285,9 +310,22 @@ int builtin_export(char *argv[], char *envp[])
 	if (!argv[1])
 		return (print_sorted_envp(envp));
 	has_met_an_error = FALSE;
-
 	i = 1;
-	(void)i;
+	while (argv[i])
+	{
+		if (!is_a_valid_exported_name(argv[i]))
+		{
+			print_export_name_error(argv[i]);
+			has_met_an_error = TRUE;
+			i++;
+			continue ;
+		}
+		// if (var_already_exits_in_envp(argv[i]))
+		// 		modify_var_in_envp(envp, argv[i]);
+		// else
+		//		insert_new_value_in_envp(envp, argv[i]) //need to change envp to global for this
+		i++;
+	}
 	if (has_met_an_error)
 		return (1);
 	return (0);
