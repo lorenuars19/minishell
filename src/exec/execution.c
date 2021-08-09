@@ -6,15 +6,11 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 19:01:47 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/09 19:05:53 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/09 19:17:44 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/*
-** WRAPPER to facilitate memory management
-*/
 
 int	execution(t_node *node, char *envp[])
 {

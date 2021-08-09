@@ -60,6 +60,7 @@ SRCS = \
 	./src/scanner_utils.c \
 	./src/exec/is_path_.c \
 	./src/exec/setup_signals.c \
+	./src/exec/execution.c \
 	./src/exec/builtins.c \
 	./src/exec/exec_binary.c \
 	./src/exec/exec_piped.c \

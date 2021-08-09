@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:52 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/09 19:00:42 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/09 19:15:52 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,10 @@ void	check_for_builtins(t_exdat *ed, t_node *node)
 		i++;
 
 	if (i == BUILTIN_CD || i == BUILTIN_EXPORT || i == BUILTIN_UNSET || i == BUILTIN_EXIT)
-		ed->is_fork = NOT_FORK;
+		ed->is_fork = FALSE;
 
 	ed->f_to_call = get_builtin(i);
 
 	if (i >= 0 && i < BUILTIN_MAX)
-		ed->is_builtin = BUILTIN;
+		ed->is_builtin = TRUE;
 }
