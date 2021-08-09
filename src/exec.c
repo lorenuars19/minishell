@@ -1,27 +1,30 @@
 #include <stdlib.h>
 #include "minishell.h"
 
-int	execution(t_node *node, char *envp[])
+int	exec(t_node *node, char *envp[])
 {
-	t_ctx ctx;
+	// t_ctx ctx;
 
-	if (exec_nodes(node, &ctx, envp))
+	if (exec_nodes(node, envp))
 		return (1);
 
 	return (0);
 }
 
-int	exec_nodes(t_node *node, t_ctx *ctx, char *envp[])
+int	exec_nodes(t_node *node, char *envp[])
 {
+	int	ret;
+
 	if (node->type == COMMAND_NODE)
 	{
-		if (exec_command(node, envp))
-			return (1);
+		ret = exec_command(node, envp);
+		return (ret);
 	}
 	else if (node->type == PIPE_NODE)
 	{
-		if (exec_piped(node, ctx, envp))
-			return (1);
+		// if (exec_piped(node, ctx, envp))
+		// 	return (1);
+		printf("TODO, execution of pipes\n");
 	}
 	else
 	{
@@ -30,71 +33,52 @@ int	exec_nodes(t_node *node, t_ctx *ctx, char *envp[])
 	return (0);
 }
 
-int	check_for_builtins(t_node *node, char *envp[])
-{
-	int i;
-	static char *builtins[] = {
-		"echo",
-		"cd",
-		"pwd",
-		"export",
-		"unset",
-		"env",
-		"exit",
-		NULL};
-	i = 0;
-	while (node->args && node->args[0] && builtins[i] && str_cmp(node->args[0], builtins[i]))
-		i++;
-	if (exec_builtin(node, envp, i))
-		return (1);
-	return (0);
-}
-
-int	exec_builtin(t_node *node, char *envp[], int index)
-{
-	static int (*builtins[])(char *argv[], char *envp[]) = {
-		builtin_echo,
-		builtin_cd,
-		builtin_pwd,
-		builtin_export,
-		builtin_unset,
-		builtin_env,
-		builtin_exit};
-	if (index >= 0 && index < BUILTIN_END)
-	{
-		if (builtins[index](node->args, envp))
-		{
-			return (1);
-		}
-	}
-	return (0);
-}
 
 int	exec_command(t_node *node, char *envp[])
 {
-	int status;
 	pid_t cpid;
 
-	if (check_for_builtins(node, envp))
-		return (1);
+	(void)envp;
 	cpid = fork();
 	if (cpid < 0)
-		return (error_sys_put("fork"));
-	else if (cpid == FORKED_CHILD)
-		return (exec_binary(node, envp));
-	else
 	{
-		//TODO parent stuff
-		printf("Child PID : %d\n", cpid);
-		status = wait_for_child(cpid);
-		if (status)
-		{
-			return (error_printf(status, "child exit code : %d\n", status));
-		}
-		//TODO close pipe ? or other sutff maybe IDK
+		put_str_fd_nl(STDERR_FILENO, "Error setting up the fork");
+		return (1);
 	}
+	else if (cpid == FORKED_CHILD)
+	{
+		execvp(node->args[0], node->args);
+		printf("error: %s\n", strerror(errno));
+	}
+	wait(NULL);
 	return (0);
 }
+
+// int	exec_command(t_node *node, char *envp[])
+// {
+// 	int status;
+// 	pid_t cpid;
+
+// 	if (check_for_builtins(node, envp))
+// 		return (1);
+// 	cpid = fork();
+// 	if (cpid < 0)
+// 		return (error_sys_put("fork"));
+// 	else if (cpid == FORKED_CHILD)
+// 		return (exec_binary(node, envp));
+// 	else
+// 	{
+// 		//TODO parent stuff
+// 		printf("Child PID : %d\n", cpid);
+// 		status = wait_for_child(cpid);
+// 		if (status)
+// 		{
+// 			return (error_printf(status, "child exit code : %d\n", status));
+// 		}
+// 		//TODO close pipe ? or other sutff maybe IDK
+// 	}
+// 	return (0);
+// }
 
 int	sub_wait_for_child(int wstatus)
 {
@@ -198,6 +182,46 @@ int	is_path_executable(char *path)
 	if (S_ISREG(sb.st_mode) && sb.st_mode & 0111)
 	{
 		return (1);
+	}
+	return (0);
+}
+
+int check_for_builtins(t_node *node, char *envp[])
+{
+	int i;
+	static char *builtins[] = {
+		"echo",
+		"cd",
+		"pwd",
+		"export",
+		"unset",
+		"env",
+		"exit",
+		NULL};
+	i = 0;
+	while (node->args && node->args[0] && builtins[i] && str_cmp(node->args[0], builtins[i]))
+		i++;
+	if (exec_builtin(node, envp, i))
+		return (1);
+	return (0);
+}
+
+int exec_builtin(t_node *node, char *envp[], int index)
+{
+	static int (*builtins[])(char *argv[], char *envp[]) = {
+		builtin_echo,
+		builtin_cd,
+		builtin_pwd,
+		builtin_export,
+		builtin_unset,
+		builtin_env,
+		builtin_exit};
+	if (index >= 0 && index < BUILTIN_END)
+	{
+		if (builtins[index](node->args, envp))
+		{
+			return (1);
+		}
 	}
 	return (0);
 }
