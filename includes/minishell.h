@@ -21,10 +21,4 @@
 
 # define HEREDOC_FILENAME "/tmp/.minishell_heredoc.txt"
 
-typedef enum e_bool
-{
-	FALSE,
-	TRUE
-}	t_bool;
-
 #endif
