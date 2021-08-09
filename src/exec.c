@@ -330,7 +330,6 @@ static int	is_path_executable(char *path)
 	return (0);
 }
 
-#	  	include <debug_utils.h>
 
 static char	*find_path(t_node *node)
 {
