@@ -79,7 +79,7 @@ int	exec_command(t_node *node, char *envp[])
 		return (1);
 	cpid = fork();
 	if (cpid < 0)
-		return (error_sys_put(errno));
+		return (error_sys_put("fork"));
 	else if (cpid == FORKED_CHILD)
 		return (exec_binary(node, envp));
 	else
