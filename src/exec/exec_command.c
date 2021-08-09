@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:58 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/09 19:28:05 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/10 01:46:40 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,13 @@ dprintf(2, ">\n \033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork
 		(ed->is_builtin == TRUE) ? ("\033[33mBUILTIN") : ("\033[33mBINARY"),\
 		(ed->is_fork == TRUE) ? ("\033[33mFORKED") : ("\033[33mNOT FORKED"), \
 		ed->f_to_call);
-
-
-		if (ed->is_pipe == TRUE && set_redir_pipe(ed, node))
-			return(error_put(1, "exec_command : set_redir_pipe"));
-		if (node->redirections && set_redir_file(ed, node))
-			return(error_put(1, "exec_command : set_redir_file"));
+		if (ed->is_fork == TRUE)
+		{
+			if (ed->is_pipe == TRUE && set_redir_pipe(ed, node))
+				return(error_put(1, "exec_command : set_redir_pipe"));
+			if (node->redirections && set_redir_file(ed, node))
+				return(error_put(1, "exec_command : set_redir_file"));
+		}
 		if (ed->is_builtin == TRUE)
 		{
 			ed->status = ed->f_to_call(node->args, envp);

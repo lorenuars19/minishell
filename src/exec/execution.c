@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 19:01:47 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/09 19:45:21 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/10 01:49:04 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	execution(t_node *node, char *envp[])
 	t_exdat	ed;
 
 	ed = (t_exdat){0, FALSE, TRUE, builtin_dummy,
-		FALSE, {-1, -1}, -1, 0};
+		FALSE, {STDIN_FILENO, STDOUT_FILENO}, -1, 0};
 	ed.status = exec_nodes(&ed, node, envp);
 	if (ed.status)
 		return (ed.status);
