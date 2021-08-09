@@ -3,38 +3,44 @@
 
 int	exec(t_node *node, char *envp[])
 {
-	// t_ctx ctx;
+	t_context ctx;
+	int		children;
+	int		i;
 
-	if (exec_nodes(node, envp))
-		return (1);
-
+	ctx.fd[STDIN_FILENO] = STDIN_FILENO;
+	ctx.fd[STDOUT_FILENO] = STDOUT_FILENO;
+	ctx.fd_close = -1;
+	children = exec_node(node, &ctx, envp);
+	printf("number of children spawned: %d\n", children);
+	i = 0;
+	while (i < children)
+	{
+		wait(NULL);
+		i++;
+	}
 	return (0);
 }
 
-int	exec_nodes(t_node *node, char *envp[])
+int exec_node(t_node *node, t_context *ctx, char *envp[])
 {
 	int	ret;
 
+	ret = 0;
 	if (node->type == COMMAND_NODE)
 	{
-		ret = exec_command(node, envp);
+		ret = exec_command(node, ctx, envp);
 		return (ret);
 	}
 	else if (node->type == PIPE_NODE)
 	{
-		// if (exec_piped(node, ctx, envp))
-		// 	return (1);
-		printf("TODO, execution of pipes\n");
+		ret = exec_pipe(node, ctx, envp);
+		return (ret);
 	}
-	else
-	{
-		return (1);
-	}
-	return (0);
+	return (ret);
 }
 
 
-int	exec_command(t_node *node, char *envp[])
+int	exec_command(t_node *node, t_context *ctx, char *envp[])
 {
 	pid_t cpid;
 
@@ -43,15 +49,50 @@ int	exec_command(t_node *node, char *envp[])
 	if (cpid < 0)
 	{
 		put_str_fd_nl(STDERR_FILENO, "Error setting up the fork");
-		return (1);
+		return (-1);
 	}
 	else if (cpid == FORKED_CHILD)
 	{
+		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
+		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
+		if (ctx->fd_close != -1)
+			close(ctx->fd_close);
 		execvp(node->args[0], node->args);
+		//TODO print on stderror
 		printf("error: %s\n", strerror(errno));
 	}
-	wait(NULL);
-	return (0);
+	return (1);
+}
+
+int exec_pipe(t_node *node, t_context *ctx, char *envp[])
+{
+	int	pipe_fd[2];
+	t_node	*lhs;
+	t_node	*rhs;
+	t_context	lhs_ctx;
+	t_context	rhs_ctx;
+	int children;
+
+	if (pipe(pipe_fd) == -1)
+	{
+		//TODO print on stderror
+		printf("minishell: pipe: %s\n", strerror(errno));
+		return (-1);
+	}
+	lhs_ctx = *ctx;
+	lhs_ctx.fd[STDOUT_FILENO] = pipe_fd[STDOUT_FILENO];
+	lhs_ctx.fd_close = pipe_fd[STDIN_FILENO];
+	lhs = node->left;
+	children = exec_node(lhs, &lhs_ctx, envp);
+	rhs_ctx = *ctx;
+	rhs_ctx.fd[STDIN_FILENO] = pipe_fd[STDIN_FILENO];
+	rhs_ctx.fd_close = pipe_fd[STDOUT_FILENO];
+	rhs = node->right;
+	children += exec_node(rhs, &rhs_ctx, envp);
+
+	close(pipe_fd[STDIN_FILENO]);
+	close(pipe_fd[STDOUT_FILENO]);
+	return (children);
 }
 
 // int	exec_command(t_node *node, char *envp[])
@@ -113,16 +154,6 @@ int	wait_for_child(pid_t cpid)
 	return (ret);
 }
 
-int	exec_piped(t_node *node, t_ctx *ctx, char *envp[])
-{
-	if (node->type != PIPE_NODE)
-		return (1);
-
-	(void)ctx;
-	(void)envp;
-
-	return (0);
-}
 
 int	exec_binary(t_node *node, char *envp[])
 {

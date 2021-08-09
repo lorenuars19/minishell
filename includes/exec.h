@@ -19,14 +19,16 @@ typedef enum e_builtin_commands
 typedef struct s_pipe_context
 {
 	int	fd[2];
-	int	close_fd;
-}	t_ctx;
+	int	fd_close;
+}	t_context;
 
 int	exec(t_node *node, char *envp[]);
 
-int exec_nodes(t_node *node, char *envp[]);
+int exec_node(t_node *node, t_context *ctx, char *envp[]);
 
-int exec_command(t_node *node, char *envp[]);
+int exec_command(t_node *node, t_context *ctx, char *envp[]);
+int exec_pipe(t_node * node, t_context *ctx, char *envp[]);
+
 int wait_for_child(pid_t cpid);
 
 int	exec_binary(t_node *node, char *envp[]);
@@ -44,6 +46,5 @@ int builtin_unset(char *argv[], char *envp[]);
 int builtin_env(char *argv[], char *envp[]);
 int builtin_exit(char *argv[], char *envp[]);
 
-int exec_piped(t_node * node, t_ctx *ctx, char *envp[]);
 
 #endif

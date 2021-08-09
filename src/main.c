@@ -34,8 +34,7 @@ int main(int argc, char **argv, char **envp)
 		// execution(nodes, envp);
 		// if (nodes->type == COMMAND_NODE)
 		// 	check_for_builtins(nodes, envp);
-		if (nodes->type == COMMAND_NODE)
-			exec_command(nodes, envp);
+		exec(nodes, envp);
 		free_tokens_without_data(tokens);
 		free_nodes(nodes);
 		if (str_cmp("exit", line) == 0)
