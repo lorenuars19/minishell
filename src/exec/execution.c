@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 19:01:47 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/09 19:25:18 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/09 19:45:21 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,9 @@ int	execution(t_node *node, char *envp[])
 	ed.status = exec_nodes(&ed, node, envp);
 	if (ed.status)
 		return (ed.status);
-	while (ed.is_pipe == TRUE && ed.n_children >= 0)
+	if (setup_signals(REVERT_TO_DEFAULT))
+		return (ed.status);
+	while (ed.is_pipe == TRUE && ed.n_children > 0)
 	{
 		wait(&(ed.status));
 
