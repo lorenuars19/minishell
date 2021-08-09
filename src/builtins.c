@@ -78,26 +78,29 @@ int builtin_echo(char *argv[], char *envp[])
 
 int builtin_cd(char *argv[], char *envp[])
 {
-	(void)envp;
-	if (!argv)
-		return (1);
+	char	*path;
+
 	if (!argv[1])
-	{
-		put_str_fd(STDERR_FILENO, "minishell: cd: not enough arguments\n");
-		return (1);
-	}
-	if (argv[2])
+		path = get_value_from_envp("HOME", envp);
+	else if (argv[2])
 	{
 		put_str_fd(STDERR_FILENO, "minishell: cd: too many arguments\n");
 		return (1);
 	}
-	if (chdir(argv[1]) == -1)
+	else
+		path = str_dupli(argv[1]);
+	if (!path)
+		return (1);
+	if (chdir(path) == -1)
 	{
 		put_str_fd(STDERR_FILENO, "minishell: cd: ");
-		put_str_fd(STDERR_FILENO, strerror(errno));
-		put_str_fd(STDERR_FILENO, "\n");
+		put_str_fd(STDERR_FILENO, path);
+		put_str_fd(STDERR_FILENO, ": ");
+		put_str_fd_nl(STDERR_FILENO, strerror(errno));
+		free(path);
 		return (1);
 	}
+	free(path);
 	return (0);
 }
 
