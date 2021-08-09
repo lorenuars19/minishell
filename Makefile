@@ -58,8 +58,16 @@ SRCS = \
 	./src/variable_expansion.c \
 	./src/parser.c \
 	./src/scanner_utils.c \
-	./src/builtins.c \
-	./src/exec.c \
+	./src/exec/is_path_.c \
+	./src/exec/setup_signals.c \
+	./src/exec/builtins.c \
+	./src/exec/exec_binary.c \
+	./src/exec/exec_piped.c \
+	./src/exec/check_for_builtins.c \
+	./src/exec/set_redir_.c \
+	./src/exec/exec_command.c \
+	./src/exec/exec_nodes.c \
+	./src/exec/wait_for_child.c \
 	./src/scanner.c \
 	./src/merge_tokens.c \
 	./src/main.c \

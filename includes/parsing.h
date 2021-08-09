@@ -6,11 +6,7 @@
 # define MALLOC_ERROR -1
 # define SPECIAL_CHARS "|\'\" <>\t"
 
-enum
-{
-	FALSE,
-	TRUE
-};
+
 
 typedef	enum e_token_type
 {
