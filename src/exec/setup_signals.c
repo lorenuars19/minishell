@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:50:16 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/09 18:50:22 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/12 18:30:48 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 static void	sig_handle_child(int signum)
 {
 	kill(0, signum);
+	setup_signals(REVERT_TO_DEFAULT);
 }
 
 static void	sig_handle_parent(int signum)

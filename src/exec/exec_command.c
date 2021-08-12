@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:58 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/10 01:46:40 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/12 17:29:22 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,9 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 {
 	int	cpid;
 
-	*ed = (t_exdat){0, FALSE, TRUE, builtin_dummy, ed->is_pipe,
-		{ed->p[0], ed->p[1]}, ed->fd_close, 0};
+	*ed = (t_exdat){0, FALSE, TRUE, builtin_dummy,
+		ed->is_pipe, ed->pipe_open,
+		{ed->p[0], ed->p[1]}, {ed->fd[0], ed->fd[1]}, ed->fd_close, 0};
 	check_for_builtins(ed, node);
 
 	cpid = 0;
@@ -31,11 +32,7 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 	else if (cpid == FORKED_CHILD)
 	{
 
-//TODO REMOVE DEBUG
-dprintf(2, ">\n \033[32;1mEXEC_DATA\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not %s\033[0m ed->f_to_call <%p>\n<", \
-		(ed->is_builtin == TRUE) ? ("\033[33mBUILTIN") : ("\033[33mBINARY"),\
-		(ed->is_fork == TRUE) ? ("\033[33mFORKED") : ("\033[33mNOT FORKED"), \
-		ed->f_to_call);
+DED;
 		if (ed->is_fork == TRUE)
 		{
 			if (ed->is_pipe == TRUE && set_redir_pipe(ed, node))

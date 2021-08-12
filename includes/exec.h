@@ -7,6 +7,16 @@
 # define READ_P 0
 
 # define FORKED_CHILD 0
+
+# define DED \
+dprintf(2, "\n> \033[32;1m %s:%d %s\033[0m : ed->builtin_mode %s\033[0m ed->fork_or_not %s\033[0m ed->f_to_call <%p> |\n "\
+		"\tis_pipe %d pipe_open %d \n\tp[0] %d p[1] %d \n\tfd[0] %d fd[1] %d \n\tfd_close %d n_children %d <\n", \
+		__FILE__, __LINE__, __FUNCTION__, \
+		(ed->is_builtin == TRUE) ? ("\033[33mBUILTIN") : ("\033[33mBINARY"),\
+		(ed->is_fork == TRUE) ? ("\033[33mFORKED") : ("\033[33mNOT FORKED"), \
+		ed->f_to_call, ed->is_pipe, ed->pipe_open,\
+		ed->p[0], ed->p[1], ed->fd[0], ed->fd[1], ed->fd_close, ed->n_children);
+
 typedef enum e_builtin_commands
 {
 	BUILTIN_ECHO,
@@ -28,7 +38,9 @@ typedef struct s_exec_data
 	t_builtin_f		f_to_call;
 
 	t_bool			is_pipe;
+	t_bool			pipe_open;
 	int				p[2];
+	int				fd[2];
 	int				fd_close;
 	int				n_children;
 }	t_exdat;

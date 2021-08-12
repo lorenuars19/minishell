@@ -10,9 +10,8 @@ int	set_redir_file(t_exdat *ed, t_node *node)
 	redir = node->redirections;
 	while (redir)
 	{
-		if (redir && ed->fd_close >= 0
-			&& close(ed->fd_close))
-			return (error_printf(errno, "close : %d %s\n",
+		if (redir && ed->fd_close > STDERR_FILENO && 0 && close(ed->fd_close))
+			return (error_printf(errno, "set_redir_file : close : %d %s\n",
 				ed->fd_close, strerror(errno)));
 		o_flags = O_RDONLY;
 		dup_fd = STDOUT_FILENO;
@@ -34,7 +33,7 @@ int	set_redir_file(t_exdat *ed, t_node *node)
 		ed->fd_close = open(redir->filename, o_flags, (S_IRUSR + S_IWUSR)
 			| (S_IRGRP + S_IWGRP) | S_IROTH);
 		if (ed->fd_close < 0)
-			return (error_printf(errno, "sub_set_redir : open : \"%s\" %d %s",
+			return (error_printf(errno, "set_redir_file : open : \"%s\" %d %s",
 				redir->filename, ed->fd_close, strerror(errno)));
 		if (dup2(ed->fd_close, dup_fd) < 0)
 			return (error_printf(errno, "sub_set_redir : dup2 : %d %s",
@@ -50,23 +49,18 @@ int	set_redir_pipe(t_exdat *ed, t_node *node)
 		return (1);
 
 //TODO remove
-dprintf(2, "set_redirection : ed fd_to_close %d p[READ_P] %d p[WRITE_P] %d\n",
-ed->fd_close, ed->p[READ_P], ed->p[WRIT_P]);
+dprintf(2, "set_redirection : cmd [%s] | ed fd_to_close %d p[0] %d p[1] %d\n",
+	node->args[0], ed->fd_close, ed->fd[0], ed->fd[1]);
 
 	if (ed->is_pipe == TRUE
-		&& dup2(ed->p[READ_P], STDIN_FILENO) < 0)
+		&& dup2(ed->fd[STDIN_FILENO], STDIN_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDIN : %d %s",
-			ed->p[READ_P], strerror(errno)));
+			ed->fd[STDIN_FILENO], strerror(errno)));
 	if (ed->is_pipe == TRUE
-		&& dup2(ed->p[WRIT_P], STDOUT_FILENO) < 0)
+		&& dup2(ed->fd[STDOUT_FILENO], STDOUT_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDOUT : %d %s",
-			ed->p[WRIT_P], strerror(errno)));
-	if (ed->fd_close >= 0)
-	{
-		if (close(ed->fd_close))
-			return (error_sys_put("close"));
-	}
-	if (node->redirections && set_redir_file(ed, node))
-		return (error_sys_put("sub_set_redir"));
+			ed->fd[STDOUT_FILENO], strerror(errno)));
+	if (ed->fd_close > STDERR_FILENO && close(ed->fd_close))
+		return (error_sys_put("set_redir_pipe : close"));
 	return (0);
 }

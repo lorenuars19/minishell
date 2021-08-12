@@ -51,7 +51,7 @@ int main(int argc, char **argv, char **envp)
 		status = execution(nodes, envp);
 
 //TODO remove debug
-dprintf(2, ">\n Last command status : %d\n<\n", status);
+dprintf(2, "\n> Last command status : %d <\n", status);
 
 		free_tokens_without_data(tokens);
 		free_nodes(nodes);
