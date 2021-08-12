@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "minishell.h"
 
+#include <debug_utils.h>
+
 int	exec(t_node *node, char *envp[])
 {
 	t_context ctx;
@@ -9,6 +11,11 @@ int	exec(t_node *node, char *envp[])
 
 	ctx.fd[STDIN_FILENO] = STDIN_FILENO;
 	ctx.fd[STDOUT_FILENO] = STDOUT_FILENO;
+
+DM(exec, ctx.fd[0])
+DM(exec, ctx.fd[1])
+DM(exec, ctx.fd_close)
+
 	ctx.fd_close = -1;
 	children = exec_node(node, &ctx, envp);
 	printf("number of children spawned: %d\n", children);
@@ -33,6 +40,11 @@ int exec_node(t_node *node, t_context *ctx, char *envp[])
 	}
 	else if (node->type == PIPE_NODE)
 	{
+
+DM(exec_node, ctx->fd[0])
+DM(exec_node, ctx->fd[1])
+DM(exec_node, ctx->fd_close)
+
 		ret = exec_pipe(node, ctx, envp);
 		return (ret);
 	}
@@ -53,6 +65,12 @@ int	exec_command(t_node *node, t_context *ctx, char *envp[])
 	}
 	else if (cpid == FORKED_CHILD)
 	{
+
+
+DM(exec_command before dup2s, ctx->fd[0])
+DM(exec_command before dup2s, ctx->fd[1])
+DM(exec_command before dup2s, ctx->fd_close)
+
 		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
 		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 		if (ctx->fd_close != -1)
@@ -83,11 +101,27 @@ int exec_pipe(t_node *node, t_context *ctx, char *envp[])
 	lhs_ctx.fd[STDOUT_FILENO] = pipe_fd[STDOUT_FILENO];
 	lhs_ctx.fd_close = pipe_fd[STDIN_FILENO];
 	lhs = node->left;
+
+
+DM(exec_pipe lhs, lhs_ctx.fd[0])
+DM(exec_pipe lhs, lhs_ctx.fd[1])
+DM(exec_pipe lhs, lhs_ctx.fd_close)
+
 	children = exec_node(lhs, &lhs_ctx, envp);
+
+
 	rhs_ctx = *ctx;
 	rhs_ctx.fd[STDIN_FILENO] = pipe_fd[STDIN_FILENO];
 	rhs_ctx.fd_close = pipe_fd[STDOUT_FILENO];
 	rhs = node->right;
+
+usleep(50000);
+
+DM(exec_pipe rhs, rhs_ctx.fd[0])
+DM(exec_pipe rhs, rhs_ctx.fd[1])
+DM(exec_pipe rhs, rhs_ctx.fd_close)
+
+
 	children += exec_node(rhs, &rhs_ctx, envp);
 
 	close(pipe_fd[STDIN_FILENO]);
