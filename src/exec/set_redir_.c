@@ -49,14 +49,14 @@ int	set_redir_pipe(t_exdat *ed, t_node *node)
 		return (1);
 
 //TODO remove
-dprintf(2, "set_redirection : cmd [%s] | ed fd_to_close %d p[0] %d p[1] %d\n",
+dprintf(2, "\n> set_redirection : cmd [%s] | ed fd_to_close %d fd[0] %d fd[1] %d\n",
 	node->args[0], ed->fd_close, ed->fd[0], ed->fd[1]);
 
-	if (ed->is_pipe == TRUE
+	if (ed->is_pipe == TRUE && ed->fd[STDIN_FILENO] >= 0
 		&& dup2(ed->fd[STDIN_FILENO], STDIN_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDIN : %d %s",
 			ed->fd[STDIN_FILENO], strerror(errno)));
-	if (ed->is_pipe == TRUE
+	if (ed->is_pipe == TRUE && ed->fd[STDOUT_FILENO] >= 0
 		&& dup2(ed->fd[STDOUT_FILENO], STDOUT_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDOUT : %d %s",
 			ed->fd[STDOUT_FILENO], strerror(errno)));

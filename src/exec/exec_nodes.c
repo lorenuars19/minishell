@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:50:02 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/12 18:24:48 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/13 13:52:51 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,19 +17,13 @@
 ** The actual starting point that will be called recursively
 */
 
-int	exec_nodes(t_exdat *ed, t_node *node, char *envp[])
+int exec_nodes(t_exdat *ed, t_node *node, char *envp[])
 {
 //TODO REMOvE
 dprintf(2, "\n> exec_nodes : cmd [%s] | node->type %s<\n",
-	(node->args) ?
-		(node->args[0])
-	:
-		("|"),
-	(node->type == COMMAND_NODE) ?
-		("COMMAND_NODE")
-	:
-		("PIPE_NODE"));
-DED;
+		(node->args) ? (node->args[0]) : ("|"),
+		(node->type == COMMAND_NODE) ? ("COMMAND_NODE"): ("PIPE_NODE"));
+	DED;
 
 	if (node->type == COMMAND_NODE)
 	{
@@ -48,5 +42,10 @@ DED;
 	{
 		return (1);
 	}
-	return (0);
+	if (setup_signals(REVERT_TO_DEFAULT))
+		return (error_sys_put("setup_signals"));
+
+
+
+	return (ed->status);
 }
