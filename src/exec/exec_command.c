@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:58 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/14 23:26:03 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/15 00:10:43 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 		return(error_put(1, "exec_command : node NULL or not COMMAND"));
 	init_ed(ed);
 	check_for_builtins(ed, node);
-
-	ed->n_children++;
 
 	cpid = 0;
 	if (ed->is_fork == TRUE)
@@ -61,6 +59,11 @@ int	exec_command(t_exdat *ed, t_node *node, char *envp[])
 	}
 	else
 	{
+
+
+dprintf(2, "node->type");
+
+		ed->n_children++;
 		if (ed->is_pipe == FALSE)
 		{
 			ed->status = wait_for_child(cpid);

@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:45 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/14 19:28:31 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/15 00:06:43 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,6 @@ int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 
 	if (lhs.status)
 		return (lhs.status);
-
-// usleep(1000 * 1000);
 
 	rhs = *ed;
 
