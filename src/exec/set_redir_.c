@@ -10,9 +10,8 @@ int	set_redir_file(t_exdat *ed, t_node *node)
 	redir = node->redirections;
 	while (redir)
 	{
-		if (redir && ed->fd_close > STDERR_FILENO && 0 && close(ed->fd_close))
-			return (error_printf(errno, "set_redir_file : close : %d %s\n",
-				ed->fd_close, strerror(errno)));
+		if (redir && ed->fd_close >= 0)
+			close(ed->fd_close);
 		o_flags = O_RDONLY;
 		dup_fd = STDOUT_FILENO;
 
@@ -60,7 +59,7 @@ dprintf(2, "\n> set_redirection : cmd [%s] | ed fd_to_close %d fd[0] %d fd[1] %d
 		&& dup2(ed->fd[STDOUT_FILENO], STDOUT_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDOUT : %d %s",
 			ed->fd[STDOUT_FILENO], strerror(errno)));
-	if (ed->fd_close > STDERR_FILENO && close(ed->fd_close))
-		return (error_sys_put("set_redir_pipe : close"));
+	if (ed->fd_close >= 0)
+		close(ed->fd_close);
 	return (0);
 }

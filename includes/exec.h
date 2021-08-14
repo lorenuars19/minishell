@@ -20,6 +20,10 @@ dprintf(2, "\n> \033[32;1m %s:%d %s\033[0m : cmd [%s] node->type \033[33m%s\033[
 		ed->f_to_call, ed->is_pipe, ed->pipe_open,\
 		ed->p[0], ed->p[1], ed->fd[0], ed->fd[1], ed->fd_close, ed->n_children);
 
+# define DCL(value) dprintf(2, "\n> %s:%d %s : \033[31mCLOSE FD " #value " %d \033[0m<\n", __FILE__, __LINE__, __FUNCTION__, value);
+
+# define close(value) DCL(value) close(value);
+
 typedef enum e_builtin_commands
 {
 	BUILTIN_ECHO,
@@ -45,6 +49,7 @@ typedef struct s_exec_data
 	int				p[2];
 	int				fd[2];
 	int				fd_close;
+	int				n_command;
 	int				n_children;
 }	t_exdat;
 
