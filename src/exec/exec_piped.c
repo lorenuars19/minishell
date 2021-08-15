@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:45 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/15 00:06:43 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/15 15:30:19 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 
 	lhs.fd[WRIT_P] = ed->p[WRIT_P];
 	ed->status = exec_nodes(&lhs, node->left, envp);
-	ed->n_children += lhs.n_children;
+	ed->n_children++;
 
 	if (lhs.status)
 		return (lhs.status);
@@ -54,7 +54,7 @@ int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 
 	rhs.fd_close = ed->p[READ_P];
 	ed->status = exec_nodes(&rhs, node->right, envp);
-	ed->n_children += rhs.n_children;
+	ed->n_children++;
 
 	if (rhs.status)
 		return (rhs.status);
@@ -65,5 +65,7 @@ int	exec_piped(t_exdat *ed, t_node *node, char *envp[])
 	if (ed->p[WRIT_P] >= 0)
 		close(ed->p[WRIT_P]);
 
-	return (ed->status);
+DED;
+
+	return (ed->n_children);
 }

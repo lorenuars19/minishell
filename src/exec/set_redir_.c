@@ -59,7 +59,5 @@ dprintf(2, "\n> set_redirection : cmd [%s] | ed fd_to_close %d fd[0] %d fd[1] %d
 		&& dup2(ed->fd[STDOUT_FILENO], STDOUT_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDOUT : %d %s",
 			ed->fd[STDOUT_FILENO], strerror(errno)));
-	if (ed->fd_close >= 0)
-		close(ed->fd_close);
 	return (0);
 }
