@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_piped.c                                       :+:      :+:    :+:   */
+/*   exec_pipe.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:45 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 20:02:37 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/16 20:05:34 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx)
+int	exec_pipe(t_exdat *ed, t_node *node, t_ctx *ctx)
 {
 	int		p[2];
 	t_ctx	lhs;
