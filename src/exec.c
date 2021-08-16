@@ -26,15 +26,9 @@ int exec_node(t_node *node, t_context *ctx, char *envp[])
 
 	ret = 0;
 	if (node->type == COMMAND_NODE)
-	{
-		ret = exec_command(node, ctx, envp);
-		return (ret);
-	}
+		return (exec_command(node, ctx, envp));
 	else if (node->type == PIPE_NODE)
-	{
-		ret = exec_pipe(node, ctx, envp);
-		return (ret);
-	}
+		return (exec_pipe(node, ctx, envp));
 	return (ret);
 }
 
@@ -47,69 +41,49 @@ int	exec_command(t_node *node, t_context *ctx, char *envp[])
 	cpid = fork();
 	if (cpid < 0)
 	{
-		put_str_fd_nl(STDERR_FILENO, "Error setting up the fork");
-		return (-1);
+		put_str_fd(STDERR_FILENO, "minishell: fork: ");
+		put_str_fd_nl(STDERR_FILENO, strerror(errno));
+		return (0);
 	}
 	else if (cpid == FORKED_CHILD)
 	{
-		if (ctx->fd[STDIN_FILENO] != STDIN_FILENO)
-			dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
-		if (ctx->fd[STDOUT_FILENO] != STDOUT_FILENO)
-			dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
+		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
+		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 		if (ctx->fd_close != -1)
 			close(ctx->fd_close);
 		execvp(node->args[0], node->args);
-		//TODO print on stderror
-		printf("error: %s\n", strerror(errno));
+		put_str_fd(STDERR_FILENO, "minishell: execve: ");
+		put_str_fd_nl(STDERR_FILENO, strerror(errno));
 	}
 	return (1);
 }
 
-void print_context(t_context *ctx, char *name)
-{
-	printf("context %s: in:%d, out:%d, close:%d\n", name, ctx->fd[0], ctx->fd[1], ctx->fd_close);
-}
-
 int exec_pipe(t_node *node, t_context *ctx, char *envp[])
 {
-	int	pipe_fd[2];
+	int			p[2];
 	t_context	lhs_ctx;
 	t_context	rhs_ctx;
-	int children;
+	int			children;
 
-	printf("command: left:%s, right: %s\n", node->left->args[0], (node->right->type == COMMAND_NODE ? node->right->args[0] : "PIPE"));
-	printf("context of exec_pipe: in:%d, out:%d, close:%d\n", ctx->fd[0], ctx->fd[1], ctx->fd_close);
-
-	if (ctx->fd_close >= 0)
+	if (pipe(p) == -1)
 	{
-		if (close(ctx->fd_close) == -1)
-			printf("ERROR while closing fd %d\n", ctx->fd_close);
+		put_str_fd(STDERR_FILENO, "minishell: pipe: ");
+		put_str_fd_nl(STDERR_FILENO, strerror(errno));
+		return (0);
 	}
-	if (pipe(pipe_fd) == -1)
-	{
-		//TODO print on stderror
-		printf("minishell: pipe: %s\n", strerror(errno));
-		return (-1);
-	}
-	printf("pipe: fd0: %d, fd1: %d\n", pipe_fd[0], pipe_fd[1]);
 	lhs_ctx = *ctx;
-	lhs_ctx.fd[STDOUT_FILENO] = pipe_fd[STDOUT_FILENO];
-	lhs_ctx.fd_close = pipe_fd[STDIN_FILENO];
-	print_context(&lhs_ctx, "lhs");
+	lhs_ctx.fd[STDOUT_FILENO] = p[STDOUT_FILENO];
+	lhs_ctx.fd_close = p[STDIN_FILENO];
 	children = exec_node(node->left, &lhs_ctx, envp);
+
+	close(p[STDOUT_FILENO]);
+
 	rhs_ctx = *ctx;
-	rhs_ctx.fd[STDIN_FILENO] = pipe_fd[STDIN_FILENO];
-	rhs_ctx.fd_close = pipe_fd[STDOUT_FILENO];
-	print_context(&rhs_ctx, "rhs");
+	rhs_ctx.fd[STDIN_FILENO] = p[STDIN_FILENO];
+	rhs_ctx.fd_close = -1;
 	children += exec_node(node->right, &rhs_ctx, envp);
 
-
-	if (close(pipe_fd[STDIN_FILENO]) == -1)
-		printf("ERROR2 while closing fd %d\n", pipe_fd[STDIN_FILENO]);
-	if (close(pipe_fd[STDOUT_FILENO]) == -1)
-		printf("ERROR3 while closing fd %d\n", pipe_fd[STDOUT_FILENO]);
-	else
-		printf("writing end of pipe %d is closed\n", pipe_fd[STDOUT_FILENO]);
+	close(p[STDIN_FILENO]);
 	return (children);
 }
 
