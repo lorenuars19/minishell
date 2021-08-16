@@ -73,8 +73,6 @@ void print_context(t_context *ctx, char *name)
 int exec_pipe(t_node *node, t_context *ctx, char *envp[])
 {
 	int	pipe_fd[2];
-	t_node	*lhs;
-	t_node	*rhs;
 	t_context	lhs_ctx;
 	t_context	rhs_ctx;
 	int children;
@@ -98,14 +96,12 @@ int exec_pipe(t_node *node, t_context *ctx, char *envp[])
 	lhs_ctx.fd[STDOUT_FILENO] = pipe_fd[STDOUT_FILENO];
 	lhs_ctx.fd_close = pipe_fd[STDIN_FILENO];
 	print_context(&lhs_ctx, "lhs");
-	lhs = node->left;
-	children = exec_node(lhs, &lhs_ctx, envp);
+	children = exec_node(node->left, &lhs_ctx, envp);
 	rhs_ctx = *ctx;
 	rhs_ctx.fd[STDIN_FILENO] = pipe_fd[STDIN_FILENO];
 	rhs_ctx.fd_close = pipe_fd[STDOUT_FILENO];
 	print_context(&rhs_ctx, "rhs");
-	rhs = node->right;
-	children += exec_node(rhs, &rhs_ctx, envp);
+	children += exec_node(node->right, &rhs_ctx, envp);
 
 
 	if (close(pipe_fd[STDIN_FILENO]) == -1)
