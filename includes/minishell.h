@@ -1,6 +1,8 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+
+# define _GNU_SOURCE
 # include <stdio.h>
 # include <stdlib.h>
 # include <stdint.h>
@@ -20,7 +22,7 @@
 # include "exec.h"
 
 
-# define HEREDOC_FILENAME "/tmp/.minishell_heredoc.txt"
+# define HEREDOC_PATH "/tmp/"
 
 typedef struct s_shell_data
 {

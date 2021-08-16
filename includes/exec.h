@@ -43,7 +43,7 @@ typedef struct s_exec_data
 
 	int			n_children;
 
-	int			file_close;
+	int			file_fd;
 }	t_exdat;
 
 typedef enum e_revert_signal_or_not

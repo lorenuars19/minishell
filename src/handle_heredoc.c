@@ -1,19 +1,9 @@
 #include "minishell.h"
-#include <fcntl.h>
-#include <stdlib.h>
-#include <errno.h>
 
-int	get_here_document(char *delimiter)
+int	get_here_document(int fd, char *delimiter)
 {
-	int	fd;
 	char	*line;
 
-	fd = open(HEREDOC_FILENAME, O_CREAT | O_TRUNC | O_WRONLY, 0666);
-	if (fd == -1)
-	{
-		printf("problem while opening temporary heredoc file' %s\n", strerror(errno));
-		return (1);
-	}
 	line = readline(">");
 	while (line && str_cmp(line, delimiter) != 0)
 	{
@@ -28,6 +18,5 @@ int	get_here_document(char *delimiter)
 		return (2);
 	}
 	free(line);
-	close(fd);
 	return (0);
 }

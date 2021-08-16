@@ -79,7 +79,7 @@ int syntax_checker(char *line, t_token *tokens);
 t_bool contains_unclosed_quotes(char *line);
 t_bool has_redirection_type(t_token *token);
 void skip_blank_tokens(t_token **tokens);
-int get_here_document(char *delimiter);
+int	get_here_document(int fd, char *delimiter);
 char **make_envp_copy(char **envp);
 void free_envp(char **envp);
 char *get_value_from_envp(char *name, char **envp);
