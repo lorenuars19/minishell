@@ -69,7 +69,6 @@ SRCS = \
 	./src/exec/set_redir_.c \
 	./src/exec/exec_command.c \
 	./src/exec/exec_nodes.c \
-	./src/exec/wait_for_child.c \
 	./src/scanner.c \
 	./src/merge_tokens.c \
 	./src/main.c \

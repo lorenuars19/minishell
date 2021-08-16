@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:50:16 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 10:37:29 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/16 14:20:03 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ static void	sig_handle_parent(int signum)
 	rl_replace_line("", 0);
 	rl_on_new_line();
 	rl_redisplay();
-	kill(0, signum);
 }
 
 int	setup_signals(t_revert revert_to_default)

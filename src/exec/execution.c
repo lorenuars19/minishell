@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 19:01:47 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 13:44:22 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/16 14:29:45 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static void sub_wait_children(t_exdat *ed)
 	{
 dprintf(2, "\n> exec_nodes : loop : before wait <\n");
 
-	cpid = waitpid(-1, &wstatus, 0);
+	cpid = wait(&wstatus);
 	ed->status = get_exit_code(wstatus);
 
 //TODO remove debug
@@ -49,7 +49,7 @@ int	execution(t_node *node, char *envp[])
 	if (ed.is_pipe == FALSE && ed.status)
 		return (error_put(ed.status, "execution : exec_nodes : non-zero exit code"));
 
-dprintf(2, "\n\n>-D-B-G->\n\033[33;1mn_children %d\033[0m\n<-D-B-G-<\n\n", ed.n_children);
+dprintf(2, "\n\n>-DBG->\n\033[33;1mn_children %d\033[0m\n<-DBG-<\n\n", ed.n_children);
 
 	sub_wait_children(&ed);
 
