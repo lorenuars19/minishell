@@ -94,7 +94,7 @@ int		setup_signals(t_revert revert_to_default);
 
 int		exec_binary(t_node *node, char *envp[]);
 
-int		exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx);
+int		exec_pipe(t_exdat *ed, t_node *node, t_ctx *ctx);
 int		set_redir_file(t_exdat *ed, t_node *node);
 int		set_redir_pipe(t_exdat *ed, t_ctx *ctx, t_node *node);
 

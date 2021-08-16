@@ -59,11 +59,11 @@ SRCS = \
 	./src/parser.c \
 	./src/scanner_utils.c \
 	./src/exec/is_path_.c \
+	./src/exec/exec_pipe.c \
 	./src/exec/setup_signals.c \
 	./src/exec/execution.c \
 	./src/exec/builtins.c \
 	./src/exec/exec_binary.c \
-	./src/exec/exec_piped.c \
 	./src/exec/check_for_builtins.c \
 	./src/exec/get_exit_code.c \
 	./src/exec/set_redir_.c \
