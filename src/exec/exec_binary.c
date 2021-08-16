@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:55 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/14 17:52:00 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/16 18:19:39 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ static char	*find_path(t_node *node)
 	while (tab && tab[i] && node->args && node->args[0])
 	{
 		path = str_jointo(tab[i], "/", NULL);
-		// path = str_jointo(path, node->args[0], &path);
 		path = str_jointo(path, node->args[0], &path);
 		if (is_path_executable(path))
 		{
@@ -51,10 +50,6 @@ int	exec_binary(t_node *node, char *envp[])
 		return (error_printf(1, "command \"%s\" not found", node->args[0]));
 	else if (!path)
 		return(error_put(1, "find_path : returned NULL"));
-
-//TODO remove debug
-dprintf(2, "\n> \033[32;1mexecve\033[0m(path \"%s\", node->args <%p>, envp <%p>) <\n\n", path, node->args, envp);
-
 	if (setup_signals(DEFER_SIGNAL))
 			return (error_sys_put("setup_signals"));
 	status = execve(path, node->args, envp);

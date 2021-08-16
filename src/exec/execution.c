@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 19:01:47 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 14:29:45 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/16 16:25:15 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,13 @@ static void sub_wait_children(t_exdat *ed)
 	{
 dprintf(2, "\n> exec_nodes : loop : before wait <\n");
 
-	cpid = wait(&wstatus);
+	cpid = waitpid(-1, &wstatus, WUNTRACED);
+	while (!WIFSIGNALED(wstatus) || !WIFEXITED(wstatus))
+	{
+		cpid = waitpid(-1, &wstatus, WUNTRACED);
+		if (WIFEXITED(wstatus) || WIFSIGNALED(wstatus))
+			break;
+	}
 	ed->status = get_exit_code(wstatus);
 
 //TODO remove debug

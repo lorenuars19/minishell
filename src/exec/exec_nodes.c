@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:50:02 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 14:37:56 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/16 16:05:30 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,6 @@
 
 int exec_nodes(t_exdat *ed, t_node *node, t_ctx *ctx)
 {
-//TODO REMOvE
-dprintf(2, "\n> exec_nodes : cmd [%s] | node->type %s<\n",
-		(node->args) ? (node->args[0]) : ("|"),
-		(node->type == COMMAND_NODE) ? ("COMMAND_NODE"): ("PIPE_NODE"));
-DED;
-
-DPCTX(ctx);
 
 	if (node->type == COMMAND_NODE)
 	{
