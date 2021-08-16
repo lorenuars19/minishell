@@ -22,4 +22,17 @@
 
 # define HEREDOC_FILENAME "/tmp/.minishell_heredoc.txt"
 
+typedef struct s_shell_data
+{
+	char	***envp_addr;
+
+	char	*line;
+
+	int		status;
+
+	t_token *tokens;
+	t_node	*nodes;
+}	t_sd;
+
+
 #endif

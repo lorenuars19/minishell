@@ -1,66 +1,81 @@
 #include "minishell.h"
 #include <stdlib.h>
 
+static int set_prompt(t_sd *sd)
+{
+	char *prompt;
+
+	prompt = NULL;
+	prompt = getcwd(NULL, 0);
+	prompt = str_jointo("\033[34m", prompt, &prompt);
+	if (sd->status)
+		prompt = str_jointo(prompt, " \033[31;1m$\033[0m ", &prompt);
+	else
+		prompt = str_jointo(prompt, " \033[32;1m$\033[0m ", &prompt);
+	sd->line = readline(prompt);
+	free(prompt);
+	if (!sd->line)
+	{
+		printf("\nexit\n");
+		free(sd->line);
+		return (1);
+	}
+	return (0);
+}
+
+static int process_command(t_sd *sd)
+{
+	if (sd->line && *(sd->line))
+		add_history(sd->line);
+	sd->tokens = scanner(sd->line);
+	if (syntax_checker(sd->line, sd->tokens) != 0)
+	{
+		free_tokens_with_data(sd->tokens);
+		free(sd->line);
+		return (1);
+	}
+	expand_variables(*(sd->envp_addr), sd->tokens);
+	merge_tokens(sd->tokens);
+	print_tokens(sd->tokens);
+	sd->nodes = parser(sd->tokens);
+	print_nodes(sd->nodes, 0);
+
+	sd->status = execution(sd->nodes, *(sd->envp_addr));
+
+	free_tokens_without_data(sd->tokens);
+	free_nodes(sd->nodes);
+	return (0);
+}
+
 int main(int argc, char **argv, char **envp)
 {
+	t_sd sd;
 	(void)argc;
 	(void)argv;
-	int 	status;
-	char 	*line;
-	char	*prompt;
 
-	status = 0;
+	sd = (t_sd){&envp, NULL, 0, NULL, NULL};
+
+	sd.status = 0;
 
 	if (setup_signals(REVERT_TO_DEFAULT))
-			return (error_sys_put("setup_signals"));
+		return (error_sys_put("setup_signals"));
 
 	while (1)
 	{
-		line = NULL;
-		prompt = NULL;
-		prompt = getcwd(NULL, 0);
-		prompt = str_jointo("\n\033[34m", prompt, &prompt);
-		if (status)
-			prompt = str_jointo(prompt, " \033[31;1m$\033[0m ", &prompt);
-		else
-			prompt = str_jointo(prompt, " \033[32;1m$\033[0m ", &prompt);
-		line = readline(prompt);
-		free(prompt);
-		if (!line)
-		{
-			printf("\nexit\n");
-			free(line);
+		if (set_prompt(&sd))
 			return (EXIT_SUCCESS);
-		}
-		printf("\nline : \"%s\"\n", line);
-		if (line && *line)
-			add_history(line);
-		t_token *tokens = scanner(line);
-		if (syntax_checker(line, tokens) != 0)
-		{
-			free_tokens_with_data(tokens);
-			free(line);
-			continue ;
-		}
-		expand_variables(envp, tokens);
-		merge_tokens(tokens);
-		print_tokens(tokens);
-		t_node *nodes = parser(tokens);
-		print_nodes(nodes, 0);
-
-		status = execution(nodes, envp);
-
 //TODO remove debug
-dprintf(2, "\n> Last command status : %d <\n", status);
-
-		free_tokens_without_data(tokens);
-		free_nodes(nodes);
-		if (str_cmp("exit", line) == 0)
+dprintf(2, "\nline : \"%s\"\n", sd.line);
+		if (process_command(&sd))
+			continue ;
+//TODO remove debug
+dprintf(2, "\n> Last command status : %d <\n", sd.status);
+		if (str_cmp("exit", sd.line) == 0)
 		{
-			free(line);
+			free(sd.line);
 			return (EXIT_SUCCESS);
 		}
-		free(line);
+		free(sd.line);
 	}
 	return (0);
 }
