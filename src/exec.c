@@ -11,13 +11,10 @@ int	exec(t_node *node, char *envp[])
 	ctx.fd[STDOUT_FILENO] = STDOUT_FILENO;
 	ctx.fd_close = -1;
 	children = exec_node(node, &ctx, envp);
-	printf("number of children spawned: %d\n", children);
 	i = 0;
-	(void)i;
 	while (i < children)
 	{
 		wait(NULL);
-		printf("%d th command done\n", i);
 		i++;
 	}
 	return (0);
@@ -65,8 +62,6 @@ int	exec_command(t_node *node, t_context *ctx, char *envp[])
 		//TODO print on stderror
 		printf("error: %s\n", strerror(errno));
 	}
-	// waitpid(cpid, NULL, 0);
-	// printf("command %s terminated\n", node->args[0]);
 	return (1);
 }
 
@@ -84,8 +79,14 @@ int exec_pipe(t_node *node, t_context *ctx, char *envp[])
 	t_context	rhs_ctx;
 	int children;
 
-	printf("context: in:%d, out:%d, close:%d\n", ctx->fd[0], ctx->fd[1], ctx->fd_close);
 	printf("command: left:%s, right: %s\n", node->left->args[0], (node->right->type == COMMAND_NODE ? node->right->args[0] : "PIPE"));
+	printf("context of exec_pipe: in:%d, out:%d, close:%d\n", ctx->fd[0], ctx->fd[1], ctx->fd_close);
+
+	if (ctx->fd_close >= 0)
+	{
+		if (close(ctx->fd_close) == -1)
+			printf("ERROR while closing fd %d\n", ctx->fd_close);
+	}
 	if (pipe(pipe_fd) == -1)
 	{
 		//TODO print on stderror
@@ -106,8 +107,13 @@ int exec_pipe(t_node *node, t_context *ctx, char *envp[])
 	rhs = node->right;
 	children += exec_node(rhs, &rhs_ctx, envp);
 
-	close(pipe_fd[STDIN_FILENO]);
-	close(pipe_fd[STDOUT_FILENO]);
+
+	if (close(pipe_fd[STDIN_FILENO]) == -1)
+		printf("ERROR2 while closing fd %d\n", pipe_fd[STDIN_FILENO]);
+	if (close(pipe_fd[STDOUT_FILENO]) == -1)
+		printf("ERROR3 while closing fd %d\n", pipe_fd[STDOUT_FILENO]);
+	else
+		printf("writing end of pipe %d is closed\n", pipe_fd[STDOUT_FILENO]);
 	return (children);
 }
 
