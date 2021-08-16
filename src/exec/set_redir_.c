@@ -46,10 +46,6 @@ int	set_redir_pipe(t_exdat *ed, t_ctx *ctx, t_node *node)
 	if (!ed || !node || !ctx)
 		return (1);
 
-//TODO remove
-dprintf(2, "\n> set_redirection : cmd [%s] | ed fd_to_close %d fd[0] %d fd[1] %d\n",
-	node->args[0], ctx->fd_close, ctx->fd[0], ctx->fd[1]);
-
 	if (ctx->fd[STDIN_FILENO] != STDIN_FILENO
 		&& dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO) < 0)
 		return (error_printf(errno, "set_redirection : dup2 STDIN : %d %s",

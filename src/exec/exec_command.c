@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:58 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 15:00:24 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/16 21:49:25 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static void	init_ed(t_exdat *ed)
 {
 	ed->is_builtin = FALSE;
 	ed->is_fork = TRUE;
-	ed->f_to_call = builtin_dummy;
+	ed->f_to_call = builtin_empty;
 }
 
 static int	sub_exec_command_child(t_exdat *ed, t_node *node, t_ctx *ctx)

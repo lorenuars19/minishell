@@ -82,6 +82,6 @@ int		builtin_pwd(char *argv[], char *envp[]);
 int		builtin_export(char *argv[], char *envp[]);
 int		builtin_unset(char *argv[], char *envp[]);
 int		builtin_env(char *argv[], char *envp[]);
-int		builtin_dummy(char *argv[], char *envp[]);
+int		builtin_empty(char *argv[], char *envp[]);
 
 #endif
