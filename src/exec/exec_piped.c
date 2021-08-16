@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:45 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 18:26:38 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/16 18:34:43 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int	exec_piped(t_exdat *ed, t_node *node, t_ctx *ctx)
 	t_ctx	lhs;
 	t_ctx	rhs;
 
-	// close(ctx->fd_close);
+	close(ctx->fd_close);
 	if(pipe(p))
 		return (error_sys_put("pipe"));
 
