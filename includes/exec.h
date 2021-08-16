@@ -8,35 +8,6 @@
 
 # define FORKED_CHILD 0
 
-# define _TO_STR(VAL) #VAL
-# define STRYFY(VAL) _TO_STR(VAL)
-
-# define _STR_ALL_ __FILE__ ":" STRYFY(__LINE__)
-# define _DEB_LOC _STR_ALL_
-
-# define DED \
-dprintf(2, "\n>>>\n\033[32;1m%s\033[0m : cmd [%s] node->type \033[33m%s\033[0m | "\
-		"ed->builtin_mode %s\033[0m ed->fork_or_not %s\033[0m ed->f_to_call <%p> |\n"\
-		"is_pipe %d pipe_open %d n_children %d |\nctx fd[0] %d fd[1] %d fd_close %d\n<<<\n", \
-		_DEB_LOC , \
-		(node->args) ? (node->args[0]) : ("|"),\
-		(node->type == COMMAND_NODE) ? ("COMMAND_NODE"): ("PIPE_NODE"),\
-		(ed->is_builtin == TRUE) ? ("\033[33mBUILTIN") : ("\033[33mBINARY"),\
-		(ed->is_fork == TRUE) ? ("\033[33mFORKED") : ("\033[33mNOT FORKED"), \
-		ed->f_to_call, ed->is_pipe, ed->pipe_open, ed->n_children,\
-		ctx->fd[0], ctx->fd[1], ctx->fd_close);
-
-
-# define DCTX(value) dprintf(2, "%s " #value " : fd[0] %d fd[1] %d fd_close %d | node->args[0] %s\n",\
-	_DEB_LOC, value.fd[0], value.fd[1], value.fd_close, (node->args) ? (node->args[0]) : ("|"));
-
-# define DPCTX(value) dprintf(2, "%s " #value " : fd[0] %d fd[1] %d fd_close %d | node->args[0] %s\n",\
-	_DEB_LOC, value->fd[0], value->fd[1], value->fd_close, (node->args) ? (node->args[0]) : ("|"));
-
-# define DCL(value) dprintf(2, "\n> %s : \033[31mCLOSE FD " #value " %d \033[0m<\n", _DEB_LOC, value);
-
-# define close(value) DCL(value) close(value);
-
 typedef enum e_builtin_commands
 {
 	BUILTIN_ECHO,
@@ -74,8 +45,6 @@ typedef struct s_exec_data
 
 	int			file_close;
 }	t_exdat;
-
-
 
 typedef enum e_revert_signal_or_not
 {

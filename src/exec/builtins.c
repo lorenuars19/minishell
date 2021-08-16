@@ -1,7 +1,7 @@
 
-#include "minishell.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include "minishell.h"
 
 static int	get_envp_length(char **envp)
 {

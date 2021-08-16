@@ -6,15 +6,18 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:52 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/09 19:15:52 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/16 20:53:16 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/*
-** BUILTINS
-*/
+int	builtin_dummmy(char *argv[], char *envp[])
+{
+	(void)envp;
+	(void)argv;
+	return (0);
+}
 
 static t_builtin_f get_builtin(int index)
 {
