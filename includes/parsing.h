@@ -6,8 +6,6 @@
 # define MALLOC_ERROR -1
 # define SPECIAL_CHARS "|\'\" <>\t"
 
-
-
 typedef	enum e_token_type
 {
 	T_GENERAL = 'g',
@@ -82,5 +80,8 @@ t_bool contains_unclosed_quotes(char *line);
 t_bool has_redirection_type(t_token *token);
 void skip_blank_tokens(t_token **tokens);
 int get_here_document(char *delimiter);
+char **make_envp_copy(char **envp);
+void free_envp(char **envp);
+char *get_value_from_envp(char *name, char **envp);
 
 #endif
