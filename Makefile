@@ -57,6 +57,7 @@ SRCS = \
 	./src/syntax_checker.c \
 	./src/variable_expansion.c \
 	./src/parser.c \
+	./src/get_here_document.c \
 	./src/scanner_utils.c \
 	./src/exec/is_path_.c \
 	./src/exec/exec_pipe.c \
@@ -72,7 +73,6 @@ SRCS = \
 	./src/scanner.c \
 	./src/merge_tokens.c \
 	./src/main.c \
-	./src/handle_heredoc.c \
 
 HEADERS = \
 	./includes/exec.h\

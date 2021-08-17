@@ -21,7 +21,6 @@
 # include "parsing.h"
 # include "exec.h"
 
-
 # define HEREDOC_PATH "/tmp/"
 
 typedef struct s_shell_data
