@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:58 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 21:49:25 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/17 17:14:13 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static int	sub_exec_command_child(t_exdat *ed, t_node *node, t_ctx *ctx)
 		ed->status = exec_binary(node, ed->envp);
 	if (ed->is_fork == TRUE)
 		exit(ed->status);
-	exit (ed->status);
+	return (ed->status);
 }
 
 int	exec_command(t_exdat *ed, t_node *node, t_ctx *ctx)
