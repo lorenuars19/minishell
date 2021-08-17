@@ -35,8 +35,6 @@ int	exec_binary(t_node *node, char *envp[]);
 char *find_path(t_node *node);
 int	is_path_executable(char *path);
 
-int check_for_builtins(t_node *node, char *envp[]);
-int	exec_builtin(t_node *node, char *envp[], int index);
 
 int builtin_echo(char *argv[], char *envp[]);
 int builtin_cd(char *argv[], char *envp[]);
@@ -45,6 +43,9 @@ int builtin_export(char *argv[], char *envp[]);
 int builtin_unset(char *argv[], char *envp[]);
 int builtin_env(char *argv[], char *envp[]);
 int builtin_exit(char *argv[], char *envp[]);
+
+t_bool is_command_a_builtin(t_node *node);
+int exec_builtin(t_node *node, char **envp);
 
 
 #endif

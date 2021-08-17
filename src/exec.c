@@ -38,6 +38,11 @@ int	exec_command(t_node *node, t_context *ctx, char *envp[])
 	pid_t cpid;
 
 	(void)envp;
+	if (is_command_a_builtin(node))
+	{
+		exec_builtin(node, envp);
+		return (1);
+	}
 	cpid = fork();
 	if (cpid < 0)
 	{
@@ -87,31 +92,48 @@ int exec_pipe(t_node *node, t_context *ctx, char *envp[])
 	return (children);
 }
 
-// int	exec_command(t_node *node, char *envp[])
-// {
-// 	int status;
-// 	pid_t cpid;
+t_bool is_command_a_builtin(t_node *node)
+{
+	static char *builtin_names[] = {
+		"echo",
+		"cd",
+		"pwd",
+		"export",
+		"unset",
+		"env",
+		"exit",
+		NULL};
+	int i;
 
-// 	if (check_for_builtins(node, envp))
-// 		return (1);
-// 	cpid = fork();
-// 	if (cpid < 0)
-// 		return (error_sys_put("fork"));
-// 	else if (cpid == FORKED_CHILD)
-// 		return (exec_binary(node, envp));
-// 	else
-// 	{
-// 		//TODO parent stuff
-// 		printf("Child PID : %d\n", cpid);
-// 		status = wait_for_child(cpid);
-// 		if (status)
-// 		{
-// 			return (error_printf(status, "child exit code : %d\n", status));
-// 		}
-// 		//TODO close pipe ? or other sutff maybe IDK
-// 	}
-// 	return (0);
-// }
+	i = 0;
+	while (builtin_names[i])
+	{
+		if (str_cmp(node->args[0], builtin_names[i]) == 0)
+			return (TRUE);
+		i++;
+	}
+	return (FALSE);
+}
+
+int exec_builtin(t_node *node, char **envp)
+{
+	static int (*builtins[])(char *argv[], char *envp[]) = {
+		builtin_echo, builtin_cd, builtin_pwd, builtin_export,
+		builtin_unset, builtin_env, builtin_exit};
+	static char *builtin_names[] = {
+		"echo", "cd", "pwd", "export",
+		"unset", "env", "exit", NULL};
+	int i;
+
+	i = 0;
+	while (builtin_names[i])
+	{
+		if (str_cmp(node->args[0], builtin_names[i]) == 0)
+			return (builtins[i](node->args, envp));
+		i++;
+	}
+	return (-1);
+}
 
 int	sub_wait_for_child(int wstatus)
 {
@@ -209,42 +231,42 @@ int	is_path_executable(char *path)
 	return (0);
 }
 
-int check_for_builtins(t_node *node, char *envp[])
-{
-	int i;
-	static char *builtins[] = {
-		"echo",
-		"cd",
-		"pwd",
-		"export",
-		"unset",
-		"env",
-		"exit",
-		NULL};
-	i = 0;
-	while (node->args && node->args[0] && builtins[i] && str_cmp(node->args[0], builtins[i]))
-		i++;
-	if (exec_builtin(node, envp, i))
-		return (1);
-	return (0);
-}
+// int check_for_builtins(t_node *node, char *envp[])
+// {
+// 	int i;
+// 	static char *builtins[] = {
+// 		"echo",
+// 		"cd",
+// 		"pwd",
+// 		"export",
+// 		"unset",
+// 		"env",
+// 		"exit",
+// 		NULL};
+// 	i = 0;
+// 	while (node->args && node->args[0] && builtins[i] && str_cmp(node->args[0], builtins[i]))
+// 		i++;
+// 	if (exec_builtin(node, envp, i))
+// 		return (1);
+// 	return (0);
+// }
 
-int exec_builtin(t_node *node, char *envp[], int index)
-{
-	static int (*builtins[])(char *argv[], char *envp[]) = {
-		builtin_echo,
-		builtin_cd,
-		builtin_pwd,
-		builtin_export,
-		builtin_unset,
-		builtin_env,
-		builtin_exit};
-	if (index >= 0 && index < BUILTIN_END)
-	{
-		if (builtins[index](node->args, envp))
-		{
-			return (1);
-		}
-	}
-	return (0);
-}
+// int exec_builtin(t_node *node, char *envp[], int index)
+// {
+// 	static int (*builtins[])(char *argv[], char *envp[]) = {
+// 		builtin_echo,
+// 		builtin_cd,
+// 		builtin_pwd,
+// 		builtin_export,
+// 		builtin_unset,
+// 		builtin_env,
+// 		builtin_exit};
+// 	if (index >= 0 && index < BUILTIN_END)
+// 	{
+// 		if (builtins[index](node->args, envp))
+// 		{
+// 			return (1);
+// 		}
+// 	}
+// 	return (0);
+// }
