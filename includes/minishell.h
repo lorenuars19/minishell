@@ -19,4 +19,6 @@
 
 # define HEREDOC_FILENAME "/tmp/.minishell_heredoc.txt"
 
+extern t_info	g_info;
+
 #endif
