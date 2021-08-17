@@ -36,9 +36,9 @@ static int process_command(t_sd *sd)
 	}
 	expand_variables(*(sd->envp_addr), sd->tokens);
 	merge_tokens(sd->tokens);
-	print_tokens(sd->tokens);
+	// print_tokens(sd->tokens);
 	sd->nodes = parser(sd->tokens);
-	print_nodes(sd->nodes, 0);
+	// print_nodes(sd->nodes, 0);
 
 	sd->status = execution(sd->nodes, *(sd->envp_addr));
 
@@ -65,7 +65,7 @@ int main(int argc, char **argv, char **envp)
 		if (set_prompt(&sd))
 			return (EXIT_SUCCESS);
 //TODO remove debug
-dprintf(2, "\nline : \"%s\"\n", sd.line);
+// dprintf(2, "\nline : \"%s\"\n", sd.line);
 		if (process_command(&sd))
 			continue ;
 //TODO remove debug

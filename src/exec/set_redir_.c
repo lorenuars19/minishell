@@ -3,7 +3,7 @@
 static void set_o_flags(t_redirection *redir, int *o_flags,
 						int file_exists, int *dup_fd)
 {
-	if (redir->mode == M_INPUT)
+	if (redir->mode == M_INPUT || redir->mode == M_HEREDOC)
 	{
 		(*o_flags) = O_RDONLY;
 		*(dup_fd) = STDIN_FILENO;
@@ -14,7 +14,7 @@ static void set_o_flags(t_redirection *redir, int *o_flags,
 		(*o_flags) = O_WRONLY | O_APPEND;
 	else if (redir->mode == M_HEREDOC)
 		*(o_flags) = O_TMPFILE | O_RDWR;
-	if (!file_exists)
+	if (!file_exists && redir->mode != M_HEREDOC)
 		*(o_flags) |= O_CREAT;
 }
 

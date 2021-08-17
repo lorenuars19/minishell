@@ -1,7 +1,6 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-
 # define _GNU_SOURCE
 # include <stdio.h>
 # include <stdlib.h>
@@ -34,6 +33,7 @@ typedef struct s_shell_data
 	t_token *tokens;
 	t_node	*nodes;
 }	t_sd;
+
 
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:50:02 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 20:07:04 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/17 17:26:44 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,21 +17,18 @@
 ** The actual starting point that will be called recursively
 */
 
-int exec_nodes(t_exdat *ed, t_node *node, t_ctx *ctx)
+int	exec_nodes(t_exdat *ed, t_node *node, t_ctx *ctx)
 {
-
 	if (node->type == COMMAND_NODE)
 	{
-		ed->status = exec_command(ed, node, ctx);
-		if (ed->status)
-			return (ed->status);
+		if (exec_command(ed, node, ctx))
+			return (error_put(1, "exec_nodes : exec_command"));
 	}
 	else if (node->type == PIPE_NODE)
 	{
 		ed->is_pipe = TRUE;
-		ed->status = exec_pipe(ed, node, ctx);
-		if (ed->status)
-			return (ed->status);
+		if (exec_pipe(ed, node, ctx))
+			return (error_put(1, "exec_nodes : exec_pipe"));
 	}
 	else
 	{

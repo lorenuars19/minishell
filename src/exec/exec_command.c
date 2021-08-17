@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:58 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/17 17:14:13 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/17 17:45:25 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,19 @@ static int	sub_exec_command_child(t_exdat *ed, t_node *node, t_ctx *ctx)
 			exit (error_put(1, "exec_command : set_redir_file"));
 	}
 	if (ed->is_builtin == TRUE)
+	{
 		ed->status = ed->f_to_call(node->args, ed->envp);
+		if (ed->status)
+			return (error_put(ed->status, "sub_exec_command_child : builtin"));
+	}
 	else
-		ed->status = exec_binary(node, ed->envp);
+	{
+		if (exec_binary(node, ed->envp))
+			return (error_put(1, "sub_exec_command_child : exec_binary"));
+	}
 	if (ed->is_fork == TRUE)
-		exit(ed->status);
-	return (ed->status);
+		exit(0);
+	return (0);
 }
 
 int	exec_command(t_exdat *ed, t_node *node, t_ctx *ctx)
@@ -54,11 +61,11 @@ int	exec_command(t_exdat *ed, t_node *node, t_ctx *ctx)
 	else if (cpid == FORKED_CHILD)
 	{
 		if (sub_exec_command_child(ed, node, ctx))
-			return (ed->status);
-		return (ed->status);
+			return (error_put(1, "exec_command : sub_exec_command_child"));
+		return (0);
 	}
 	else
 	{
-		return (ed->status);
+		return (0);
 	}
 }
