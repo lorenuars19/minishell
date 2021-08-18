@@ -46,11 +46,22 @@ int	set_input_redirection(t_redirection *redirection, t_context *ctx)
 
 	if (redirection->mode == M_INPUT)
 	{
+		if (ctx->fd[0] != STDIN_FILENO)
+			close(ctx->fd[0]);
 		fd = open(redirection->filename, O_RDONLY);
 		if (fd == -1)
 			return (print_open_error(redirection->filename));
+		ctx->fd[0] = fd;
+	}
+	else if (redirection->mode == M_HEREDOC)
+	{
 		if (ctx->fd[0] != STDIN_FILENO)
 			close(ctx->fd[0]);
+		if (get_here_document(redirection->filename) != 0)
+			return (1);
+		fd = open(HEREDOC_FILENAME, O_RDONLY);
+		if (fd == -1)
+			return (print_open_error(HEREDOC_FILENAME));
 		ctx->fd[0] = fd;
 	}
 	return (0);
@@ -88,7 +99,8 @@ int	set_redirection(t_node *node, t_context *ctx)
 	current_redir = node->redirections;
 	while (current_redir)
 	{
-		if (current_redir->mode == M_INPUT)
+		if (current_redir->mode == M_INPUT
+				|| current_redir->mode == M_HEREDOC)
 		{
 			if (set_input_redirection(current_redir, ctx) != 0)
 				return (1);
@@ -111,8 +123,10 @@ int	exec_command(t_node *node, t_context *ctx)
 	if (is_command_a_builtin(node))
 	{
 		exec_builtin(node);
-		return (1);
+		return (0);
 	}
+	if (set_redirection(node, ctx) != 0)
+		return (1);
 	cpid = fork();
 	if (cpid < 0)
 	{
@@ -122,8 +136,6 @@ int	exec_command(t_node *node, t_context *ctx)
 	}
 	else if (cpid == FORKED_CHILD)
 	{
-		if (set_redirection(node, ctx) != 0)
-			return (1);
 		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
 		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 		if (ctx->fd_close != -1)
@@ -131,7 +143,12 @@ int	exec_command(t_node *node, t_context *ctx)
 		execvp(node->args[0], node->args);
 		put_str_fd(STDERR_FILENO, "minishell: execve: ");
 		put_str_fd_nl(STDERR_FILENO, strerror(errno));
+		return (1);
 	}
+	if (ctx->fd[0] != STDIN_FILENO)
+		close(ctx->fd[0]);
+	if (ctx->fd[1] != STDOUT_FILENO)
+		close(ctx->fd[1]);
 	return (1);
 }
 
