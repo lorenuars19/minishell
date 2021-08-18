@@ -81,7 +81,7 @@ char	*get_value_from_envp(char *name, char **envp)
 	length = str_len(name);
 	while (envp[i])
 	{
-		if (str_cmp_n(envp[i], name, length) == 0 && envp[i][length] == '=')
+		if (ft_strncmp(envp[i], name, length) == 0 && envp[i][length] == '=')
 			return (str_dupli(&(envp[i][length + 1])));
 		i++;
 	}

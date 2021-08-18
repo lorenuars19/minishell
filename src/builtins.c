@@ -116,18 +116,34 @@ int builtin_pwd(char *argv[])
 	return (0);
 }
 
+int ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	unsigned int i;
+
+	i = 0;
+	if (n == 0)
+		return (0);
+	while (i < n && s1[i] == s2[i] && s1[i] && s2[i])
+	{
+		i++;
+	}
+	if (i == n)
+		return ((unsigned char)s1[i - 1] - (unsigned char)s2[i - 1]);
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+}
+
 t_bool	variable_already_exits_in_envp(char **envp, char *name)
 {
 	int	i;
 	int	length;
 
-	if (!envp)
-		return (FALSE);
+	length = 0;
+	while (name[length] && name[length] != '=')
+		length++;
 	i = 0;
-	length = str_len(name);
 	while (envp[i])
 	{
-		if (str_cmp_n(name, envp[i], length) == 0 && envp[i][length] == '=')
+		if (ft_strncmp(name, envp[i], length) == 0 && envp[i][length] == '=')
 			return (TRUE);
 		i++;
 	}
@@ -170,7 +186,7 @@ static void	delete_variable_from_envp(char *name, char **envp)
 	length = str_len(name);
 	while (envp && envp[i])
 	{
-		if (str_cmp_n(name, envp[i], length) == 0 && envp[i][length] == '=')
+		if (ft_strncmp(name, envp[i], length) == 0 && envp[i][length] == '=')
 		{
 			free(envp[i]);
 			shift_envp_up(envp, i);
@@ -240,7 +256,7 @@ static void	print_one_exported_variable(char *variable)
 
 	if (!variable)
 		return ;
-	if (!str_cmp_n("_=", variable, 2))
+	if (!ft_strncmp("_=", variable, 2))
 		return ;
 	printf("declare -x ");
 	i = 0;
@@ -300,6 +316,38 @@ static void	print_export_name_error(char *name)
 	put_str_fd(STDERR_FILENO, "': not a valid identifier\n");
 }
 
+int	modify_var_in_envp(char **envp, char *name)
+{
+	int	length;
+	int	i;
+	t_bool	should_append_equal;
+
+	length = 0;
+	while (name[length] && name[length] != '=')
+		length++;
+	should_append_equal = FALSE;
+	if (name[length] != '=')
+		should_append_equal = TRUE;
+	i = 0;
+	while (envp[i])
+	{
+		if (ft_strncmp(name, envp[i], length) == 0 && envp[i][length] == '=')
+		{
+			free(envp[i]);
+			envp[i] = ft_calloc(str_len(name) + 2, sizeof(char));
+			if (!envp[i])
+				return (1);
+			ft_strncpy(envp[i], name, str_len(name));
+			if (should_append_equal)
+				envp[i][str_len(name)] = '=';
+			printf("new line in envp %s\n", envp[i]);
+			return (0);
+		}
+		i++;
+	}
+	return (0);
+}
+
 int builtin_export(char *argv[])
 {
 	int		i;
@@ -318,8 +366,8 @@ int builtin_export(char *argv[])
 			i++;
 			continue ;
 		}
-		// if (var_already_exits_in_envp(argv[i]))
-		// 		modify_var_in_envp(envp, argv[i]);
+		if (variable_already_exits_in_envp(g_info.envp, argv[i]))
+			modify_var_in_envp(g_info.envp, argv[i]);
 		// else
 		//		insert_new_value_in_envp(envp, argv[i]) //need to change envp to global for this
 		i++;
