@@ -57,8 +57,6 @@ int	set_input_redirection(t_redirection *redirection, t_context *ctx)
 	{
 		if (ctx->fd[0] != STDIN_FILENO)
 			close(ctx->fd[0]);
-		if (get_here_document(redirection->filename) != 0)
-			return (1);
 		fd = open(HEREDOC_FILENAME, O_RDONLY);
 		if (fd == -1)
 			return (print_open_error(HEREDOC_FILENAME));
@@ -116,6 +114,37 @@ int	set_redirection(t_node *node, t_context *ctx)
 	return (0);
 }
 
+t_bool	there_is_a_heredoc_redirection(t_node *node)
+{
+	t_redirection *redir;
+
+	redir = node->redirections;
+	while (redir)
+	{
+		if (redir->mode == M_HEREDOC)
+			return (TRUE);
+		redir = redir->next;
+	}
+	return (FALSE);
+}
+
+int		get_heredocs_redir(t_node *node)
+{
+	t_redirection *redir;
+
+	redir = node->redirections;
+	while (redir)
+	{
+		if (redir->mode == M_HEREDOC)
+		{
+			if (get_here_document(redir->filename) != 0)
+				return (1);
+		}
+		redir = redir->next;
+	}
+	return (0);
+}
+
 int	exec_command(t_node *node, t_context *ctx)
 {
 	pid_t cpid;
@@ -125,8 +154,11 @@ int	exec_command(t_node *node, t_context *ctx)
 		exec_builtin(node);
 		return (0);
 	}
-	if (set_redirection(node, ctx) != 0)
-		return (1);
+	if (there_is_a_heredoc_redirection(node))
+	{
+		if (get_heredocs_redir(node) != 0)
+			return (0);
+	}
 	cpid = fork();
 	if (cpid < 0)
 	{
@@ -136,6 +168,8 @@ int	exec_command(t_node *node, t_context *ctx)
 	}
 	else if (cpid == FORKED_CHILD)
 	{
+		if (set_redirection(node, ctx) != 0)
+			return (1);
 		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
 		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 		if (ctx->fd_close != -1)
@@ -145,10 +179,6 @@ int	exec_command(t_node *node, t_context *ctx)
 		put_str_fd_nl(STDERR_FILENO, strerror(errno));
 		return (1);
 	}
-	if (ctx->fd[0] != STDIN_FILENO)
-		close(ctx->fd[0]);
-	if (ctx->fd[1] != STDOUT_FILENO)
-		close(ctx->fd[1]);
 	return (1);
 }
 
