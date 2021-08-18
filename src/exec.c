@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "minishell.h"
 
 int	exec(t_node *node)
@@ -32,6 +31,78 @@ int exec_node(t_node *node, t_context *ctx)
 	return (ret);
 }
 
+int	print_open_error(char *filename)
+{
+	put_str_fd(STDERR_FILENO, "minishell: ");
+	put_str_fd(STDERR_FILENO, filename);
+	put_str_fd(STDERR_FILENO, ": ");
+	put_str_fd_nl(STDERR_FILENO, strerror(errno));
+	return (1);
+}
+
+int	set_input_redirection(t_redirection *redirection, t_context *ctx)
+{
+	int	fd;
+
+	if (redirection->mode == M_INPUT)
+	{
+		fd = open(redirection->filename, O_RDONLY);
+		if (fd == -1)
+			return (print_open_error(redirection->filename));
+		if (ctx->fd[0] != STDIN_FILENO)
+			close(ctx->fd[0]);
+		ctx->fd[0] = fd;
+	}
+	return (0);
+}
+
+int set_output_redirection(t_redirection *redirection, t_context *ctx)
+{
+	int fd;
+
+	if (redirection->mode == M_TRUNCATE)
+	{
+		fd = open(redirection->filename, O_CREAT | O_TRUNC | O_WRONLY, 0664);
+		if (fd == -1)
+			return (print_open_error(redirection->filename));
+		if (ctx->fd[1] != STDOUT_FILENO)
+			close(ctx->fd[1]);
+		ctx->fd[1] = fd;
+	}
+	else if (redirection->mode == M_APPEND)
+	{
+		fd = open(redirection->filename, O_CREAT | O_APPEND | O_WRONLY, 0664);
+		if (fd == -1)
+			return (print_open_error(redirection->filename));
+		if (ctx->fd[1] != STDOUT_FILENO)
+			close(ctx->fd[1]);
+		ctx->fd[1] = fd;
+	}
+	return (0);
+}
+
+int	set_redirection(t_node *node, t_context *ctx)
+{
+	t_redirection	*current_redir;
+
+	current_redir = node->redirections;
+	while (current_redir)
+	{
+		if (current_redir->mode == M_INPUT)
+		{
+			if (set_input_redirection(current_redir, ctx) != 0)
+				return (1);
+		}
+		else if (current_redir->mode == M_TRUNCATE
+					|| current_redir->mode == M_APPEND)
+		{
+			if (set_output_redirection(current_redir, ctx) != 0)
+				return (1);
+		}
+		current_redir = current_redir->next;
+	}
+	return (0);
+}
 
 int	exec_command(t_node *node, t_context *ctx)
 {
@@ -51,6 +122,8 @@ int	exec_command(t_node *node, t_context *ctx)
 	}
 	else if (cpid == FORKED_CHILD)
 	{
+		if (set_redirection(node, ctx) != 0)
+			return (1);
 		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
 		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 		if (ctx->fd_close != -1)
@@ -229,43 +302,3 @@ int	is_path_executable(char *path)
 	}
 	return (0);
 }
-
-// int check_for_builtins(t_node *node, char *envp[])
-// {
-// 	int i;
-// 	static char *builtins[] = {
-// 		"echo",
-// 		"cd",
-// 		"pwd",
-// 		"export",
-// 		"unset",
-// 		"env",
-// 		"exit",
-// 		NULL};
-// 	i = 0;
-// 	while (node->args && node->args[0] && builtins[i] && str_cmp(node->args[0], builtins[i]))
-// 		i++;
-// 	if (exec_builtin(node, envp, i))
-// 		return (1);
-// 	return (0);
-// }
-
-// int exec_builtin(t_node *node, char *envp[], int index)
-// {
-// 	static int (*builtins[])(char *argv[], char *envp[]) = {
-// 		builtin_echo,
-// 		builtin_cd,
-// 		builtin_pwd,
-// 		builtin_export,
-// 		builtin_unset,
-// 		builtin_env,
-// 		builtin_exit};
-// 	if (index >= 0 && index < BUILTIN_END)
-// 	{
-// 		if (builtins[index](node->args, envp))
-// 		{
-// 			return (1);
-// 		}
-// 	}
-// 	return (0);
-// }
