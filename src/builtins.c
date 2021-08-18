@@ -340,11 +340,49 @@ int	modify_var_in_envp(char **envp, char *name)
 			ft_strncpy(envp[i], name, str_len(name));
 			if (should_append_equal)
 				envp[i][str_len(name)] = '=';
-			printf("new line in envp %s\n", envp[i]);
 			return (0);
 		}
 		i++;
 	}
+	return (0);
+}
+
+char **realloc_envp_with_one_more_line(void)
+{
+	int		new_length;
+	int		i;
+	char	**new_envp;
+
+	new_length = get_envp_length(g_info.envp) + 1;
+	new_envp = ft_calloc(new_length + 1, sizeof(char *));
+	if (!new_envp)
+		return (NULL);
+	i = 0;
+	while (i < new_length - 1)
+	{
+		new_envp[i] = g_info.envp[i];
+		i++;
+	}
+	free(g_info.envp);
+	return (new_envp);
+}
+
+int	insert_new_value_in_envp(char *name)
+{
+	int	i;
+
+	g_info.envp = realloc_envp_with_one_more_line();
+	if (!g_info.envp)
+		return (1);
+	i = 0;
+	while (g_info.envp[i])
+		i++;
+	g_info.envp[i] = ft_calloc(str_len(name) + 2, sizeof(char));
+	if (!g_info.envp[i])
+		return (1);
+	ft_strncpy(g_info.envp[i], name, strlen(name));
+	if (!str_has(name, '='))
+		g_info.envp[i][str_len(name)] = '=';
 	return (0);
 }
 
@@ -368,8 +406,8 @@ int builtin_export(char *argv[])
 		}
 		if (variable_already_exits_in_envp(g_info.envp, argv[i]))
 			modify_var_in_envp(g_info.envp, argv[i]);
-		// else
-		//		insert_new_value_in_envp(envp, argv[i]) //need to change envp to global for this
+		else
+			insert_new_value_in_envp(argv[i]);
 		i++;
 	}
 	if (has_met_an_error)
