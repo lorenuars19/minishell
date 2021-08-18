@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "minishell.h"
 
-int	exec(t_node *node, char *envp[])
+int	exec(t_node *node)
 {
 	t_context ctx;
 	int		children;
@@ -10,7 +10,7 @@ int	exec(t_node *node, char *envp[])
 	ctx.fd[STDIN_FILENO] = STDIN_FILENO;
 	ctx.fd[STDOUT_FILENO] = STDOUT_FILENO;
 	ctx.fd_close = -1;
-	children = exec_node(node, &ctx, envp);
+	children = exec_node(node, &ctx);
 	i = 0;
 	while (i < children)
 	{
@@ -20,27 +20,26 @@ int	exec(t_node *node, char *envp[])
 	return (0);
 }
 
-int exec_node(t_node *node, t_context *ctx, char *envp[])
+int exec_node(t_node *node, t_context *ctx)
 {
 	int	ret;
 
 	ret = 0;
 	if (node->type == COMMAND_NODE)
-		return (exec_command(node, ctx, envp));
+		return (exec_command(node, ctx));
 	else if (node->type == PIPE_NODE)
-		return (exec_pipe(node, ctx, envp));
+		return (exec_pipe(node, ctx));
 	return (ret);
 }
 
 
-int	exec_command(t_node *node, t_context *ctx, char *envp[])
+int	exec_command(t_node *node, t_context *ctx)
 {
 	pid_t cpid;
 
-	(void)envp;
 	if (is_command_a_builtin(node))
 	{
-		exec_builtin(node, envp);
+		exec_builtin(node);
 		return (1);
 	}
 	cpid = fork();
@@ -63,7 +62,7 @@ int	exec_command(t_node *node, t_context *ctx, char *envp[])
 	return (1);
 }
 
-int exec_pipe(t_node *node, t_context *ctx, char *envp[])
+int exec_pipe(t_node *node, t_context *ctx)
 {
 	int			p[2];
 	t_context	lhs_ctx;
@@ -79,14 +78,14 @@ int exec_pipe(t_node *node, t_context *ctx, char *envp[])
 	lhs_ctx = *ctx;
 	lhs_ctx.fd[STDOUT_FILENO] = p[STDOUT_FILENO];
 	lhs_ctx.fd_close = p[STDIN_FILENO];
-	children = exec_node(node->left, &lhs_ctx, envp);
+	children = exec_node(node->left, &lhs_ctx);
 
 	close(p[STDOUT_FILENO]);
 
 	rhs_ctx = *ctx;
 	rhs_ctx.fd[STDIN_FILENO] = p[STDIN_FILENO];
 	rhs_ctx.fd_close = -1;
-	children += exec_node(node->right, &rhs_ctx, envp);
+	children += exec_node(node->right, &rhs_ctx);
 
 	close(p[STDIN_FILENO]);
 	return (children);
@@ -115,9 +114,9 @@ t_bool is_command_a_builtin(t_node *node)
 	return (FALSE);
 }
 
-int exec_builtin(t_node *node, char **envp)
+int exec_builtin(t_node *node)
 {
-	static int (*builtins[])(char *argv[], char *envp[]) = {
+	static int (*builtins[])(char *argv[]) = {
 		builtin_echo, builtin_cd, builtin_pwd, builtin_export,
 		builtin_unset, builtin_env, builtin_exit};
 	static char *builtin_names[] = {
@@ -129,7 +128,7 @@ int exec_builtin(t_node *node, char **envp)
 	while (builtin_names[i])
 	{
 		if (str_cmp(node->args[0], builtin_names[i]) == 0)
-			return (builtins[i](node->args, envp));
+			return (builtins[i](node->args));
 		i++;
 	}
 	return (-1);

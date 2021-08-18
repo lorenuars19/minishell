@@ -48,12 +48,11 @@ void	free_envp(char **envp)
 	free(envp);
 }
 
-int builtin_echo(char *argv[], char *envp[])
+int builtin_echo(char *argv[])
 {
 	int		i;
 	t_bool	should_print_trailing_nl;
 
-	(void)envp;
 	if (*argv && argv[1] && str_cmp(argv[1], "-n") == 0)
 	{
 		should_print_trailing_nl = FALSE;
@@ -76,12 +75,12 @@ int builtin_echo(char *argv[], char *envp[])
 	return (0);
 }
 
-int builtin_cd(char *argv[], char *envp[])
+int builtin_cd(char *argv[])
 {
 	char	*path;
 
 	if (!argv[1])
-		path = get_value_from_envp("HOME", envp);
+		path = get_value_from_envp("HOME", g_info.envp);
 	else if (argv[2])
 	{
 		put_str_fd(STDERR_FILENO, "minishell: cd: too many arguments\n");
@@ -104,12 +103,11 @@ int builtin_cd(char *argv[], char *envp[])
 	return (0);
 }
 
-int builtin_pwd(char *argv[], char *envp[])
+int builtin_pwd(char *argv[])
 {
 	char	*pwd;
 
 	(void)argv;
-	(void)envp;
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 		return (1);
@@ -182,7 +180,7 @@ static void	delete_variable_from_envp(char *name, char **envp)
 	}
 }
 
-int builtin_unset(char *argv[], char *envp[])
+int builtin_unset(char *argv[])
 {
 	int	i;
 	t_bool	has_met_an_error;
@@ -201,7 +199,7 @@ int builtin_unset(char *argv[], char *envp[])
 			has_met_an_error = TRUE;
 		}
 		else
-			delete_variable_from_envp(argv[i], envp);
+			delete_variable_from_envp(argv[i], g_info.envp);
 		i++;
 	}
 	if (has_met_an_error)
@@ -302,13 +300,13 @@ static void	print_export_name_error(char *name)
 	put_str_fd(STDERR_FILENO, "': not a valid identifier\n");
 }
 
-int builtin_export(char *argv[], char *envp[])
+int builtin_export(char *argv[])
 {
 	int		i;
 	t_bool	has_met_an_error;
 
 	if (!argv[1])
-		return (print_sorted_envp(envp));
+		return (print_sorted_envp(g_info.envp));
 	has_met_an_error = FALSE;
 	i = 1;
 	while (argv[i])
@@ -331,25 +329,27 @@ int builtin_export(char *argv[], char *envp[])
 	return (0);
 }
 
-int builtin_env(char *argv[], char *envp[])
+int builtin_env(char *argv[])
 {
 	int	i;
 
 	(void)argv;
-	if (!envp)
-		return (1);
 	i = 0;
-	while (envp[i])
+	while (g_info.envp[i])
 	{
-		printf("%s\n", envp[i]);
+		printf("%s\n", g_info.envp[i]);
 		i++;
 	}
 	return (0);
 }
 
-int builtin_exit(char *argv[], char *envp[])
+int builtin_exit(char *argv[])
 {
-	(void)envp;
-	(void)argv;
-	return (0);
+	int	exit_status;
+
+	if (!argv[1])
+		exit_status = 0;
+	free_envp(g_info.envp);
+	free_nodes(g_info.nodes);
+	exit(exit_status);
 }

@@ -29,23 +29,16 @@ int main(int argc, char **argv, char **envp)
 			free(line);
 			continue ;
 		}
+		free(line);
 		expand_variables(g_info.envp, tokens);
 		merge_tokens(tokens);
 		// print_tokens(tokens);
 		t_node *nodes = parser(tokens);
+		free_tokens_without_data(tokens);
+		g_info.nodes = nodes;
 		// print_nodes(nodes, 0);
 		// execution(nodes, envp);
-		// if (nodes->type == COMMAND_NODE)
-		// 	check_for_builtins(nodes, envp);
-		exec(nodes, g_info.envp);
-		free_tokens_without_data(tokens);
+		exec(nodes);
 		free_nodes(nodes);
-		if (str_cmp("exit", line) == 0)
-		{
-			free_envp(g_info.envp);
-			free(line);
-			exit(EXIT_SUCCESS);
-		}
-		free(line);
 	}
 }

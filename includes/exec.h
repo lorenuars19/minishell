@@ -25,16 +25,16 @@ typedef struct s_pipe_context
 typedef struct
 {
 	char	**envp;
-	t_node	*node;
+	t_node	*nodes;
 	int		last_exit_status;
 }	t_info;
 
-int	exec(t_node *node, char *envp[]);
+int	exec(t_node *node);
 
-int exec_node(t_node *node, t_context *ctx, char *envp[]);
+int exec_node(t_node *node, t_context *ctx);
 
-int exec_command(t_node *node, t_context *ctx, char *envp[]);
-int exec_pipe(t_node * node, t_context *ctx, char *envp[]);
+int exec_command(t_node *node, t_context *ctx);
+int exec_pipe(t_node * node, t_context *ctx);
 
 int wait_for_child(pid_t cpid);
 
@@ -43,16 +43,16 @@ char *find_path(t_node *node);
 int	is_path_executable(char *path);
 
 
-int builtin_echo(char *argv[], char *envp[]);
-int builtin_cd(char *argv[], char *envp[]);
-int builtin_pwd(char *argv[], char *envp[]);
-int builtin_export(char *argv[], char *envp[]);
-int builtin_unset(char *argv[], char *envp[]);
-int builtin_env(char *argv[], char *envp[]);
-int builtin_exit(char *argv[], char *envp[]);
+int builtin_echo(char *argv[]);
+int builtin_cd(char *argv[]);
+int builtin_pwd(char *argv[]);
+int builtin_export(char *argv[]);
+int builtin_unset(char *argv[]);
+int builtin_env(char *argv[]);
+int builtin_exit(char *argv[]);
 
 t_bool is_command_a_builtin(t_node *node);
-int exec_builtin(t_node *node, char **envp);
+int exec_builtin(t_node *node);
 
 
 #endif
