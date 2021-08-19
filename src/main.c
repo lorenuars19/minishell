@@ -1,6 +1,8 @@
 #include "minishell.h"
 #include <stdlib.h>
 
+t_info	g_info;
+
 static int set_prompt(t_sd *sd)
 {
 	char *prompt;

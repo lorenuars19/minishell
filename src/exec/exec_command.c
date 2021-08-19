@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:58 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/19 16:45:30 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/19 17:28:46 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static int	sub_exec_command_child(t_exdat *ed, t_node *node, t_ctx *ctx)
 	}
 	if (ed->is_builtin == TRUE)
 	{
-		ed->status = ed->f_to_call(node->args, ed->envp);
+		ed->status = ed->f_to_call(node->args);
 		if (ed->status)
 			return (error_put(ed->status, "sub_exec_command_child : builtin"));
 	}

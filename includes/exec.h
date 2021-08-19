@@ -20,7 +20,7 @@ typedef enum e_builtin_commands
 	BUILTIN_MAX
 }	t_builtins;
 
-typedef	int (*t_builtin_f)(char *argv[], char *envp[]);
+typedef	int (*t_builtin_f)(char *argv[]);
 
 typedef struct s_pipe_context
 {
@@ -76,12 +76,12 @@ int		is_path_executable(char *path);
 ** BUILTINS
 */
 
-int		builtin_echo(char *argv[], char *envp[]);
-int		builtin_cd(char *argv[], char *envp[]);
-int		builtin_pwd(char *argv[], char *envp[]);
-int		builtin_export(char *argv[], char *envp[]);
-int		builtin_unset(char *argv[], char *envp[]);
-int		builtin_env(char *argv[], char *envp[]);
-int		builtin_empty(char *argv[], char *envp[]);
+int		builtin_echo(char *argv[]);
+int		builtin_cd(char *argv[]);
+int		builtin_pwd(char *argv[]);
+int		builtin_export(char *argv[]);
+int		builtin_unset(char *argv[]);
+int		builtin_env(char *argv[]);
+int		builtin_empty(char *argv[]);
 
 #endif

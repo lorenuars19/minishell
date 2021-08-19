@@ -1,7 +1,6 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# define _GNU_SOURCE
 # include <stdio.h>
 # include <stdlib.h>
 # include <stdint.h>
@@ -34,6 +33,13 @@ typedef struct s_shell_data
 	t_node	*nodes;
 }	t_sd;
 
+typedef struct s_info
+{
+	char	**envp;
+	t_node	*nodes;
+	int		last_exit_status;
+}	t_info;
 
+extern t_info g_info;
 
 #endif

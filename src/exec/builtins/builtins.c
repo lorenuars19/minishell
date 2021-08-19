@@ -1,7 +1,6 @@
-
+#include "minishell.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include "minishell.h"
 
 static int	get_envp_length(char **envp)
 {
@@ -49,12 +48,11 @@ void	free_envp(char **envp)
 	free(envp);
 }
 
-int builtin_echo(char *argv[], char *envp[])
+int builtin_echo(char *argv[])
 {
 	int		i;
 	t_bool	should_print_trailing_nl;
 
-	(void)envp;
 	if (*argv && argv[1] && str_cmp(argv[1], "-n") == 0)
 	{
 		should_print_trailing_nl = FALSE;
@@ -77,12 +75,12 @@ int builtin_echo(char *argv[], char *envp[])
 	return (0);
 }
 
-int builtin_cd(char *argv[], char *envp[])
+int builtin_cd(char *argv[])
 {
 	char	*path;
 
 	if (!argv[1])
-		path = get_value_from_envp("HOME", envp);
+		path = get_value_from_envp("HOME", g_info.envp);
 	else if (argv[2])
 	{
 		put_str_fd(STDERR_FILENO, "minishell: cd: too many arguments\n");
@@ -105,12 +103,11 @@ int builtin_cd(char *argv[], char *envp[])
 	return (0);
 }
 
-int builtin_pwd(char *argv[], char *envp[])
+int builtin_pwd(char *argv[])
 {
 	char	*pwd;
 
 	(void)argv;
-	(void)envp;
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 		return (1);
@@ -119,18 +116,34 @@ int builtin_pwd(char *argv[], char *envp[])
 	return (0);
 }
 
+int ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	unsigned int i;
+
+	i = 0;
+	if (n == 0)
+		return (0);
+	while (i < n && s1[i] == s2[i] && s1[i] && s2[i])
+	{
+		i++;
+	}
+	if (i == n)
+		return ((unsigned char)s1[i - 1] - (unsigned char)s2[i - 1]);
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+}
+
 t_bool	variable_already_exits_in_envp(char **envp, char *name)
 {
 	int	i;
 	int	length;
 
-	if (!envp)
-		return (FALSE);
+	length = 0;
+	while (name[length] && name[length] != '=')
+		length++;
 	i = 0;
-	length = str_len(name);
 	while (envp[i])
 	{
-		if (str_cmp_n(name, envp[i], length) == 0 && envp[i][length] == '=')
+		if (ft_strncmp(name, envp[i], length) == 0 && envp[i][length] == '=')
 			return (TRUE);
 		i++;
 	}
@@ -173,7 +186,7 @@ static void	delete_variable_from_envp(char *name, char **envp)
 	length = str_len(name);
 	while (envp && envp[i])
 	{
-		if (str_cmp_n(name, envp[i], length) == 0 && envp[i][length] == '=')
+		if (ft_strncmp(name, envp[i], length) == 0 && envp[i][length] == '=')
 		{
 			free(envp[i]);
 			shift_envp_up(envp, i);
@@ -183,7 +196,7 @@ static void	delete_variable_from_envp(char *name, char **envp)
 	}
 }
 
-int builtin_unset(char *argv[], char *envp[])
+int builtin_unset(char *argv[])
 {
 	int	i;
 	t_bool	has_met_an_error;
@@ -202,7 +215,7 @@ int builtin_unset(char *argv[], char *envp[])
 			has_met_an_error = TRUE;
 		}
 		else
-			delete_variable_from_envp(argv[i], envp);
+			delete_variable_from_envp(argv[i], g_info.envp);
 		i++;
 	}
 	if (has_met_an_error)
@@ -243,7 +256,7 @@ static void	print_one_exported_variable(char *variable)
 
 	if (!variable)
 		return ;
-	if (!str_cmp_n("_=", variable, 2))
+	if (!ft_strncmp("_=", variable, 2))
 		return ;
 	printf("declare -x ");
 	i = 0;
@@ -303,13 +316,83 @@ static void	print_export_name_error(char *name)
 	put_str_fd(STDERR_FILENO, "': not a valid identifier\n");
 }
 
-int builtin_export(char *argv[], char *envp[])
+int	modify_var_in_envp(char **envp, char *name)
+{
+	int	length;
+	int	i;
+	t_bool	should_append_equal;
+
+	length = 0;
+	while (name[length] && name[length] != '=')
+		length++;
+	should_append_equal = FALSE;
+	if (name[length] != '=')
+		should_append_equal = TRUE;
+	i = 0;
+	while (envp[i])
+	{
+		if (ft_strncmp(name, envp[i], length) == 0 && envp[i][length] == '=')
+		{
+			free(envp[i]);
+			envp[i] = ft_calloc(str_len(name) + 2, sizeof(char));
+			if (!envp[i])
+				return (1);
+			ft_strncpy(envp[i], name, str_len(name));
+			if (should_append_equal)
+				envp[i][str_len(name)] = '=';
+			return (0);
+		}
+		i++;
+	}
+	return (0);
+}
+
+char **realloc_envp_with_one_more_line(void)
+{
+	int		new_length;
+	int		i;
+	char	**new_envp;
+
+	new_length = get_envp_length(g_info.envp) + 1;
+	new_envp = ft_calloc(new_length + 1, sizeof(char *));
+	if (!new_envp)
+		return (NULL);
+	i = 0;
+	while (i < new_length - 1)
+	{
+		new_envp[i] = g_info.envp[i];
+		i++;
+	}
+	free(g_info.envp);
+	return (new_envp);
+}
+
+int	insert_new_value_in_envp(char *name)
+{
+	int	i;
+
+	g_info.envp = realloc_envp_with_one_more_line();
+	if (!g_info.envp)
+		return (1);
+	i = 0;
+	while (g_info.envp[i])
+		i++;
+	g_info.envp[i] = ft_calloc(str_len(name) + 2, sizeof(char));
+	if (!g_info.envp[i])
+		return (1);
+	ft_strncpy(g_info.envp[i], name, strlen(name));
+	if (!str_has(name, '='))
+		g_info.envp[i][str_len(name)] = '=';
+	return (0);
+}
+
+int builtin_export(char *argv[])
 {
 	int		i;
 	t_bool	has_met_an_error;
 
 	if (!argv[1])
-		return (print_sorted_envp(envp));
+		return (print_sorted_envp(g_info.envp));
 	has_met_an_error = FALSE;
 	i = 1;
 	while (argv[i])
@@ -321,10 +404,10 @@ int builtin_export(char *argv[], char *envp[])
 			i++;
 			continue ;
 		}
-		// if (var_already_exits_in_envp(argv[i]))
-		// 		modify_var_in_envp(envp, argv[i]);
-		// else
-		//		insert_new_value_in_envp(envp, argv[i]) //need to change envp to global for this
+		if (variable_already_exits_in_envp(g_info.envp, argv[i]))
+			modify_var_in_envp(g_info.envp, argv[i]);
+		else
+			insert_new_value_in_envp(argv[i]);
 		i++;
 	}
 	if (has_met_an_error)
@@ -332,25 +415,33 @@ int builtin_export(char *argv[], char *envp[])
 	return (0);
 }
 
-int builtin_env(char *argv[], char *envp[])
+int builtin_env(char *argv[])
 {
 	int	i;
 
 	(void)argv;
-	if (!envp)
-		return (1);
 	i = 0;
-	while (envp[i])
+	while (g_info.envp[i])
 	{
-		printf("%s\n", envp[i]);
+		printf("%s\n", g_info.envp[i]);
 		i++;
 	}
 	return (0);
 }
 
-int builtin_empty(char *argv[], char *envp[])
+int builtin_exit(char *argv[])
 {
-	(void)envp;
+	int	exit_status;
+
+	if (!argv[1])
+		exit_status = 0;
+	free_envp(g_info.envp);
+	free_nodes(g_info.nodes);
+	exit(exit_status);
+}
+
+int	builtin_empty(char*argv[])
+{
 	(void)argv;
 	return (0);
 }
