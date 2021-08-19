@@ -147,14 +147,32 @@ int		get_heredocs_redir(t_node *node)
 	return (0);
 }
 
+static char	*get_bin_filename_helper(char *name, char **paths)
+{
+	int			i;
+	char		*bin_filename;
+	struct stat	statbuf;
+
+	i = 0;
+	while (paths[i])
+	{
+		bin_filename = str_jointo(paths[i], "/", NULL);
+		bin_filename = str_jointo(bin_filename, name, &bin_filename);
+		if (!bin_filename)
+			return (NULL);
+		if (stat(bin_filename, &statbuf) == 0)
+			return (bin_filename);
+		free(bin_filename);
+		i++;
+	}
+	return (NULL);
+}
 
 char	*get_bin_filename(char *name)
 {
 	char	*path_variable;
 	char	**paths;
-	int		i;
 	char	*bin_filename;
-	struct stat statbuf;
 
 	if (str_has(name, '/'))
 		return (str_dupli(name));
@@ -164,28 +182,15 @@ char	*get_bin_filename(char *name)
 	paths = ft_split(path_variable, ':');
 	if (!paths)
 		return (NULL);
-	i = 0;
-	while (paths[i])
-	{
-		bin_filename = str_jointo(paths[i], "/", NULL);
-		bin_filename = str_jointo(bin_filename, name, NULL);
-		if (!bin_filename)
-		{
-			free_envp(paths);
-			return (NULL);
-		}
-		if (stat(bin_filename, &statbuf) == 0)
-		{
-			free_envp(paths);
-			return (bin_filename);
-		}
-		free(bin_filename);
-		i++;
-	}
+	free(path_variable);
+	bin_filename = get_bin_filename_helper(name, paths);
 	free_envp(paths);
-	put_str_fd(STDERR_FILENO, name);
-	put_str_fd(STDERR_FILENO, ": command not found\n");
-	return (NULL);
+	if (!bin_filename)
+	{
+		put_str_fd(STDERR_FILENO, name);
+		put_str_fd(STDERR_FILENO, ": command not found\n");
+	}
+	return (bin_filename);
 }
 
 int	exec_command(t_node *node, t_context *ctx)
