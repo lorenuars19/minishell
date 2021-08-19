@@ -217,8 +217,8 @@ int	exec_command(t_node *node, t_context *ctx)
 		bin_filename = get_bin_filename(node->args[0]);
 		if (!bin_filename)
 			return (127);
-		else
-			printf("%s\n", bin_filename);
+		// else
+		// 	printf("%s\n", bin_filename);
 		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
 		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 		if (ctx->fd_close != -1)
