@@ -10,7 +10,7 @@ static int set_prompt(t_sd *sd)
 	prompt = NULL;
 	prompt = getcwd(NULL, 0);
 	prompt = str_jointo("\033[34m", prompt, &prompt);
-	if (sd->status)
+	if (g_info.last_exit_status)
 		prompt = str_jointo(prompt, " \033[31;1m$\033[0m ", &prompt);
 	else
 		prompt = str_jointo(prompt, " \033[32;1m$\033[0m ", &prompt);
@@ -36,13 +36,13 @@ static int process_command(t_sd *sd)
 		free(sd->line);
 		return (1);
 	}
-	expand_variables(*(sd->envp_addr), sd->tokens);
+	expand_variables(g_info.envp, sd->tokens);
 	merge_tokens(sd->tokens);
 	// print_tokens(sd->tokens);
 	sd->nodes = parser(sd->tokens);
 	// print_nodes(sd->nodes, 0);
 
-	sd->status = execution(sd->nodes, *(sd->envp_addr));
+	g_info.last_exit_status = execution(sd->nodes, g_info.envp);
 
 	free_tokens_without_data(sd->tokens);
 	free_nodes(sd->nodes);
@@ -55,15 +55,13 @@ int main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 
-	sd = (t_sd){&envp, NULL, 0, NULL, NULL};
-
-	sd.status = 0;
-
-	if (setup_signals(REVERT_TO_DEFAULT))
-		return (error_sys_put("setup_signals"));
+	sd = (t_sd){NULL, NULL, NULL};
+	g_info = (t_info){make_envp_copy(envp), NULL, 0};
 
 	while (1)
 	{
+		if (setup_signals(REVERT_TO_DEFAULT))
+			return (error_sys_put("setup_signals"));
 		if (set_prompt(&sd))
 			return (EXIT_SUCCESS);
 //TODO remove debug
@@ -71,7 +69,7 @@ int main(int argc, char **argv, char **envp)
 		if (process_command(&sd))
 			continue ;
 //TODO remove debug
-dprintf(2, "\n> Last command status : %d <\n", sd.status);
+dprintf(2, "\n> Last command status : %d <\n", g_info.last_exit_status);
 		if (str_cmp("exit", sd.line) == 0)
 		{
 			free(sd.line);
