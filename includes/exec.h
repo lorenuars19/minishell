@@ -55,4 +55,7 @@ t_bool is_command_a_builtin(t_node *node);
 int exec_builtin(t_node *node);
 int ft_strncmp(const char *s1, const char *s2, size_t n);
 
+char **ft_split(char const *s, char c);
+char *ft_strjoin(char const *s1, char const *s2);
+
 #endif

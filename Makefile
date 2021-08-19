@@ -53,6 +53,7 @@ LDFLAGS = -lreadline -ltermcap $(LIB_UTILS)
 
 SRCS = \
 	./src/exec.c \
+	./src/ft_split.c \
 	./src/merge_tokens.c \
 	./src/scanner.c \
 	./src/handle_heredoc.c \

@@ -1,5 +1,7 @@
 #include "minishell.h"
 
+//TODO check the case when there are only redirections but no command
+
 int	exec(t_node *node)
 {
 	t_context ctx;
@@ -145,9 +147,51 @@ int		get_heredocs_redir(t_node *node)
 	return (0);
 }
 
+
+char	*get_bin_filename(char *name)
+{
+	char	*path_variable;
+	char	**paths;
+	int		i;
+	char	*bin_filename;
+	struct stat statbuf;
+
+	if (str_has(name, '/'))
+		return (str_dupli(name));
+	path_variable = get_value_from_envp("PATH", g_info.envp);
+	if (!path_variable)
+		return (NULL);
+	paths = ft_split(path_variable, ':');
+	if (!paths)
+		return (NULL);
+	i = 0;
+	while (paths[i])
+	{
+		bin_filename = str_jointo(paths[i], "/", NULL);
+		bin_filename = str_jointo(bin_filename, name, NULL);
+		if (!bin_filename)
+		{
+			free_envp(paths);
+			return (NULL);
+		}
+		if (stat(bin_filename, &statbuf) == 0)
+		{
+			free_envp(paths);
+			return (bin_filename);
+		}
+		free(bin_filename);
+		i++;
+	}
+	free_envp(paths);
+	put_str_fd(STDERR_FILENO, name);
+	put_str_fd(STDERR_FILENO, ": command not found\n");
+	return (NULL);
+}
+
 int	exec_command(t_node *node, t_context *ctx)
 {
-	pid_t cpid;
+	pid_t	cpid;
+	char	*bin_filename;
 
 	if (is_command_a_builtin(node))
 	{
@@ -170,11 +214,16 @@ int	exec_command(t_node *node, t_context *ctx)
 	{
 		if (set_redirection(node, ctx) != 0)
 			return (1);
+		bin_filename = get_bin_filename(node->args[0]);
+		if (!bin_filename)
+			return (1);
+		else
+			printf("%s\n", bin_filename);
 		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
 		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 		if (ctx->fd_close != -1)
 			close(ctx->fd_close);
-		execvp(node->args[0], node->args);
+		execve(bin_filename, node->args, g_info.envp);
 		print_error_filename(node->args[0]);
 		return (errno);
 	}
