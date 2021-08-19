@@ -13,8 +13,8 @@ static void set_o_flags(t_redirection *redir, int *o_flags,
 	else if (redir->mode == M_APPEND)
 		(*o_flags) = O_WRONLY | O_APPEND;
 	else if (redir->mode == M_HEREDOC)
-		*(o_flags) = O_TMPFILE | O_RDWR;
-	if (!file_exists && redir->mode != M_HEREDOC)
+		*(o_flags) = O_TRUNC | O_RDWR;
+	if (!file_exists)
 		*(o_flags) |= O_CREAT;
 }
 
@@ -43,7 +43,7 @@ dprintf(2, "ed->file_fd %d\n", ed->file_fd);
 		}
 		else
 		{
-			ed->file_fd = open(HEREDOC_PATH, o_flags, 0664);
+			ed->file_fd = open(redir->filename, o_flags, 0664);
 			if (ed->file_fd < 0)
 				return (error_sys_put("set_redir_file : open"));
 		}

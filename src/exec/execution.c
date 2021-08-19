@@ -6,15 +6,15 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 19:01:47 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 23:28:31 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/19 12:12:10 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void sub_wait_children(t_exdat *ed)
+static void	sub_wait_children(t_exdat *ed)
 {
-	int wstatus;
+	int	wstatus;
 
 	while (ed->n_children > 0)
 	{
@@ -23,14 +23,15 @@ static void sub_wait_children(t_exdat *ed)
 		{
 			waitpid(-1, &wstatus, WUNTRACED);
 			if (WIFEXITED(wstatus) || WIFSIGNALED(wstatus))
-				break;
+				break ;
 		}
-		ed->status = get_exit_code(wstatus);
+		if (ed->is_fork)
+			ed->status = get_exit_code(wstatus);
 		ed->n_children--;
 	}
 }
 
-int execution(t_node *node, char *envp[])
+int	execution(t_node *node, char *envp[])
 {
 	t_ctx	ctx;
 	t_exdat	ed;
@@ -39,9 +40,9 @@ int execution(t_node *node, char *envp[])
 	ctx = (t_ctx){{STDIN_FILENO, STDOUT_FILENO}, -1};
 	ed.status = exec_nodes(&ed, node, &ctx);
 	if (setup_signals(REVERT_TO_DEFAULT))
-		return (error_put(ed.status, "execution : setup_signals : non-zero exit code"));
+		return (error_put(1, "execution : setup_signals : non-zero exit code"));
 	if (ed.is_pipe == FALSE && ed.status)
-		return (error_put(ed.status, "execution : exec_nodes : non-zero exit code"));
+		return (error_put(1, "execution : exec_nodes : non-zero exit code"));
 	sub_wait_children(&ed);
 	close(ed.file_fd);
 	return (ed.status);

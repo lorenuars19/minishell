@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:58 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/17 17:45:25 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/19 12:10:38 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ static int	sub_exec_command_child(t_exdat *ed, t_node *node, t_ctx *ctx)
 	if (ed->is_fork == TRUE)
 	{
 		if (ed->is_pipe == TRUE && set_redir_pipe(ed, ctx, node))
-			exit (error_put(1, "exec_command : set_redir_pipe"));
+			exit(error_put(1, "exec_command : set_redir_pipe"));
 		if (node->redirections && set_redir_file(ed, node))
-			exit (error_put(1, "exec_command : set_redir_file"));
+			exit(error_put(1, "exec_command : set_redir_file"));
 	}
 	if (ed->is_builtin == TRUE)
 	{
