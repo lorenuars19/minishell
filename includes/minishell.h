@@ -20,7 +20,7 @@
 # include "parsing.h"
 # include "exec.h"
 
-# define HEREDOC_PATH "/tmp/"
+# define HEREDOC_PATH "/tmp/.minishell_heredoc_tmp"
 
 typedef struct s_shell_data
 {

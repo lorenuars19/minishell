@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 19:01:47 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/19 12:12:10 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/19 14:07:32 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,12 @@ static void	sub_wait_children(t_exdat *ed)
 
 	while (ed->n_children > 0)
 	{
-		waitpid(-1, &wstatus, WUNTRACED);
+		if (waitpid(-1, &wstatus, WUNTRACED) < 0)
+			break ;
 		while (!WIFSIGNALED(wstatus) || !WIFEXITED(wstatus))
 		{
-			waitpid(-1, &wstatus, WUNTRACED);
+			if (waitpid(-1, &wstatus, WUNTRACED) < 0)
+				break ;
 			if (WIFEXITED(wstatus) || WIFSIGNALED(wstatus))
 				break ;
 		}

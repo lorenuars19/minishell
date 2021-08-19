@@ -34,11 +34,9 @@ int set_redir_file(t_exdat *ed, t_node *node)
 		dup_fd = STDOUT_FILENO;
 		file_exists = is_path_regular_file(redir->filename);
 		set_o_flags(redir, &o_flags, file_exists, &dup_fd);
-dprintf(2, "redir->filename %s\n", redir->filename);
 		if (redir->mode == M_HEREDOC)
 		{
 			ed->file_fd = open(HEREDOC_PATH, o_flags, 0664);
-dprintf(2, "ed->file_fd %d\n", ed->file_fd);
 			get_here_document(ed->file_fd, redir->filename);
 		}
 		else
