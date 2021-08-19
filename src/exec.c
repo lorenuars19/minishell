@@ -31,7 +31,7 @@ int exec_node(t_node *node, t_context *ctx)
 	return (ret);
 }
 
-int	print_open_error(char *filename)
+int	print_error_filename(char *filename)
 {
 	put_str_fd(STDERR_FILENO, "minishell: ");
 	put_str_fd(STDERR_FILENO, filename);
@@ -50,7 +50,7 @@ int	set_input_redirection(t_redirection *redirection, t_context *ctx)
 			close(ctx->fd[0]);
 		fd = open(redirection->filename, O_RDONLY);
 		if (fd == -1)
-			return (print_open_error(redirection->filename));
+			return (print_error_filename(redirection->filename));
 		ctx->fd[0] = fd;
 	}
 	else if (redirection->mode == M_HEREDOC)
@@ -59,7 +59,7 @@ int	set_input_redirection(t_redirection *redirection, t_context *ctx)
 			close(ctx->fd[0]);
 		fd = open(HEREDOC_FILENAME, O_RDONLY);
 		if (fd == -1)
-			return (print_open_error(HEREDOC_FILENAME));
+			return (print_error_filename(HEREDOC_FILENAME));
 		ctx->fd[0] = fd;
 	}
 	return (0);
@@ -73,7 +73,7 @@ int set_output_redirection(t_redirection *redirection, t_context *ctx)
 	{
 		fd = open(redirection->filename, O_CREAT | O_TRUNC | O_WRONLY, 0664);
 		if (fd == -1)
-			return (print_open_error(redirection->filename));
+			return (print_error_filename(redirection->filename));
 		if (ctx->fd[1] != STDOUT_FILENO)
 			close(ctx->fd[1]);
 		ctx->fd[1] = fd;
@@ -82,7 +82,7 @@ int set_output_redirection(t_redirection *redirection, t_context *ctx)
 	{
 		fd = open(redirection->filename, O_CREAT | O_APPEND | O_WRONLY, 0664);
 		if (fd == -1)
-			return (print_open_error(redirection->filename));
+			return (print_error_filename(redirection->filename));
 		if (ctx->fd[1] != STDOUT_FILENO)
 			close(ctx->fd[1]);
 		ctx->fd[1] = fd;
@@ -175,9 +175,8 @@ int	exec_command(t_node *node, t_context *ctx)
 		if (ctx->fd_close != -1)
 			close(ctx->fd_close);
 		execvp(node->args[0], node->args);
-		put_str_fd(STDERR_FILENO, "minishell: execve: ");
-		put_str_fd_nl(STDERR_FILENO, strerror(errno));
-		return (1);
+		print_error_filename(node->args[0]);
+		return (errno);
 	}
 	return (1);
 }
