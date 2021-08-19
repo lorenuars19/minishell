@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 19:01:47 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/19 14:07:32 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/19 16:51:28 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static void	sub_wait_children(t_exdat *ed)
 {
 	int	wstatus;
 
-	while (ed->n_children > 0)
+	while (ed->n_children > 0 && ed->is_fork == TRUE)
 	{
 		if (waitpid(-1, &wstatus, WUNTRACED) < 0)
 			break ;
@@ -27,8 +27,7 @@ static void	sub_wait_children(t_exdat *ed)
 			if (WIFEXITED(wstatus) || WIFSIGNALED(wstatus))
 				break ;
 		}
-		if (ed->is_fork)
-			ed->status = get_exit_code(wstatus);
+		ed->status = get_exit_code(wstatus);
 		ed->n_children--;
 	}
 }

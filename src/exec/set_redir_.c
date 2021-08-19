@@ -37,7 +37,6 @@ int set_redir_file(t_exdat *ed, t_node *node)
 		if (redir->mode == M_HEREDOC)
 		{
 			ed->file_fd = open(HEREDOC_PATH, o_flags, 0664);
-			get_here_document(ed->file_fd, redir->filename);
 		}
 		else
 		{
@@ -47,6 +46,8 @@ int set_redir_file(t_exdat *ed, t_node *node)
 		}
 		if (dup2(ed->file_fd, dup_fd) < 0)
 			return (error_sys_put("sub_set_redir : dup2"));
+		if (redir->mode == M_HEREDOC)
+			get_here_document(ed->file_fd, redir->filename);
 		redir = redir->next;
 	}
 	return (0);

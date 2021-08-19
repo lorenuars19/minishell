@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:52 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/16 21:49:20 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/19 16:45:26 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ static t_builtin_f get_builtin(int index)
 
 void	check_for_builtins(t_exdat *ed, t_node *node)
 {
-	int i;
-	static char *builtins[] = {
+	int			i;
+	static char	*builtins[] = {
 		"echo",
 		"cd",
 		"pwd",
@@ -54,7 +54,8 @@ void	check_for_builtins(t_exdat *ed, t_node *node)
 		&& str_cmp(node->args[0], builtins[i]))
 		i++;
 
-	if (i == BUILTIN_CD || i == BUILTIN_EXPORT || i == BUILTIN_UNSET || i == BUILTIN_EXIT)
+	if (ed->is_pipe == FALSE && (i == BUILTIN_CD || i == BUILTIN_EXPORT
+			|| i == BUILTIN_UNSET || i == BUILTIN_EXIT))
 		ed->is_fork = FALSE;
 
 	ed->f_to_call = get_builtin(i);
