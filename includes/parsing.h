@@ -56,8 +56,9 @@ struct s_node
 	t_node_type		type;
 	char			**args;
 	t_redirection	*redirections;
-	t_node			*right;	//in case of a pipe node
-	t_node			*left; //in case of a pipe node
+	t_node			*right;
+	t_node			*left;
+	pid_t			pid;
 };
 
 t_token	*scanner(char *line);

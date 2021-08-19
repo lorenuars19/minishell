@@ -2,22 +2,26 @@
 
 //TODO check the case when there are only redirections but no command
 
+void	wait_for_children(t_node *node)
+{
+	if (node->type == COMMAND_NODE && node->pid != 0)
+		waitpid(node->pid, NULL, 0);
+	else if (node->type == PIPE_NODE)
+	{
+		wait_for_children(node->left);
+		wait_for_children(node->right);
+	}
+}
+
 int	exec(t_node *node)
 {
 	t_context ctx;
-	int		children;
-	int		i;
 
 	ctx.fd[STDIN_FILENO] = STDIN_FILENO;
 	ctx.fd[STDOUT_FILENO] = STDOUT_FILENO;
 	ctx.fd_close = -1;
-	children = exec_node(node, &ctx);
-	i = 0;
-	while (i < children)
-	{
-		wait(NULL);
-		i++;
-	}
+	exec_node(node, &ctx);
+	wait_for_children(node);
 	return (0);
 }
 
@@ -193,20 +197,27 @@ char	*get_bin_filename(char *name)
 	return (bin_filename);
 }
 
+static t_bool	is_part_of_pipeline(t_context *ctx)
+{
+	if (ctx->fd[0] != STDIN_FILENO || ctx->fd[1] != STDOUT_FILENO)
+		return (TRUE);
+	return (FALSE);
+}
+
 int	exec_command(t_node *node, t_context *ctx)
 {
 	pid_t	cpid;
 	char	*bin_filename;
 
-	if (is_command_a_builtin(node))
-	{
-		exec_builtin(node);
-		return (0);
-	}
 	if (there_is_a_heredoc_redirection(node))
 	{
 		if (get_heredocs_redir(node) != 0)
 			return (0);
+	}
+	if (is_command_a_builtin(node) && !is_part_of_pipeline(ctx))
+	{
+		exec_builtin(node);
+		return (0);
 	}
 	cpid = fork();
 	if (cpid < 0)
@@ -218,21 +229,24 @@ int	exec_command(t_node *node, t_context *ctx)
 	else if (cpid == FORKED_CHILD)
 	{
 		if (set_redirection(node, ctx) != 0)
-			return (1);
-		bin_filename = get_bin_filename(node->args[0]);
-		if (!bin_filename)
-			return (127);
+			exit(1);
 		// else
 		// 	printf("%s\n", bin_filename);
 		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
 		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 		if (ctx->fd_close != -1)
 			close(ctx->fd_close);
+		if (is_command_a_builtin(node))
+			exit(exec_builtin(node));
+		bin_filename = get_bin_filename(node->args[0]);
+		if (!bin_filename)
+			exit(127);
 		execve(bin_filename, node->args, g_info.envp);
 		print_error_filename(bin_filename);
 		free(bin_filename);
-		return (errno);
+		exit(errno);
 	}
+	node->pid = cpid;
 	return (1);
 }
 

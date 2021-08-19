@@ -36,13 +36,6 @@ int exec_node(t_node *node, t_context *ctx);
 int exec_command(t_node *node, t_context *ctx);
 int exec_pipe(t_node * node, t_context *ctx);
 
-int wait_for_child(pid_t cpid);
-
-int	exec_binary(t_node *node, char *envp[]);
-char *find_path(t_node *node);
-int	is_path_executable(char *path);
-
-
 int builtin_echo(char *argv[]);
 int builtin_cd(char *argv[]);
 int builtin_pwd(char *argv[]);
@@ -56,6 +49,5 @@ int exec_builtin(t_node *node);
 int ft_strncmp(const char *s1, const char *s2, size_t n);
 
 char **ft_split(char const *s, char c);
-char *ft_strjoin(char const *s1, char const *s2);
 
 #endif
