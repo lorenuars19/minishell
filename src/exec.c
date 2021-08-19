@@ -216,7 +216,7 @@ int	exec_command(t_node *node, t_context *ctx)
 			return (1);
 		bin_filename = get_bin_filename(node->args[0]);
 		if (!bin_filename)
-			return (1);
+			return (127);
 		else
 			printf("%s\n", bin_filename);
 		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
@@ -224,7 +224,8 @@ int	exec_command(t_node *node, t_context *ctx)
 		if (ctx->fd_close != -1)
 			close(ctx->fd_close);
 		execve(bin_filename, node->args, g_info.envp);
-		print_error_filename(node->args[0]);
+		print_error_filename(bin_filename);
+		free(bin_filename);
 		return (errno);
 	}
 	return (1);
