@@ -6,7 +6,7 @@
 /*   By: lorenuar <lorenuar@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 18:49:58 by lorenuar          #+#    #+#             */
-/*   Updated: 2021/08/19 17:28:46 by lorenuar         ###   ########.fr       */
+/*   Updated: 2021/08/19 18:22:26 by lorenuar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,11 @@ static void	init_ed(t_exdat *ed)
 
 static int	sub_exec_command_child(t_exdat *ed, t_node *node, t_ctx *ctx)
 {
+
 	if (ed->is_fork == TRUE)
 	{
-		if (ed->is_pipe == TRUE && set_redir_pipe(ed, ctx, node))
-			exit(error_put(1, "exec_command : set_redir_pipe"));
-		if (node->redirections && set_redir_file(ed, node))
-			exit(error_put(1, "exec_command : set_redir_file"));
+		if (ed->is_pipe == TRUE && set_redir_dup(ed, node, ctx))
+			exit(error_put(1, "exec_command : set_redir_dup"));
 	}
 	if (ed->is_builtin == TRUE)
 	{
@@ -54,6 +53,14 @@ int	exec_command(t_exdat *ed, t_node *node, t_ctx *ctx)
 	check_for_builtins(ed, node);
 	ed->n_children++;
 	cpid = 0;
+
+dprintf(2, "BEFORE set_redir_file : ctx : fd[0] %d | fd[1] %d\n", ctx->fd[0], ctx->fd[1]);
+
+	if (node->redirections && set_redir_file(ed, node, ctx))
+			exit(error_put(1, "exec_command : set_redir_file"));
+
+dprintf(2, "AFTER set_redir_file : ctx : fd[0] %d | fd[1] %d\n", ctx->fd[0], ctx->fd[1]);
+
 	if (ed->is_fork == TRUE)
 		cpid = fork();
 	if (cpid < 0)
