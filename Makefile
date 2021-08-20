@@ -63,6 +63,7 @@ SRCS = \
 	./src/builtins.c \
 	./src/scanner_utils.c \
 	./src/variable_expansion.c \
+	./src/ft_itoa.c \
 
 HEADERS = \
 	./includes/parsing.h\
