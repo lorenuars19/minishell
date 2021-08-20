@@ -204,6 +204,47 @@ static t_bool	is_part_of_pipeline(t_context *ctx)
 	return (FALSE);
 }
 
+int	fds_cleanup(t_context *ctx, int copy_fd[2])
+{
+	if (ctx->fd[0] != STDIN_FILENO)
+	{
+		close(ctx->fd[0]);
+		dup2(copy_fd[0], STDIN_FILENO);
+		close(copy_fd[0]);
+	}
+	if (ctx->fd[1] != STDOUT_FILENO)
+	{
+		close(ctx->fd[1]);
+		dup2(copy_fd[1], STDOUT_FILENO);
+		close(copy_fd[1]);
+	}
+	return (0);
+}
+
+int	exec_builtin_in_parent(t_node *node, t_context *ctx)
+{
+	int	copy_fd[2];
+
+	if (set_redirection(node, ctx) != 0)
+	{
+		g_info.last_exit_status = 1;
+		return (0);
+	}
+	if (ctx->fd[0] != STDIN_FILENO)
+	{
+		copy_fd[0] = dup(STDIN_FILENO);
+		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
+	}
+	if (ctx->fd[1] != STDOUT_FILENO)
+	{
+		copy_fd[1] = dup(STDOUT_FILENO);
+		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
+	}
+	g_info.last_exit_status = exec_builtin(node);
+	fds_cleanup(ctx, copy_fd);
+	return (0);
+}
+
 int	exec_command(t_node *node, t_context *ctx)
 {
 	pid_t	cpid;
@@ -216,7 +257,7 @@ int	exec_command(t_node *node, t_context *ctx)
 	}
 	if (is_command_a_builtin(node) && !is_part_of_pipeline(ctx))
 	{
-		exec_builtin(node);
+		exec_builtin_in_parent(node, ctx);
 		return (0);
 	}
 	cpid = fork();
