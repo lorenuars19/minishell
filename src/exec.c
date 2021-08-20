@@ -4,8 +4,21 @@
 
 void	wait_for_children(t_node *node)
 {
+	int	wstatus;
+
 	if (node->type == COMMAND_NODE && node->pid != 0)
-		waitpid(node->pid, NULL, 0);
+	{
+		if (waitpid(node->pid, &wstatus, 0) == -1)
+			return ;
+		if (WIFEXITED(wstatus))
+			g_info.last_exit_status = WEXITSTATUS(wstatus);
+		else if (WIFSIGNALED(wstatus))
+		{
+			g_info.last_exit_status = WTERMSIG(wstatus) + 128;
+			// if (__WCOREDUMP(wstatus))
+			// 	printf("core was dumped\n");
+		}
+	}
 	else if (node->type == PIPE_NODE)
 	{
 		wait_for_children(node->left);
