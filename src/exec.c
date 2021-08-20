@@ -77,20 +77,20 @@ int set_output_redirection(t_redirection *redirection, t_context *ctx)
 
 	if (redirection->mode == M_TRUNCATE)
 	{
+		if (ctx->fd[1] != STDOUT_FILENO)
+			close(ctx->fd[1]);
 		fd = open(redirection->filename, O_CREAT | O_TRUNC | O_WRONLY, 0664);
 		if (fd == -1)
 			return (print_error_filename(redirection->filename));
-		if (ctx->fd[1] != STDOUT_FILENO)
-			close(ctx->fd[1]);
 		ctx->fd[1] = fd;
 	}
 	else if (redirection->mode == M_APPEND)
 	{
+		if (ctx->fd[1] != STDOUT_FILENO)
+			close(ctx->fd[1]);
 		fd = open(redirection->filename, O_CREAT | O_APPEND | O_WRONLY, 0664);
 		if (fd == -1)
 			return (print_error_filename(redirection->filename));
-		if (ctx->fd[1] != STDOUT_FILENO)
-			close(ctx->fd[1]);
 		ctx->fd[1] = fd;
 	}
 	return (0);
