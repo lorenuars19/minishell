@@ -37,7 +37,6 @@ int main(int argc, char **argv, char **envp)
 		free_tokens_without_data(tokens);
 		g_info.nodes = nodes;
 		// print_nodes(nodes, 0);
-		// execution(nodes, envp);
 		exec(nodes);
 		free_nodes(nodes);
 	}

@@ -5,8 +5,8 @@ int	get_variable_length(char *data)
 {
 	int	length;
 
-	if (is_digit(data[0]))
-		return (0);
+	if (data[0] == '?')
+		return (1);
 	length = 0;
 	while (is_alnum(data[length]) || data[length] == '_')
 		length++;
@@ -48,9 +48,9 @@ char	*get_variable_name(t_token *token)
 
 static t_bool	is_a_valid_name(char *data)
 {
-	if (data[0] == '$' && (data[1] == '_' || is_alnum(data[1])))
-		return (TRUE);
-	return (FALSE);
+	if (data[0] != '_' && !is_alpha(data[0]) && data[0] != '?')
+		return (FALSE);
+	return (TRUE);
 }
 
 t_bool	should_token_be_expanded(t_token *token)
@@ -64,7 +64,7 @@ t_bool	should_token_be_expanded(t_token *token)
 		i = 0;
 		while (token->data[i])
 		{
-			if (token->data[i] == '$' && is_a_valid_name(token->data + i))
+			if (token->data[i] == '$' && is_a_valid_name(token->data + i + 1))
 				return (TRUE);
 			i++;
 		}
@@ -88,7 +88,7 @@ char	*get_value_from_envp(char *name, char **envp)
 	return (str_dupli(""));
 }
 
-char	*replace_variable_with_its_value(t_token *token, char *value, char *name)
+char	*replace_variable_by_its_value(t_token *token, char *value, char *name)
 {
 	(void)token;
 	(void)value;
@@ -127,13 +127,16 @@ char	*expand_one_variable(t_token *token, char **envp)
 	name = get_variable_name(token);
 	if (!name)
 		return (NULL);
-	value = get_value_from_envp(name, envp);
+	if (ft_strncmp(name, "?", 1) == 0)
+		value = ft_itoa(g_info.last_exit_status);
+	else
+		value = get_value_from_envp(name, envp);
 	if (!value)
 	{
 		free(name);
 		return (NULL);
 	}
-	expanded_token = replace_variable_with_its_value(token, value, name);
+	expanded_token = replace_variable_by_its_value(token, value, name);
 	free(name);
 	free(value);
 	return (expanded_token);

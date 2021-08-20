@@ -1,7 +1,6 @@
 #include "minishell.h"
-#include <fcntl.h>
-#include <stdlib.h>
-#include <errno.h>
+
+// TODO expand variables when necessary during heredoc aquisition
 
 int	get_here_document(char *delimiter)
 {
