@@ -1,20 +1,7 @@
 #ifndef EXEC_H
 # define EXEC_H
 
-# define BUFF_SIZ	1024
-
 # define FORKED_CHILD 0
-typedef enum e_builtin_commands
-{
-	BUILTIN_ECHO,
-	BUILTIN_CD,
-	BUILTIN_PWD,
-	BUILTIN_EXPORT,
-	BUILTIN_UNSET,
-	BUILTIN_ENV,
-	BUILTIN_EXIT,
-	BUILTIN_END
-}	t_builtins;
 
 typedef struct s_pipe_context
 {
