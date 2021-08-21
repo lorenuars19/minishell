@@ -14,6 +14,7 @@ typedef struct
 	char	**envp;
 	t_node	*nodes;
 	int		last_exit_status;
+	t_bool	is_exec_ongoing;
 }	t_info;
 
 int	exec(t_node *node);

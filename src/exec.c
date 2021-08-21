@@ -2,7 +2,7 @@
 
 //TODO check the case when there are only redirections but no command
 
-void	wait_for_children(t_node *node)
+void	wait_for_children(t_node *node, t_bool is_end_of_pipeline)
 {
 	int	wstatus;
 
@@ -10,19 +10,21 @@ void	wait_for_children(t_node *node)
 	{
 		if (waitpid(node->pid, &wstatus, 0) == -1)
 			return ;
-		if (WIFEXITED(wstatus))
+		if (WIFEXITED(wstatus) && is_end_of_pipeline)
 			g_info.last_exit_status = WEXITSTATUS(wstatus);
-		else if (WIFSIGNALED(wstatus))
+		else if (WIFSIGNALED(wstatus) && is_end_of_pipeline)
 		{
 			g_info.last_exit_status = WTERMSIG(wstatus) + 128;
-			// if (__WCOREDUMP(wstatus))
-			// 	printf("core was dumped\n");
+			if (__WCOREDUMP(wstatus))
+				put_str("Quit (core dumped)\n");
+			else if (WTERMSIG(wstatus) == SIGINT)
+				put_str("\n");
 		}
 	}
 	else if (node->type == PIPE_NODE)
 	{
-		wait_for_children(node->left);
-		wait_for_children(node->right);
+		wait_for_children(node->left, FALSE);
+		wait_for_children(node->right, TRUE);
 	}
 }
 
@@ -33,8 +35,10 @@ int	exec(t_node *node)
 	ctx.fd[STDIN_FILENO] = STDIN_FILENO;
 	ctx.fd[STDOUT_FILENO] = STDOUT_FILENO;
 	ctx.fd_close = -1;
+	g_info.is_exec_ongoing = TRUE;
 	exec_node(node, &ctx);
-	wait_for_children(node);
+	wait_for_children(node, TRUE);
+	g_info.is_exec_ongoing = FALSE;
 	return (0);
 }
 

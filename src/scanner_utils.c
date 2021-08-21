@@ -81,26 +81,26 @@ void print_tokens(t_token *tokens)
 	}
 }
 
-void free_tokens_without_data(t_token *tokens)
+void free_tokens_excl_data(t_token *tokens)
 {
 	t_token *current_token;
 
 	current_token = tokens;
 	if (current_token)
 	{
-		free_tokens_without_data(current_token->next);
+		free_tokens_excl_data(current_token->next);
 		free(current_token);
 	}
 }
 
-void	free_tokens_with_data(t_token *tokens)
+void	free_tokens_incl_data(t_token *tokens)
 {
 	t_token *current_token;
 
 	current_token = tokens;
 	if (current_token)
 	{
-		free_tokens_with_data(current_token->next);
+		free_tokens_incl_data(current_token->next);
 		if (current_token->data)
 			free(current_token->data);
 		free(current_token);
