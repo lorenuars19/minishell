@@ -28,6 +28,20 @@ void	eof_exit(void)
 	exit(0);
 }
 
+t_bool	is_line_empty(char *line)
+{
+	int	i;
+
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] != ' ' && line[i] != '\t')
+			return (FALSE);
+		i++;
+	}
+	return (TRUE);
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	(void)argc;
@@ -42,7 +56,7 @@ int main(int argc, char **argv, char **envp)
 		line = readline("$>");
 		if (!line)
 			eof_exit();
-		if (line && *line)
+		if (line && !is_line_empty(line))
 			add_history(line);
 		t_token *tokens = scanner(line);
 		if (syntax_checker(line, tokens) != 0)
@@ -54,11 +68,9 @@ int main(int argc, char **argv, char **envp)
 		free(line);
 		expand_variables(g_info.envp, tokens);
 		merge_tokens(tokens);
-		// print_tokens(tokens);
 		t_node *nodes = parser(tokens);
 		free_tokens_excl_data(tokens);
 		g_info.nodes = nodes;
-		// print_nodes(nodes, 0);
 		exec(nodes);
 		free_nodes(nodes);
 	}
