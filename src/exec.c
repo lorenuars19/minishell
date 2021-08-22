@@ -282,14 +282,12 @@ int	exec_command(t_node *node, t_context *ctx)
 	{
 		put_str_fd(STDERR_FILENO, "minishell: fork: ");
 		put_str_fd_nl(STDERR_FILENO, strerror(errno));
-		return (0);
+		return (errno);
 	}
 	else if (cpid == FORKED_CHILD)
 	{
 		if (set_redirection(node, ctx) != 0)
 			exit(1);
-		// else
-		// 	printf("%s\n", bin_filename);
 		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
 		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 		if (ctx->fd_close != -1)
