@@ -1,5 +1,4 @@
 #include "minishell.h"
-#include <stdio.h>
 
 t_bool	contains_unclosed_quotes(char *line)
 {
@@ -29,23 +28,6 @@ void	skip_blank_tokens(t_token **tokens)
 		(*tokens) = (*tokens)->next;
 }
 
-t_bool	contains_consecutive_pipes(t_token *tokens)
-{
-	while (tokens)
-	{
-		if (tokens->type == T_PIPE)
-		{
-			tokens = tokens->next;
-			skip_blank_tokens(&tokens);
-			if (!tokens || tokens->type == T_PIPE)
-				return (TRUE);
-		}
-		else
-			tokens = tokens->next;
-	}
-	return (FALSE);
-}
-
 t_bool	token_contains_a_string(t_token *token)
 {
 	t_token_type	type;
@@ -60,8 +42,6 @@ t_bool	token_contains_a_string(t_token *token)
 
 t_bool	has_a_filename_after_redirection_operators(t_token *tokens)
 {
-	if (!tokens)
-		return (FALSE);
 	while (tokens)
 	{
 		if (has_redirection_type(tokens))
@@ -111,22 +91,23 @@ t_bool	line_contains_only_blanks(char *line)
 
 int syntax_checker(char *line, t_token *tokens)
 {
-	(void)tokens;
+	if (!tokens)
+		return (1);
 	if (line_contains_only_blanks(line))
 		return (1);
 	if (contains_unclosed_quotes(line))
 	{
-		printf("There are unclosed quotes in line\n");
+		put_str_fd(STDERR_FILENO, "unclosed quotes in line\n");
 		return (1);
 	}
 	if (!has_a_filename_after_redirection_operators(tokens))
 	{
-		printf("syntax error near redirection operator\n");
+		put_str_fd(STDERR_FILENO, "syntax error near redirection operator\n");
 		return (1);
 	}
 	if (!has_a_valid_command_before_and_after_pipes(tokens))
 	{
-		printf("syntax error near '|'\n");
+		put_str_fd(STDERR_FILENO, "syntax error near '|'\n");
 		return (1);
 	}
 	return (0);
