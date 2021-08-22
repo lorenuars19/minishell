@@ -27,6 +27,13 @@ int	ft_strncpy(char *dest, char *src, int n)
 	return (i);
 }
 
+static t_bool is_a_valid_name(char *data)
+{
+	if (data[0] != '_' && !is_alpha(data[0]) && data[0] != '?')
+		return (FALSE);
+	return (TRUE);
+}
+
 char	*get_variable_name(t_token *token)
 {
 	int		i;
@@ -34,7 +41,7 @@ char	*get_variable_name(t_token *token)
 	int		length;
 
 	i = 0;
-	while (token->data[i] != '$')
+	while (token->data[i] != '$' || is_a_valid_name(token->data + i + 1) == FALSE)
 		i++;
 	length = get_variable_length(token->data + i + 1);
 	if (length == 0)
@@ -44,13 +51,6 @@ char	*get_variable_name(t_token *token)
 		return (NULL);
 	ft_strncpy(name, token->data + i + 1, length);
 	return (name);
-}
-
-static t_bool	is_a_valid_name(char *data)
-{
-	if (data[0] != '_' && !is_alpha(data[0]) && data[0] != '?')
-		return (FALSE);
-	return (TRUE);
 }
 
 t_bool	should_token_be_expanded(t_token *token)

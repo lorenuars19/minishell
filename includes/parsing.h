@@ -84,5 +84,6 @@ int get_here_document(char *delimiter);
 char **make_envp_copy(char **envp);
 void free_envp(char **envp);
 char *get_value_from_envp(char *name, char **envp);
+char *expand_in_one_token(t_token *token, char **envp);
 
 #endif
