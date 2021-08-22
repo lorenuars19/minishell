@@ -262,10 +262,30 @@ int	exec_builtin_in_parent(t_node *node, t_context *ctx)
 	return (0);
 }
 
+void	exec_command_child(t_node *node, t_context *ctx)
+{
+	char	*binary_filename;
+
+	if (set_redirection(node, ctx) != 0)
+		exit(1);
+	dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
+	dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
+	if (ctx->fd_close != -1)
+		close(ctx->fd_close);
+	if (is_command_a_builtin(node))
+		exit(exec_builtin(node));
+	binary_filename = get_bin_filename(node->args[0]);
+	if (!binary_filename)
+		exit(127);
+	execve(binary_filename, node->args, g_info.envp);
+	print_error_filename(binary_filename);
+	free(binary_filename);
+	exit(errno);
+}
+
 int	exec_command(t_node *node, t_context *ctx)
 {
 	pid_t	cpid;
-	char	*bin_filename;
 
 	if (there_is_a_heredoc_redirection(node))
 	{
@@ -273,10 +293,7 @@ int	exec_command(t_node *node, t_context *ctx)
 			return (0);
 	}
 	if (is_command_a_builtin(node) && !is_part_of_pipeline(ctx))
-	{
-		exec_builtin_in_parent(node, ctx);
-		return (0);
-	}
+		return (exec_builtin_in_parent(node, ctx));
 	cpid = fork();
 	if (cpid < 0)
 	{
@@ -285,23 +302,7 @@ int	exec_command(t_node *node, t_context *ctx)
 		return (errno);
 	}
 	else if (cpid == FORKED_CHILD)
-	{
-		if (set_redirection(node, ctx) != 0)
-			exit(1);
-		dup2(ctx->fd[STDIN_FILENO], STDIN_FILENO);
-		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
-		if (ctx->fd_close != -1)
-			close(ctx->fd_close);
-		if (is_command_a_builtin(node))
-			exit(exec_builtin(node));
-		bin_filename = get_bin_filename(node->args[0]);
-		if (!bin_filename)
-			exit(127);
-		execve(bin_filename, node->args, g_info.envp);
-		print_error_filename(bin_filename);
-		free(bin_filename);
-		exit(errno);
-	}
+		exec_command_child(node, ctx);
 	node->pid = cpid;
 	return (1);
 }
