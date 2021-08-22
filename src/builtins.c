@@ -27,6 +27,8 @@ char	**make_envp_copy(char **envp)
 	while (i < length)
 	{
 		copy[i] = str_dupli(envp[i]);
+		if (!copy[i])
+			return (copy);
 		i++;
 	}
 	return (copy);
@@ -52,7 +54,7 @@ int builtin_echo(char *argv[])
 	int		i;
 	t_bool	should_print_trailing_nl;
 
-	if (*argv && argv[1] && str_cmp(argv[1], "-n") == 0)
+	if (argv[1] && str_cmp(argv[1], "-n") == 0)
 	{
 		should_print_trailing_nl = FALSE;
 		i = 2;
@@ -204,7 +206,7 @@ int builtin_unset(char *argv[])
 		return (0);
 	i = 1;
 	has_met_an_error = FALSE;
-	while (argv && argv[i])
+	while (argv[i])
 	{
 		if (!is_a_valid_variable_name(argv[i]))
 		{
@@ -237,7 +239,7 @@ static void	sort_envp(char **envp)
 		i = 0;
 		while (envp[i + 1])
 		{
-			if (strcmp(envp[i], envp[i + 1]) > 0)
+			if (str_cmp(envp[i], envp[i + 1]) > 0)
 			{
 				has_a_swap_occured = TRUE;
 				tmp = envp[i];
@@ -379,7 +381,7 @@ int	insert_new_value_in_envp(char *name)
 	g_info.envp[i] = ft_calloc(str_len(name) + 2, sizeof(char));
 	if (!g_info.envp[i])
 		return (1);
-	ft_strncpy(g_info.envp[i], name, strlen(name));
+	ft_strncpy(g_info.envp[i], name, str_len(name));
 	if (!str_has(name, '='))
 		g_info.envp[i][str_len(name)] = '=';
 	return (0);
