@@ -1,6 +1,7 @@
 #include "minishell.h"
 
 // TODO expand variables when necessary during heredoc aquisition
+// TODO handle eof (^D) during heredoc acquisition
 
 int	get_here_document(char *delimiter)
 {

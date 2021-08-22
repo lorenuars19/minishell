@@ -16,9 +16,9 @@ void	wait_for_children(t_node *node, t_bool is_end_of_pipeline)
 		{
 			g_info.last_exit_status = WTERMSIG(wstatus) + 128;
 			if (__WCOREDUMP(wstatus))
-				put_str("Quit (core dumped)\n");
+				printf("Quit (core dumped)\n");
 			else if (WTERMSIG(wstatus) == SIGINT)
-				put_str("\n");
+				printf("\n");
 		}
 	}
 	else if (node->type == PIPE_NODE)
