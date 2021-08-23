@@ -156,14 +156,18 @@ int	expand_in_one_token(t_token *token, char **envp)
 static void	skip_delimiter(t_token **tokens)
 {
 	t_token_type	type;
+	t_token			*first_delimiter_token;
 
 	type = (*tokens)->type;
 	if (type == T_HEREDOC)
 		*tokens = (*tokens)->next;
 	skip_blank_tokens(tokens);
 	type = (*tokens)->type;
+	first_delimiter_token = *tokens;
 	while ((*tokens) && (type == T_GENERAL || type == T_DQUOTE || type == T_SQUOTE))
 	{
+		if (type == T_DQUOTE || type == T_SQUOTE)
+			first_delimiter_token->type = type;
 		*tokens = (*tokens)->next;
 		if (*tokens)
 			type = (*tokens)->type;

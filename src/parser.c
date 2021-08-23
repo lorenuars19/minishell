@@ -141,6 +141,9 @@ int	get_one_redirection(t_token *current_token, t_node *node)
 	if (!current_redir)
 		return (-1);
 	current_redir->mode = (t_redirection_mode)current_token->type;
+	if (current_redir->mode == M_HEREDOC
+			&& current_token->next->type == T_GENERAL)
+		current_redir->should_expand = TRUE;
 	current_redir->filename = get_filename(current_token);
 	return (0);
 }

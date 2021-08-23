@@ -160,7 +160,7 @@ int		get_heredocs_redir(t_node *node)
 	{
 		if (redir->mode == M_HEREDOC)
 		{
-			if (get_here_document(redir->filename) != 0)
+			if (get_here_document(redir->filename, redir->should_expand) != 0)
 				return (1);
 		}
 		redir = redir->next;
