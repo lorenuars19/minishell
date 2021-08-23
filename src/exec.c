@@ -274,6 +274,8 @@ void	exec_command_child(t_node *node, t_context *ctx)
 		close(ctx->fd_close);
 	if (is_command_a_builtin(node))
 		exit(exec_builtin(node));
+	if (!node->args[0])
+		exit(0);
 	binary_filename = get_bin_filename(node->args[0]);
 	if (!binary_filename)
 		exit(127);
@@ -349,6 +351,8 @@ t_bool is_command_a_builtin(t_node *node)
 		NULL};
 	int i;
 
+	if (!node->args[0])
+		return (FALSE);
 	i = 0;
 	while (builtin_names[i])
 	{

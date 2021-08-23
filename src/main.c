@@ -44,7 +44,6 @@ int main(int argc, char **argv, char **envp)
 {
 	char	*line;
 	t_token	*tokens;
-	t_node	*nodes;
 
 	(void)argv;
 	(void)argc;
@@ -76,12 +75,11 @@ int main(int argc, char **argv, char **envp)
 			free_tokens_incl_data(tokens);
 			continue ;
 		}
-		nodes = parser(tokens);
+		g_info.nodes = parser(tokens);
 		free_tokens_excl_data(tokens);
-		if (!nodes)
+		if (!g_info.nodes)
 			continue ;
-		g_info.nodes = nodes;
-		exec(nodes);
-		free_nodes(nodes);
+		exec(g_info.nodes);
+		free_nodes(g_info.nodes);
 	}
 }
