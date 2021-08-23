@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "minishell.h"
 
 t_bool	should_next_tokens_be_merged(t_token *tokens)
@@ -25,7 +24,8 @@ t_token	*merge_next_tokens(t_token	*tokens)
 	t_token	*new_next;
 
 	new_data = ft_calloc(str_len(tokens->data) + str_len(tokens->next->data) + 1, sizeof(char));
-	//TODO handle if calloc fails
+	if (!new_data)
+		return (NULL);
 	i = ft_strncpy(new_data, tokens->data, str_len(tokens->data));
 	ft_strncpy(new_data + i, tokens->next->data, str_len(tokens->next->data));
 	free(tokens->data);
@@ -37,13 +37,11 @@ t_token	*merge_next_tokens(t_token	*tokens)
 	return (tokens);
 }
 
-t_token *delete_superfluous_blank_tokens(t_token *tokens)
+void	remove_blank_tokens(t_token *tokens)
 {
 	t_token *current_token;
 	t_token *temp;
 
-	if (!tokens)
-		return (NULL);
 	current_token = tokens;
 	while (current_token && current_token->next)
 	{
@@ -55,22 +53,24 @@ t_token *delete_superfluous_blank_tokens(t_token *tokens)
 		}
 		current_token = current_token->next;
 	}
-	return (tokens);
 }
 
-t_token	*merge_tokens(t_token *tokens)
+int merge_tokens(t_token *tokens)
 {
 	t_token	*current_token;
 
 	current_token = tokens;
-
 	while (current_token)
 	{
 		if (should_next_tokens_be_merged(current_token))
+		{
 			current_token = merge_next_tokens(current_token);
+			if (!current_token)
+				return (-1);
+		}
 		else
 			current_token = current_token->next;
 	}
-	delete_superfluous_blank_tokens(tokens);
-	return (tokens);
+	remove_blank_tokens(tokens);
+	return (0);
 }

@@ -74,7 +74,7 @@ void print_nodes(t_node *nodes, int spaces);
 int expand_variables(char **envp, t_token *tokens);
 void free_nodes(t_node *nodes);
 int ft_strncpy(char *dest, char *src, int n);
-t_token *merge_tokens(t_token *tokens);
+int merge_tokens(t_token *tokens);
 t_bool has_redirection_type(t_token *token);
 int syntax_checker(char *line, t_token *tokens);
 t_bool contains_unclosed_quotes(char *line);

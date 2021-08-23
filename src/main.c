@@ -69,7 +69,11 @@ int main(int argc, char **argv, char **envp)
 			free_tokens_incl_data(tokens);
 			continue ;
 		}
-		merge_tokens(tokens);
+		if (merge_tokens(tokens) != 0)
+		{
+			free_tokens_incl_data(tokens);
+			continue ;
+		}
 		t_node *nodes = parser(tokens);
 		free_tokens_excl_data(tokens);
 		g_info.nodes = nodes;
