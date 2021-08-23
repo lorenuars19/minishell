@@ -42,10 +42,12 @@ t_bool	is_line_empty(char *line)
 
 int main(int argc, char **argv, char **envp)
 {
-	(void)argc;
-	(void)argv;
-	char *line = NULL;
+	char	*line;
+	t_token	*tokens;
+	t_node	*nodes;
 
+	(void)argv;
+	(void)argc;
 	g_info.envp = make_envp_copy(envp);
 	signal(SIGINT, sigint_handler);
 	signal(SIGQUIT, sigquit_handler);
@@ -56,7 +58,7 @@ int main(int argc, char **argv, char **envp)
 			eof_exit();
 		if (line && !is_line_empty(line))
 			add_history(line);
-		t_token *tokens = scanner(line);
+		tokens = scanner(line);
 		if (syntax_checker(line, tokens) != 0)
 		{
 			free_tokens_incl_data(tokens);
@@ -74,8 +76,10 @@ int main(int argc, char **argv, char **envp)
 			free_tokens_incl_data(tokens);
 			continue ;
 		}
-		t_node *nodes = parser(tokens);
+		nodes = parser(tokens);
 		free_tokens_excl_data(tokens);
+		if (!nodes)
+			continue ;
 		g_info.nodes = nodes;
 		exec(nodes);
 		free_nodes(nodes);

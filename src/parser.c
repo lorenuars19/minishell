@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include "minishell.h"
 
 t_bool	is_pipe_next(t_token *tokens)
@@ -105,7 +103,6 @@ t_bool	contains_redirections(t_token *tokens)
 	current_token = tokens;
 	while (current_token && current_token->type != T_PIPE)
 	{
-		//TODO need to think what to do about heredocs
 		type = current_token->type;
 		if (type == T_GREATER || type == T_SMALLER
 			|| type == T_APPEND || type == T_HEREDOC)
@@ -124,34 +121,45 @@ char	*get_filename(t_token *token)
 	return (NULL);
 }
 
-void	get_redirections(t_token *tokens, t_node *node)
+int	get_one_redirection(t_token *current_token, t_node *node)
 {
-	t_token	*current_token;
-	t_redirection	*current_redirection;
+	t_redirection	*current_redir;
 
-	//TODO check return value
+	current_redir = node->redirections;
+	while (current_redir && current_redir->next)
+		current_redir = current_redir->next;
+	if (!node->redirections)
+	{
+		node->redirections = ft_calloc(1, sizeof(t_redirection));
+		current_redir = node->redirections;
+	}
+	else
+	{
+		current_redir->next = ft_calloc(1, sizeof(t_redirection));
+		current_redir = current_redir->next;
+	}
+	if (!current_redir)
+		return (-1);
+	current_redir->mode = (t_redirection_mode)current_token->type;
+	current_redir->filename = get_filename(current_token);
+	return (0);
+}
+
+int	get_redirections(t_token *tokens, t_node *node)
+{
+	t_token			*current_token;
+
 	current_token = tokens;
 	while (current_token && current_token->type != T_PIPE)
 	{
 		if (has_redirection_type(current_token))
 		{
-			if (!node->redirections)
-			{
-				node->redirections = ft_calloc(1, sizeof(t_redirection));
-				current_redirection = node->redirections;
-			}
-			else
-			{
-				current_redirection->next = ft_calloc(1, sizeof(t_redirection));
-				current_redirection = current_redirection->next;
-			}
-			// TODO fix compilation error
-			current_redirection->mode = (t_redirection_mode)current_token->type;
-			current_redirection->filename = get_filename(current_token);
+			if (get_one_redirection(current_token, node) != 0)
+				return (-1);
 		}
 		current_token = current_token->next;
 	}
-	return ;
+	return (0);
 }
 
 t_node	*parse_simple_command(t_token *tokens)
@@ -163,9 +171,19 @@ t_node	*parse_simple_command(t_token *tokens)
 		return (NULL);
 	node->type = COMMAND_NODE;
 	if (contains_redirections(tokens))
-		get_redirections(tokens, node);
-	//TODO : check return value of get_args and get_redirections
+	{
+		if (get_redirections(tokens, node) != 0)
+		{
+			free_nodes(node);
+			return (NULL);
+		}
+	}
 	node->args = get_args(tokens);
+	if (!node->args)
+	{
+		free_nodes(node);
+		return (NULL);
+	}
 	return (node);
 }
 
@@ -177,10 +195,19 @@ t_node	*parse_pipe_command(t_token *tokens)
 	if (!node)
 		return (NULL);
 	node->type = PIPE_NODE;
-	//TODO : check all return values
 	node->left = parse_simple_command(tokens);
+	if (!node->left)
+	{
+		free_nodes(node);
+		return (NULL);
+	}
 	skip_tokens_until_next_command(&tokens);
 	node->right = parser(tokens);
+	if (!node->right)
+	{
+		free_nodes(node);
+		return (NULL);
+	}
 	return (node);
 }
 
@@ -189,15 +216,10 @@ t_node	*parser(t_token *tokens)
 	t_node	*nodes;
 
 	if (!is_pipe_next(tokens))
-	{
 		nodes = parse_simple_command(tokens);
-		return (nodes);
-	}
 	else
-	{
 		nodes = parse_pipe_command(tokens);
-		return (nodes);
-	}
+	return (nodes);
 }
 
 static void	indent(int spaces)
