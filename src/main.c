@@ -1,6 +1,4 @@
 #include "minishell.h"
-#include <stdlib.h>
-
 
 t_info	g_info;
 
@@ -66,7 +64,11 @@ int main(int argc, char **argv, char **envp)
 			continue ;
 		}
 		free(line);
-		expand_variables(g_info.envp, tokens);
+		if (expand_variables(g_info.envp, tokens) != 0)
+		{
+			free_tokens_incl_data(tokens);
+			continue ;
+		}
 		merge_tokens(tokens);
 		t_node *nodes = parser(tokens);
 		free_tokens_excl_data(tokens);

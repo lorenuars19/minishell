@@ -71,7 +71,7 @@ void free_tokens_incl_data(t_token *tokens);
 void *ft_calloc(size_t nmemb, size_t size);
 t_node *parser(t_token *tokens);
 void print_nodes(t_node *nodes, int spaces);
-void expand_variables(char **envp, t_token *tokens);
+int expand_variables(char **envp, t_token *tokens);
 void free_nodes(t_node *nodes);
 int ft_strncpy(char *dest, char *src, int n);
 t_token *merge_tokens(t_token *tokens);
@@ -84,6 +84,6 @@ int get_here_document(char *delimiter);
 char **make_envp_copy(char **envp);
 void free_envp(char **envp);
 char *get_value_from_envp(char *name, char **envp);
-char *expand_in_one_token(t_token *token, char **envp);
+int expand_in_one_token(t_token *token, char **envp);
 
 #endif

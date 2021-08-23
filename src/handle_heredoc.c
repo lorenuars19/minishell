@@ -8,7 +8,8 @@ char	*get_expanded_line_heredoc(char *line)
 
 	dummy.type = T_GENERAL;
 	dummy.data = line;
-	expand_in_one_token(&dummy, g_info.envp);
+	if (expand_in_one_token(&dummy, g_info.envp) != 0)
+		return (NULL);
 	return (dummy.data);
 }
 

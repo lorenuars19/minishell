@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "minishell.h"
 
 int	get_variable_length(char *data)
@@ -90,9 +89,6 @@ char	*get_value_from_envp(char *name, char **envp)
 
 char	*replace_variable_by_its_value(t_token *token, char *value, char *name)
 {
-	(void)token;
-	(void)value;
-
 	char	*result;
 	int		i;
 	int		length;
@@ -142,7 +138,7 @@ char	*expand_one_variable(t_token *token, char **envp)
 	return (expanded_token);
 }
 
-char	*expand_in_one_token(t_token *token, char **envp)
+int	expand_in_one_token(t_token *token, char **envp)
 {
 	char	*expanded_token;
 
@@ -150,11 +146,11 @@ char	*expand_in_one_token(t_token *token, char **envp)
 	{
 		expanded_token = expand_one_variable(token, envp);
 		if (!expanded_token)
-			return (NULL);
+			return (-1);
 		free(token->data);
 		token->data = expanded_token;
 	}
-	return (token->data);
+	return (0);
 }
 
 static void	skip_delimiter(t_token **tokens)
@@ -174,7 +170,7 @@ static void	skip_delimiter(t_token **tokens)
 	}
 }
 
-void	expand_variables(char **envp, t_token *tokens)
+int	expand_variables(char **envp, t_token *tokens)
 {
 	t_token	*current_token;
 
@@ -183,8 +179,8 @@ void	expand_variables(char **envp, t_token *tokens)
 	{
 		if (should_token_be_expanded(current_token))
 		{
-			expand_in_one_token(current_token, envp);
-			//TODO check value of current_token->data, if NULL handle error
+			if (expand_in_one_token(current_token, envp) != 0)
+				return (-1);
 		}
 		if (current_token->type == T_HEREDOC)
 		{
@@ -193,4 +189,5 @@ void	expand_variables(char **envp, t_token *tokens)
 		}
 		current_token = current_token->next;
 	}
+	return (0);
 }
