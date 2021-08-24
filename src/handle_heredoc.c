@@ -8,7 +8,7 @@ char	*get_line_heredoc(char *line, t_bool should_expand)
 		return (line);
 	dummy.type = T_GENERAL;
 	dummy.data = line;
-	if (expand_in_one_token(&dummy, g_info.envp) != 0)
+	if (expand_in_one_token(&dummy, g_shell.envp) != 0)
 		return (NULL);
 	return (dummy.data);
 }

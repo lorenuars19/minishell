@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-t_info	g_info;
+t_shell	g_shell;
 
 void	sigint_handler_interactive(int signum)
 {
@@ -25,7 +25,7 @@ void	sigquit_handler_exec(int signum)
 
 void	eof_exit(void)
 {
-	free_envp(g_info.envp);
+	free_envp(g_shell.envp);
 	put_str_fd_nl(STDERR_FILENO, "exit");
 	exit(0);
 }
@@ -51,7 +51,7 @@ int main(int argc, char **argv, char **envp)
 
 	(void)argv;
 	(void)argc;
-	g_info.envp = make_envp_copy(envp);
+	g_shell.envp = make_envp_copy(envp);
 	signal(SIGINT, sigint_handler_interactive);
 	signal(SIGQUIT, SIG_IGN);
 	while (1)
@@ -69,7 +69,7 @@ int main(int argc, char **argv, char **envp)
 			continue ;
 		}
 		free(line);
-		if (expand_variables(g_info.envp, tokens) != 0)
+		if (expand_variables(g_shell.envp, tokens) != 0)
 		{
 			free_tokens_incl_data(tokens);
 			continue ;
@@ -79,11 +79,11 @@ int main(int argc, char **argv, char **envp)
 			free_tokens_incl_data(tokens);
 			continue ;
 		}
-		g_info.nodes = parser(tokens);
+		g_shell.nodes = parser(tokens);
 		free_tokens_excl_data(tokens);
-		if (!g_info.nodes)
+		if (!g_shell.nodes)
 			continue ;
-		exec(g_info.nodes);
-		free_nodes(g_info.nodes);
+		exec(g_shell.nodes);
+		free_nodes(g_shell.nodes);
 	}
 }

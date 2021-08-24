@@ -81,7 +81,7 @@ int builtin_cd(char *argv[])
 	char	*path;
 
 	if (!argv[1])
-		path = get_value_from_envp("HOME", g_info.envp);
+		path = get_value_from_envp("HOME", g_shell.envp);
 	else if (argv[2])
 	{
 		put_str_fd(STDERR_FILENO, "minishell: cd: too many arguments\n");
@@ -216,7 +216,7 @@ int builtin_unset(char *argv[])
 			has_met_an_error = TRUE;
 		}
 		else
-			delete_variable_from_envp(argv[i], g_info.envp);
+			delete_variable_from_envp(argv[i], g_shell.envp);
 		i++;
 	}
 	if (has_met_an_error)
@@ -354,17 +354,17 @@ char **realloc_envp_with_one_more_line(void)
 	int		i;
 	char	**new_envp;
 
-	new_length = get_envp_length(g_info.envp) + 1;
+	new_length = get_envp_length(g_shell.envp) + 1;
 	new_envp = ft_calloc(new_length + 1, sizeof(char *));
 	if (!new_envp)
 		return (NULL);
 	i = 0;
 	while (i < new_length - 1)
 	{
-		new_envp[i] = g_info.envp[i];
+		new_envp[i] = g_shell.envp[i];
 		i++;
 	}
-	free(g_info.envp);
+	free(g_shell.envp);
 	return (new_envp);
 }
 
@@ -372,18 +372,18 @@ int	insert_new_value_in_envp(char *name)
 {
 	int	i;
 
-	g_info.envp = realloc_envp_with_one_more_line();
-	if (!g_info.envp)
+	g_shell.envp = realloc_envp_with_one_more_line();
+	if (!g_shell.envp)
 		return (1);
 	i = 0;
-	while (g_info.envp[i])
+	while (g_shell.envp[i])
 		i++;
-	g_info.envp[i] = ft_calloc(str_len(name) + 2, sizeof(char));
-	if (!g_info.envp[i])
+	g_shell.envp[i] = ft_calloc(str_len(name) + 2, sizeof(char));
+	if (!g_shell.envp[i])
 		return (1);
-	ft_strncpy(g_info.envp[i], name, str_len(name));
+	ft_strncpy(g_shell.envp[i], name, str_len(name));
 	if (!str_has(name, '='))
-		g_info.envp[i][str_len(name)] = '=';
+		g_shell.envp[i][str_len(name)] = '=';
 	return (0);
 }
 
@@ -393,7 +393,7 @@ int builtin_export(char *argv[])
 	t_bool	has_met_an_error;
 
 	if (!argv[1])
-		return (print_sorted_envp(g_info.envp));
+		return (print_sorted_envp(g_shell.envp));
 	has_met_an_error = FALSE;
 	i = 1;
 	while (argv[i])
@@ -405,8 +405,8 @@ int builtin_export(char *argv[])
 			i++;
 			continue ;
 		}
-		if (variable_already_exits_in_envp(g_info.envp, argv[i]))
-			modify_var_in_envp(g_info.envp, argv[i]);
+		if (variable_already_exits_in_envp(g_shell.envp, argv[i]))
+			modify_var_in_envp(g_shell.envp, argv[i]);
 		else
 			insert_new_value_in_envp(argv[i]);
 		i++;
@@ -422,9 +422,9 @@ int builtin_env(char *argv[])
 
 	(void)argv;
 	i = 0;
-	while (g_info.envp[i])
+	while (g_shell.envp[i])
 	{
-		printf("%s\n", g_info.envp[i]);
+		printf("%s\n", g_shell.envp[i]);
 		i++;
 	}
 	return (0);
@@ -510,14 +510,14 @@ int builtin_exit(char *argv[])
 		if (exit_status == -1)
 		{
 			print_exit_error(argv[i]);
-			free_envp(g_info.envp);
-			free_nodes(g_info.nodes);
+			free_envp(g_shell.envp);
+			free_nodes(g_shell.nodes);
 			exit(2);
 		}
 		i++;
 	}
-	free_envp(g_info.envp);
-	free_nodes(g_info.nodes);
+	free_envp(g_shell.envp);
+	free_nodes(g_shell.nodes);
 	printf("exit\n");
 	if (i == 1)
 		exit(0);

@@ -124,7 +124,7 @@ char	*expand_one_variable(t_token *token, char **envp)
 	if (!name)
 		return (NULL);
 	if (ft_strncmp(name, "?", 1) == 0)
-		value = ft_itoa(g_info.last_exit_status);
+		value = ft_itoa(g_shell.last_exit_status);
 	else
 		value = get_value_from_envp(name, envp);
 	if (!value)

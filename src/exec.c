@@ -9,10 +9,10 @@ void	wait_for_children(t_node *node, t_bool is_end_of_pipeline)
 		if (waitpid(node->pid, &wstatus, 0) == -1)
 			return ;
 		if (WIFEXITED(wstatus) && is_end_of_pipeline)
-			g_info.last_exit_status = WEXITSTATUS(wstatus);
+			g_shell.last_exit_status = WEXITSTATUS(wstatus);
 		else if (WIFSIGNALED(wstatus) && is_end_of_pipeline)
 		{
-			g_info.last_exit_status = WTERMSIG(wstatus) + 128;
+			g_shell.last_exit_status = WTERMSIG(wstatus) + 128;
 			if (__WCOREDUMP(wstatus))
 				printf("Quit (core dumped)\n");
 			else if (WTERMSIG(wstatus) == SIGINT)
@@ -202,7 +202,7 @@ char	*get_bin_filename(char *name)
 
 	if (str_has(name, '/'))
 		return (str_dupli(name));
-	path_variable = get_value_from_envp("PATH", g_info.envp);
+	path_variable = get_value_from_envp("PATH", g_shell.envp);
 	if (!path_variable)
 		return (NULL);
 	paths = ft_split(path_variable, ':');
@@ -249,7 +249,7 @@ int	exec_builtin_in_parent(t_node *node, t_context *ctx)
 
 	if (set_redirection(node, ctx) != 0)
 	{
-		g_info.last_exit_status = 1;
+		g_shell.last_exit_status = 1;
 		return (0);
 	}
 	if (ctx->fd[0] != STDIN_FILENO)
@@ -262,7 +262,7 @@ int	exec_builtin_in_parent(t_node *node, t_context *ctx)
 		copy_fd[1] = dup(STDOUT_FILENO);
 		dup2(ctx->fd[STDOUT_FILENO], STDOUT_FILENO);
 	}
-	g_info.last_exit_status = exec_builtin(node);
+	g_shell.last_exit_status = exec_builtin(node);
 	fds_cleanup(ctx, copy_fd);
 	return (0);
 }
@@ -284,7 +284,7 @@ void	exec_command_child(t_node *node, t_context *ctx)
 	binary_filename = get_bin_filename(node->args[0]);
 	if (!binary_filename)
 		exit(127);
-	execve(binary_filename, node->args, g_info.envp);
+	execve(binary_filename, node->args, g_shell.envp);
 	print_error_filename(binary_filename);
 	free(binary_filename);
 	exit(errno);

@@ -9,13 +9,6 @@ typedef struct s_pipe_context
 	int	fd_close;
 }	t_context;
 
-typedef struct
-{
-	char	**envp;
-	t_node	*nodes;
-	int		last_exit_status;
-}	t_info;
-
 int	exec(t_node *node);
 
 int exec_node(t_node *node, t_context *ctx);

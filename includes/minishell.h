@@ -20,6 +20,14 @@
 
 # define HEREDOC_FILENAME "/tmp/.minishell_heredoc.txt"
 
-extern t_info	g_info;
+
+typedef struct
+{
+	char	**envp;
+	t_node	*nodes;
+	int		last_exit_status;
+}	t_shell;
+
+extern t_shell	g_shell;
 
 #endif
