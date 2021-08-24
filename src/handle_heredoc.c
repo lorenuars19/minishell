@@ -1,7 +1,5 @@
 #include "minishell.h"
 
-// TODO expand variables when necessary during heredoc aquisition
-
 char	*get_line_heredoc(char *line, t_bool should_expand)
 {
 	t_token	dummy;
@@ -15,10 +13,30 @@ char	*get_line_heredoc(char *line, t_bool should_expand)
 	return (dummy.data);
 }
 
+int	get_lines_heredoc(int fd, char *delimiter, t_bool should_expand)
+{
+	char	*line;
+
+	line = readline("> ");
+	while (line && str_cmp(line, delimiter) != 0)
+	{
+		line = get_line_heredoc(line, should_expand);
+		if (!line)
+			break;
+		put_str_fd_nl(fd, line);
+		free(line);
+		line = readline("> ");
+	}
+	if (!line)
+		put_str_fd(STDERR_FILENO, "minishell: warning: here-document "
+								  "delimited by end-of-file (wanted `eof')\n");
+	free(line);
+	return (0);
+}
+
 int	get_here_document(char *delimiter, t_bool should_expand)
 {
 	int	fd;
-	char	*line;
 
 	fd = open(HEREDOC_FILENAME, O_CREAT | O_TRUNC | O_WRONLY, 0666);
 	if (fd == -1)
@@ -27,20 +45,7 @@ int	get_here_document(char *delimiter, t_bool should_expand)
 		put_str_fd(STDERR_FILENO, strerror(errno));
 		return (1);
 	}
-	line = readline("> ");
-	while (line && str_cmp(line, delimiter) != 0)
-	{
-		line = get_line_heredoc(line, should_expand);
-		if (!line)
-			break ;
-		put_str_fd_nl(fd, line);
-		free(line);
-		line = readline("> ");
-	}
-	if (!line)
-		put_str_fd(STDERR_FILENO, "minishell: warning: here-document "
-					"delimited by end-of-file (wanted `eof')\n");
-	free(line);
+	get_lines_heredoc(fd, delimiter, should_expand);
 	close(fd);
 	return (0);
 }
