@@ -7,7 +7,7 @@ t_token_type	get_token_type(char c)
 	return (T_GENERAL);
 }
 
-static int		get_next_token(char *line, t_token *token, int *i)
+static int	get_next_token(char *line, t_token *token, int *i)
 {
 	t_token_type	type;
 	int				ret;

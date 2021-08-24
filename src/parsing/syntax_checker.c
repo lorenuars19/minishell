@@ -21,6 +21,7 @@ static t_bool	contains_unclosed_quotes(char *line)
 		return (TRUE);
 	return (FALSE);
 }
+
 static t_bool	has_a_filename_after_redirection_operators(t_token *tokens)
 {
 	while (tokens)
@@ -59,7 +60,7 @@ static t_bool	has_a_valid_command_before_and_after_pipes(t_token *tokens)
 	return (has_met_a_string_token_since_last_pipe);
 }
 
-int syntax_checker(char *line, t_token *tokens)
+int	syntax_checker(char *line, t_token *tokens)
 {
 	if (!tokens)
 		return (1);

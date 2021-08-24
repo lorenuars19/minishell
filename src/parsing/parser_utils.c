@@ -1,8 +1,8 @@
 #include "minishell.h"
 
-t_bool is_pipe_next(t_token *tokens)
+t_bool	is_pipe_next(t_token *tokens)
 {
-	t_token *current_token;
+	t_token	*current_token;
 
 	current_token = tokens;
 	while (current_token)
@@ -14,9 +14,9 @@ t_bool is_pipe_next(t_token *tokens)
 	return (FALSE);
 }
 
-static int count_args(t_token *tokens)
+static int	count_args(t_token *tokens)
 {
-	int count;
+	int	count;
 
 	count = 0;
 	while (tokens)
@@ -37,12 +37,12 @@ static int count_args(t_token *tokens)
 	return (count);
 }
 
-char **get_args(t_token *tokens)
+char	**get_args(t_token *tokens)
 {
-	t_token *current_token;
-	int args_count;
-	char **args;
-	int i;
+	t_token	*current_token;
+	int		args_count;
+	char	**args;
+	int		i;
 
 	current_token = tokens;
 	args_count = count_args(tokens);
@@ -64,9 +64,9 @@ char **get_args(t_token *tokens)
 	return (args);
 }
 
-void skip_tokens_until_next_command(t_token **tokens)
+void	skip_tokens_until_next_command(t_token **tokens)
 {
-	t_token_type type;
+	t_token_type	type;
 
 	while (*tokens)
 	{
@@ -74,7 +74,7 @@ void skip_tokens_until_next_command(t_token **tokens)
 		if (type == T_PIPE || (*tokens)->next == NULL)
 		{
 			*tokens = (*tokens)->next;
-			return;
+			return ;
 		}
 		*tokens = (*tokens)->next;
 	}

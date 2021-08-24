@@ -1,14 +1,14 @@
 #include "minishell.h"
 
-void skip_blank_tokens(t_token **tokens)
+void	skip_blank_tokens(t_token **tokens)
 {
 	while (*tokens && (*tokens)->type == T_BLANK)
 		(*tokens) = (*tokens)->next;
 }
 
-t_bool token_contains_a_string(t_token *token)
+t_bool	token_contains_a_string(t_token *token)
 {
-	t_token_type type;
+	t_token_type	type;
 
 	if (!token)
 		return (FALSE);
@@ -18,7 +18,7 @@ t_bool token_contains_a_string(t_token *token)
 	return (FALSE);
 }
 
-t_bool line_contains_only_blanks(char *line)
+t_bool	line_contains_only_blanks(char *line)
 {
 	while (*line)
 	{

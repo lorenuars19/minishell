@@ -77,7 +77,8 @@ static void	skip_delimiter(t_token **tokens)
 	skip_blank_tokens(tokens);
 	type = (*tokens)->type;
 	first_delimiter_token = *tokens;
-	while ((*tokens) && (type == T_GENERAL || type == T_DQUOTE || type == T_SQUOTE))
+	while ((*tokens) && (type == T_GENERAL
+			|| type == T_DQUOTE || type == T_SQUOTE))
 	{
 		if (type == T_DQUOTE || type == T_SQUOTE)
 			first_delimiter_token->type = type;

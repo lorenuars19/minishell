@@ -27,7 +27,7 @@ static t_node	*parse_simple_command(t_token *tokens)
 
 static t_node	*parse_pipe_command(t_token *tokens)
 {
-	t_node *node;
+	t_node	*node;
 
 	node = ft_calloc(1, sizeof(t_node));
 	if (!node)
@@ -60,9 +60,9 @@ t_node	*parser(t_token *tokens)
 	return (nodes);
 }
 
-int parse(char *line)
+int	parse(char *line)
 {
-	t_token *tokens;
+	t_token	*tokens;
 
 	tokens = scanner(line);
 	if (syntax_checker(line, tokens) != 0)

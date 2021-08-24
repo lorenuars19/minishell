@@ -1,21 +1,22 @@
 #include "minishell.h"
 
-t_bool has_redirection_type(t_token *token)
+t_bool	has_redirection_type(t_token *token)
 {
-	t_token_type type;
+	t_token_type	type;
 
 	if (!token)
 		return (FALSE);
 	type = token->type;
-	if (type == T_GREATER || type == T_SMALLER || type == T_APPEND || type == T_HEREDOC)
+	if (type == T_GREATER || type == T_SMALLER
+		|| type == T_APPEND || type == T_HEREDOC)
 		return (TRUE);
 	return (FALSE);
 }
 
-t_bool contains_redirections(t_token *tokens)
+t_bool	contains_redirections(t_token *tokens)
 {
-	t_token *current_token;
-	t_token_type type;
+	t_token			*current_token;
+	t_token_type	type;
 
 	if (!tokens)
 		return (FALSE);
@@ -23,14 +24,15 @@ t_bool contains_redirections(t_token *tokens)
 	while (current_token && current_token->type != T_PIPE)
 	{
 		type = current_token->type;
-		if (type == T_GREATER || type == T_SMALLER || type == T_APPEND || type == T_HEREDOC)
+		if (type == T_GREATER || type == T_SMALLER
+			|| type == T_APPEND || type == T_HEREDOC)
 			return (TRUE);
 		current_token = current_token->next;
 	}
 	return (FALSE);
 }
 
-static char *get_filename(t_token *token)
+static char	*get_filename(t_token *token)
 {
 	if (has_redirection_type(token))
 		token = token->next;
@@ -39,9 +41,9 @@ static char *get_filename(t_token *token)
 	return (NULL);
 }
 
-static int get_one_redirection(t_token *current_token, t_node *node)
+static int	get_one_redirection(t_token *current_token, t_node *node)
 {
-	t_redirection *current_redir;
+	t_redirection	*current_redir;
 
 	current_redir = node->redirections;
 	while (current_redir && current_redir->next)
@@ -60,15 +62,15 @@ static int get_one_redirection(t_token *current_token, t_node *node)
 		return (-1);
 	current_redir->mode = (t_redirection_mode)current_token->type;
 	if (current_redir->mode == M_HEREDOC
-			&& current_token->next->type == T_GENERAL)
+		&& current_token->next->type == T_GENERAL)
 		current_redir->should_expand = TRUE;
 	current_redir->filename = get_filename(current_token);
 	return (0);
 }
 
-int get_redirections(t_token *tokens, t_node *node)
+int	get_redirections(t_token *tokens, t_node *node)
 {
-	t_token *current_token;
+	t_token	*current_token;
 
 	current_token = tokens;
 	while (current_token && current_token->type != T_PIPE)

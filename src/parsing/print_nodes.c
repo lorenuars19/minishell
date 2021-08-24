@@ -37,9 +37,11 @@ static void	print_redirections(t_node *node)
 	while (current_redir)
 	{
 		if (current_redir->next)
-			printf("MODE: %c, FILENAME: %s, ", current_redir->mode, current_redir->filename);
+			printf("MODE: %c, FILENAME: %s, ",
+				current_redir->mode, current_redir->filename);
 		else
-			printf("MODE: %c, FILENAME: %s", current_redir->mode, current_redir->filename);
+			printf("MODE: %c, FILENAME: %s",
+				current_redir->mode, current_redir->filename);
 		current_redir = current_redir->next;
 	}
 }

@@ -1,11 +1,11 @@
 #include "minishell.h"
 
-static void free_args(char **args)
+static void	free_args(char **args)
 {
-	int i;
+	int	i;
 
 	if (!args)
-		return;
+		return ;
 	i = 0;
 	while (args[i])
 	{
@@ -15,7 +15,7 @@ static void free_args(char **args)
 	free(args);
 }
 
-static void free_redirections(t_redirection *redirections)
+static void	free_redirections(t_redirection *redirections)
 {
 	if (redirections)
 	{
@@ -25,7 +25,7 @@ static void free_redirections(t_redirection *redirections)
 	}
 }
 
-void free_nodes(t_node *nodes)
+void	free_nodes(t_node *nodes)
 {
 	if (nodes->type == COMMAND_NODE)
 	{

@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int get_quote_token(char *line, t_token *token, int *index)
+int	get_quote_token(char *line, t_token *token, int *index)
 {
 	token->type = get_token_type(*line);
 	token->data = ft_strcdup(line, token->type);
@@ -10,7 +10,7 @@ int get_quote_token(char *line, t_token *token, int *index)
 	return (0);
 }
 
-int get_general_token(char *line, t_token *token, int *index)
+int	get_general_token(char *line, t_token *token, int *index)
 {
 	token->type = T_GENERAL;
 	token->data = ft_strdup_set(line, SPECIAL_CHARS);
@@ -20,7 +20,7 @@ int get_general_token(char *line, t_token *token, int *index)
 	return (0);
 }
 
-int get_blank_token(char *line, t_token *token, int *index)
+int	get_blank_token(char *line, t_token *token, int *index)
 {
 	token->type = T_BLANK;
 	token->data = NULL;
@@ -32,7 +32,7 @@ int get_blank_token(char *line, t_token *token, int *index)
 	return (0);
 }
 
-int get_pipe_token(char *line, t_token *token, int *index)
+int	get_pipe_token(char *line, t_token *token, int *index)
 {
 	(void)line;
 	token->type = T_PIPE;
@@ -41,7 +41,7 @@ int get_pipe_token(char *line, t_token *token, int *index)
 	return (0);
 }
 
-int get_redirection_token(char *line, t_token *token, int *index)
+int	get_redirection_token(char *line, t_token *token, int *index)
 {
 	if (*line == '<' && *(line + 1) == '<')
 	{

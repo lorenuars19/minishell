@@ -1,10 +1,10 @@
 #include "minishell.h"
 
-char *ft_strcdup(char *str, char c)
+char	*ft_strcdup(char *str, char c)
 {
-	int length;
-	char *result;
-	int i;
+	int		length;
+	char	*result;
+	int		i;
 
 	length = 1;
 	while (str[length] && str[length] != c)
@@ -22,11 +22,11 @@ char *ft_strcdup(char *str, char c)
 	return (result);
 }
 
-char *ft_strdup_set(char *str, char *set)
+char	*ft_strdup_set(char *str, char *set)
 {
-	int length;
-	char *result;
-	int i;
+	int		length;
+	char	*result;
+	int		i;
 
 	length = 0;
 	while (str[length] && !str_has(set, str[length]))
@@ -44,22 +44,22 @@ char *ft_strdup_set(char *str, char *set)
 	return (result);
 }
 
-void print_tokens(t_token *tokens)
+void	print_tokens(t_token *tokens)
 {
-	t_token *current_token;
+	t_token	*current_token;
 
 	current_token = tokens;
 	while (current_token)
 	{
-		printf("TOKEN: type <%c>, data <%s>\n"
-				, current_token->type, current_token->data);
+		printf("TOKEN: type <%c>, data <%s>\n",
+			current_token->type, current_token->data);
 		current_token = current_token->next;
 	}
 }
 
-void free_tokens_excl_data(t_token *tokens)
+void	free_tokens_excl_data(t_token *tokens)
 {
-	t_token *current_token;
+	t_token	*current_token;
 
 	current_token = tokens;
 	if (current_token)
@@ -71,7 +71,7 @@ void free_tokens_excl_data(t_token *tokens)
 
 void	free_tokens_incl_data(t_token *tokens)
 {
-	t_token *current_token;
+	t_token	*current_token;
 
 	current_token = tokens;
 	if (current_token)
