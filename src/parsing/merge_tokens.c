@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-t_bool	should_next_tokens_be_merged(t_token *tokens)
+static t_bool	should_next_tokens_be_merged(t_token *tokens)
 {
 	t_token_type	type;
 	t_token_type	next_type;
@@ -11,19 +11,22 @@ t_bool	should_next_tokens_be_merged(t_token *tokens)
 	next_type = tokens->next->type;
 	if	(type == T_GENERAL || type == T_DQUOTE || type == T_SQUOTE)
 	{
-		if (next_type == T_GENERAL || next_type == T_DQUOTE || next_type == T_SQUOTE)
+		if (next_type == T_GENERAL || next_type == T_DQUOTE
+				|| next_type == T_SQUOTE)
 			return (TRUE);
 	}
 	return (FALSE);
 }
 
-t_token	*merge_next_tokens(t_token	*tokens)
+static t_token	*merge_next_tokens(t_token	*tokens)
 {
 	char	*new_data;
 	int		i;
 	t_token	*new_next;
 
-	new_data = ft_calloc(str_len(tokens->data) + str_len(tokens->next->data) + 1, sizeof(char));
+	new_data = ft_calloc(str_len(tokens->data)
+							+ str_len(tokens->next->data) + 1
+						, sizeof(char));
 	if (!new_data)
 		return (NULL);
 	i = ft_strncpy(new_data, tokens->data, str_len(tokens->data));
@@ -37,7 +40,7 @@ t_token	*merge_next_tokens(t_token	*tokens)
 	return (tokens);
 }
 
-void	remove_blank_tokens(t_token *tokens)
+static void	remove_blank_tokens(t_token *tokens)
 {
 	t_token *current_token;
 	t_token *temp;

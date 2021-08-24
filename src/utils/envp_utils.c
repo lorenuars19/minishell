@@ -1,5 +1,21 @@
 #include "minishell.h"
 
+char *get_value_from_envp(char *name, char **envp)
+{
+	int i;
+	size_t length;
+
+	i = 0;
+	length = str_len(name);
+	while (envp[i])
+	{
+		if (ft_strncmp(envp[i], name, length) == 0 && envp[i][length] == '=')
+			return (str_dupli(&(envp[i][length + 1])));
+		i++;
+	}
+	return (str_dupli(""));
+}
+
 int	get_envp_length(char **envp)
 {
 	int	i;

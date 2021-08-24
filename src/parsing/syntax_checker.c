@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-t_bool	contains_unclosed_quotes(char *line)
+static t_bool	contains_unclosed_quotes(char *line)
 {
 	t_bool	in_quotes;
 	char	delimiter;
@@ -21,26 +21,7 @@ t_bool	contains_unclosed_quotes(char *line)
 		return (TRUE);
 	return (FALSE);
 }
-
-void	skip_blank_tokens(t_token **tokens)
-{
-	while (*tokens && (*tokens)->type == T_BLANK)
-		(*tokens) = (*tokens)->next;
-}
-
-t_bool	token_contains_a_string(t_token *token)
-{
-	t_token_type	type;
-
-	if (!token)
-		return (FALSE);
-	type = token->type;
-	if (type == T_GENERAL || type == T_DQUOTE || type == T_SQUOTE)
-		return (TRUE);
-	return (FALSE);
-}
-
-t_bool	has_a_filename_after_redirection_operators(t_token *tokens)
+static t_bool	has_a_filename_after_redirection_operators(t_token *tokens)
 {
 	while (tokens)
 	{
@@ -58,7 +39,7 @@ t_bool	has_a_filename_after_redirection_operators(t_token *tokens)
 	return (TRUE);
 }
 
-t_bool	has_a_valid_command_before_and_after_pipes(t_token *tokens)
+static t_bool	has_a_valid_command_before_and_after_pipes(t_token *tokens)
 {
 	t_bool	has_met_a_string_token_since_last_pipe;
 
@@ -76,17 +57,6 @@ t_bool	has_a_valid_command_before_and_after_pipes(t_token *tokens)
 		tokens = tokens->next;
 	}
 	return (has_met_a_string_token_since_last_pipe);
-}
-
-t_bool	line_contains_only_blanks(char *line)
-{
-	while (*line)
-	{
-		if (*line != ' ' && *line != '\t')
-			return (FALSE);
-		line++;
-	}
-	return (TRUE);
 }
 
 int syntax_checker(char *line, t_token *tokens)

@@ -1,28 +1,5 @@
 #include "minishell.h"
 
-static void ft_bzero(void *s, size_t n)
-{
-	size_t i;
-
-	i = 0;
-	while (i < n)
-	{
-		*((unsigned char *)s + i) = '\0';
-		i++;
-	}
-}
-
-void *ft_calloc(size_t nmemb, size_t size)
-{
-	void *ptr;
-
-	ptr = (void *)malloc(nmemb * size);
-	if (!ptr)
-		return (NULL);
-	ft_bzero(ptr, nmemb * size);
-	return (ptr);
-}
-
 char *ft_strcdup(char *str, char c)
 {
 	int length;
@@ -74,7 +51,8 @@ void print_tokens(t_token *tokens)
 	current_token = tokens;
 	while (current_token)
 	{
-		printf("\033[34;1m[TOKEN]\033[0m type <%c>, data <%s>\n", current_token->type, current_token->data);
+		printf("TOKEN: type <%c>, data <%s>\n"
+				, current_token->type, current_token->data);
 		current_token = current_token->next;
 	}
 }

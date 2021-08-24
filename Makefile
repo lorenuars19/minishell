@@ -61,17 +61,25 @@ SRCS = \
 	./src/builtins/unset.c \
 	./src/builtins/cd.c \
 	./src/exec.c \
-	./src/merge_tokens.c \
-	./src/scanner.c \
 	./src/handle_heredoc.c \
 	./src/main.c \
-	./src/syntax_checker.c \
-	./src/parser.c \
-	./src/scanner_utils.c \
-	./src/variable_expansion.c \
+	./src/parsing/free_nodes.c \
+	./src/parsing/var_expansion.c \
+	./src/parsing/parser_utils.c \
+	./src/parsing/syntax_checker_utils.c \
+	./src/parsing/get_redirections.c \
+	./src/parsing/merge_tokens.c \
+	./src/parsing/scanner.c \
+	./src/parsing/var_expansion_utils.c \
+	./src/parsing/syntax_checker.c \
+	./src/parsing/parser.c \
+	./src/parsing/get_token.c \
+	./src/parsing/scanner_utils.c \
+	./src/parsing/print_nodes.c \
 	./src/utils/ft_split.c \
 	./src/utils/envp_utils.c \
 	./src/utils/ft_itoa.c \
+	./src/utils/ft_calloc.c \
 	./src/signals.c \
 
 HEADERS = \
