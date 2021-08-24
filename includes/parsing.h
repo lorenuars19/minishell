@@ -79,7 +79,6 @@ t_bool has_redirection_type(t_token *token);
 int syntax_checker(char *line, t_token *tokens);
 t_bool has_redirection_type(t_token *token);
 void skip_blank_tokens(t_token **tokens);
-int get_here_document(char *delimiter, t_bool should_expand);
 char **make_envp_copy(char **envp);
 void free_envp(char **envp);
 char *get_value_from_envp(char *name, char **envp);

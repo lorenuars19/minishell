@@ -10,11 +10,7 @@ typedef struct s_pipe_context
 }	t_context;
 
 int	exec(t_node *node);
-
 int exec_node(t_node *node, t_context *ctx);
-
-int exec_command(t_node *node, t_context *ctx);
-int exec_pipe(t_node * node, t_context *ctx);
 
 int builtin_echo(char *argv[]);
 int builtin_cd(char *argv[]);
@@ -42,5 +38,15 @@ t_bool is_a_valid_exported_name(char *name);
 void print_export_name_error(char *name);
 
 t_bool is_line_empty(char *line);
+int print_error_filename(char *filename);
+int set_redirection(t_node *node, t_context *ctx);
+int get_heredocs_redir(t_node *node);
+
+t_bool is_command_a_builtin(t_node *node);
+void wait_for_children(t_node *node, t_bool is_end_of_pipeline);
+char *get_bin_filename(char *name);
+int exec_builtin_in_parent(t_node *node, t_context *ctx);
+t_bool there_is_a_heredoc_redirection(t_node *node);
+t_bool is_part_of_pipeline(t_context *ctx);
 
 #endif

@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-char	*get_line_heredoc(char *line, t_bool should_expand)
+static char	*get_line_heredoc(char *line, t_bool should_expand)
 {
 	t_token	dummy;
 
@@ -13,7 +13,7 @@ char	*get_line_heredoc(char *line, t_bool should_expand)
 	return (dummy.data);
 }
 
-int	get_lines_heredoc(int fd, char *delimiter, t_bool should_expand)
+static int	get_lines_heredoc(int fd, char *delimiter, t_bool should_expand)
 {
 	char	*line;
 
@@ -34,7 +34,7 @@ int	get_lines_heredoc(int fd, char *delimiter, t_bool should_expand)
 	return (0);
 }
 
-int	get_here_document(char *delimiter, t_bool should_expand)
+static int	get_here_document(char *delimiter, t_bool should_expand)
 {
 	int	fd;
 
@@ -47,5 +47,27 @@ int	get_here_document(char *delimiter, t_bool should_expand)
 	}
 	get_lines_heredoc(fd, delimiter, should_expand);
 	close(fd);
+	return (0);
+}
+
+int get_heredocs_redir(t_node *node)
+{
+	t_redirection *redir;
+
+	signal(SIGQUIT, SIG_IGN);
+	redir = node->redirections;
+	while (redir)
+	{
+		if (redir->mode == M_HEREDOC)
+		{
+			if (get_here_document(redir->filename, redir->should_expand) != 0)
+			{
+				signal(SIGQUIT, sigquit_handler_exec);
+				return (1);
+			}
+		}
+		redir = redir->next;
+	}
+	signal(SIGQUIT, sigquit_handler_exec);
 	return (0);
 }

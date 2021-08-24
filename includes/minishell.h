@@ -17,9 +17,7 @@
 # include "parsing.h"
 # include "exec.h"
 
-
 # define HEREDOC_FILENAME "/tmp/.minishell_heredoc.txt"
-
 
 typedef struct
 {

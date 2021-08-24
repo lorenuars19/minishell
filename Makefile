@@ -60,8 +60,11 @@ SRCS = \
 	./src/builtins/echo.c \
 	./src/builtins/unset.c \
 	./src/builtins/cd.c \
-	./src/exec.c \
-	./src/handle_heredoc.c \
+	./src/exec/exec.c \
+	./src/exec/get_heredocs.c \
+	./src/exec/exec_helper.c \
+	./src/exec/exec_builtin.c \
+	./src/exec/set_redirection.c \
 	./src/main.c \
 	./src/parsing/free_nodes.c \
 	./src/parsing/var_expansion.c \
