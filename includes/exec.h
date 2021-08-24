@@ -41,4 +41,6 @@ int print_sorted_envp(char **envp);
 t_bool is_a_valid_exported_name(char *name);
 void print_export_name_error(char *name);
 
+t_bool is_line_empty(char *line);
+
 #endif

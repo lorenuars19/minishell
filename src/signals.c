@@ -28,3 +28,17 @@ void	eof_exit(void)
 	put_str_fd_nl(STDERR_FILENO, "exit");
 	exit(0);
 }
+
+t_bool is_line_empty(char *line)
+{
+	int i;
+
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] != ' ' && line[i] != '\t')
+			return (FALSE);
+		i++;
+	}
+	return (TRUE);
+}
