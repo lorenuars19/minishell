@@ -49,7 +49,7 @@ int main(int argc, char **argv, char **envp)
 	(void)argc;
 	g_info.envp = make_envp_copy(envp);
 	signal(SIGINT, sigint_handler);
-	signal(SIGQUIT, sigquit_handler);
+	signal(SIGQUIT, SIG_IGN);
 	while (1)
 	{
 		line = readline("$>");

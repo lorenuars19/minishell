@@ -32,6 +32,7 @@ int	exec(t_node *node)
 {
 	t_context ctx;
 
+	signal(SIGQUIT, sigquit_handler);
 	ctx.fd[STDIN_FILENO] = STDIN_FILENO;
 	ctx.fd[STDOUT_FILENO] = STDOUT_FILENO;
 	ctx.fd_close = -1;
@@ -39,6 +40,7 @@ int	exec(t_node *node)
 	exec_node(node, &ctx);
 	wait_for_children(node, TRUE);
 	g_info.is_exec_ongoing = FALSE;
+	signal(SIGQUIT, SIG_IGN);
 	return (0);
 }
 
@@ -155,16 +157,21 @@ int		get_heredocs_redir(t_node *node)
 {
 	t_redirection *redir;
 
+	signal(SIGQUIT, SIG_IGN);
 	redir = node->redirections;
 	while (redir)
 	{
 		if (redir->mode == M_HEREDOC)
 		{
 			if (get_here_document(redir->filename, redir->should_expand) != 0)
+			{
+				signal(SIGQUIT, sigquit_handler);
 				return (1);
+			}
 		}
 		redir = redir->next;
 	}
+	signal(SIGQUIT, sigquit_handler);
 	return (0);
 }
 

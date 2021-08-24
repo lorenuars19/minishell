@@ -39,4 +39,6 @@ int ft_strncmp(const char *s1, const char *s2, size_t n);
 char **ft_split(char const *s, char c);
 char *ft_itoa(int n);
 
+void sigquit_handler(int signum);
+
 #endif
