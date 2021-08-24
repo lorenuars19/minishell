@@ -1,7 +1,5 @@
 #include "minishell.h"
 
-//TODO check the case when there are only redirections but no command
-
 void	wait_for_children(t_node *node, t_bool is_end_of_pipeline)
 {
 	int	wstatus;
@@ -32,15 +30,15 @@ int	exec(t_node *node)
 {
 	t_context ctx;
 
-	signal(SIGQUIT, sigquit_handler);
 	ctx.fd[STDIN_FILENO] = STDIN_FILENO;
 	ctx.fd[STDOUT_FILENO] = STDOUT_FILENO;
 	ctx.fd_close = -1;
-	g_info.is_exec_ongoing = TRUE;
+	signal(SIGQUIT, sigquit_handler_exec);
+	signal(SIGINT, sigint_handler_exec);
 	exec_node(node, &ctx);
 	wait_for_children(node, TRUE);
-	g_info.is_exec_ongoing = FALSE;
 	signal(SIGQUIT, SIG_IGN);
+	signal(SIGINT, sigint_handler_interactive);
 	return (0);
 }
 
@@ -165,13 +163,13 @@ int		get_heredocs_redir(t_node *node)
 		{
 			if (get_here_document(redir->filename, redir->should_expand) != 0)
 			{
-				signal(SIGQUIT, sigquit_handler);
+				signal(SIGQUIT, sigquit_handler_exec);
 				return (1);
 			}
 		}
 		redir = redir->next;
 	}
-	signal(SIGQUIT, sigquit_handler);
+	signal(SIGQUIT, sigquit_handler_exec);
 	return (0);
 }
 

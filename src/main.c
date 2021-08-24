@@ -2,18 +2,22 @@
 
 t_info	g_info;
 
-void	sigint_handler(int signum)
+void	sigint_handler_interactive(int signum)
 {
 	(void)signum;
-	if (g_info.is_exec_ongoing)
-		return ;
 	write(1, "\n", 1);
 	rl_replace_line("", 0);
 	rl_on_new_line();
 	rl_redisplay();
 }
 
-void	sigquit_handler(int signum)
+void	sigint_handler_exec(int signum)
+{
+	(void)signum;
+	return ;
+}
+
+void	sigquit_handler_exec(int signum)
 {
 	(void)signum;
 	return ;
@@ -48,7 +52,7 @@ int main(int argc, char **argv, char **envp)
 	(void)argv;
 	(void)argc;
 	g_info.envp = make_envp_copy(envp);
-	signal(SIGINT, sigint_handler);
+	signal(SIGINT, sigint_handler_interactive);
 	signal(SIGQUIT, SIG_IGN);
 	while (1)
 	{

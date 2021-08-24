@@ -14,7 +14,6 @@ typedef struct
 	char	**envp;
 	t_node	*nodes;
 	int		last_exit_status;
-	t_bool	is_exec_ongoing;
 }	t_info;
 
 int	exec(t_node *node);
@@ -39,6 +38,8 @@ int ft_strncmp(const char *s1, const char *s2, size_t n);
 char **ft_split(char const *s, char c);
 char *ft_itoa(int n);
 
-void sigquit_handler(int signum);
+void sigquit_handler_exec(int signum);
+void	sigint_handler_interactive(int signum);
+void	sigint_handler_exec(int signum);
 
 #endif
