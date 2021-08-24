@@ -1,5 +1,34 @@
 #include "minishell.h"
 
+int	parse(char *line)
+{
+	t_token	*tokens;
+
+	tokens = scanner(line);
+	if (syntax_checker(line, tokens) != 0)
+	{
+		free_tokens_incl_data(tokens);
+		free(line);
+		return (1);
+	}
+	free(line);
+	if (expand_variables(g_shell.envp, tokens) != 0)
+	{
+		free_tokens_incl_data(tokens);
+		return (1);
+	}
+	if (merge_tokens(tokens) != 0)
+	{
+		free_tokens_incl_data(tokens);
+		return (1);
+	}
+	g_shell.nodes = parser(tokens);
+	free_tokens_excl_data(tokens);
+	if (!g_shell.nodes)
+		return (1);
+	return (0);
+}
+
 t_bool	is_pipe_next(t_token *tokens)
 {
 	t_token	*current_token;

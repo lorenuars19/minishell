@@ -86,5 +86,6 @@ char **make_envp_copy(char **envp);
 void free_envp(char **envp);
 char *get_value_from_envp(char *name, char **envp);
 int expand_in_one_token(t_token *token, char **envp);
+int parse(char *line);
 
 #endif

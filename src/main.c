@@ -2,34 +2,6 @@
 
 t_shell	g_shell;
 
-void	sigint_handler_interactive(int signum)
-{
-	(void)signum;
-	write(1, "\n", 1);
-	rl_replace_line("", 0);
-	rl_on_new_line();
-	rl_redisplay();
-}
-
-void	sigint_handler_exec(int signum)
-{
-	(void)signum;
-	return ;
-}
-
-void	sigquit_handler_exec(int signum)
-{
-	(void)signum;
-	return ;
-}
-
-void	eof_exit(void)
-{
-	free_envp(g_shell.envp);
-	put_str_fd_nl(STDERR_FILENO, "exit");
-	exit(0);
-}
-
 t_bool	is_line_empty(char *line)
 {
 	int	i;
@@ -47,11 +19,12 @@ t_bool	is_line_empty(char *line)
 int main(int argc, char **argv, char **envp)
 {
 	char	*line;
-	t_token	*tokens;
 
 	(void)argv;
 	(void)argc;
 	g_shell.envp = make_envp_copy(envp);
+	if (!g_shell.envp)
+		return (1);
 	signal(SIGINT, sigint_handler_interactive);
 	signal(SIGQUIT, SIG_IGN);
 	while (1)
@@ -59,29 +32,9 @@ int main(int argc, char **argv, char **envp)
 		line = readline("$>");
 		if (!line)
 			eof_exit();
-		if (line && !is_line_empty(line))
+		if (!is_line_empty(line))
 			add_history(line);
-		tokens = scanner(line);
-		if (syntax_checker(line, tokens) != 0)
-		{
-			free_tokens_incl_data(tokens);
-			free(line);
-			continue ;
-		}
-		free(line);
-		if (expand_variables(g_shell.envp, tokens) != 0)
-		{
-			free_tokens_incl_data(tokens);
-			continue ;
-		}
-		if (merge_tokens(tokens) != 0)
-		{
-			free_tokens_incl_data(tokens);
-			continue ;
-		}
-		g_shell.nodes = parser(tokens);
-		free_tokens_excl_data(tokens);
-		if (!g_shell.nodes)
+		if (parse(line) != 0)
 			continue ;
 		exec(g_shell.nodes);
 		free_nodes(g_shell.nodes);

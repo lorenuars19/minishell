@@ -64,6 +64,7 @@ SRCS = \
 	./src/scanner_utils.c \
 	./src/variable_expansion.c \
 	./src/ft_itoa.c \
+	./src/signals.c \
 
 HEADERS = \
 	./includes/parsing.h\

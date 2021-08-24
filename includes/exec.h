@@ -34,5 +34,6 @@ char *ft_itoa(int n);
 void sigquit_handler_exec(int signum);
 void	sigint_handler_interactive(int signum);
 void	sigint_handler_exec(int signum);
+void eof_exit(void);
 
 #endif
