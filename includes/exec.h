@@ -36,4 +36,9 @@ void	sigint_handler_interactive(int signum);
 void	sigint_handler_exec(int signum);
 void eof_exit(void);
 
+char **realloc_envp_with_one_more_line(void);
+int print_sorted_envp(char **envp);
+t_bool is_a_valid_exported_name(char *name);
+void print_export_name_error(char *name);
+
 #endif
