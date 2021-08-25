@@ -6,7 +6,7 @@
 /*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/25 12:54:36 by aclose            #+#    #+#             */
-/*   Updated: 2021/08/25 12:54:37 by aclose           ###   ########.fr       */
+/*   Updated: 2021/08/25 14:28:21 by aclose           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static int	exec_command(t_node *node, t_context *ctx)
 
 	if (there_is_a_heredoc_redirection(node))
 	{
-		if (get_heredocs_redir(node) != 0)
+		if (get_heredocs(node) != 0)
 			return (0);
 	}
 	if (is_command_a_builtin(node) && !is_part_of_pipeline(ctx))

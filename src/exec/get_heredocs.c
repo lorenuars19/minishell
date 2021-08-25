@@ -6,7 +6,7 @@
 /*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/25 12:53:19 by aclose            #+#    #+#             */
-/*   Updated: 2021/08/25 12:53:19 by aclose           ###   ########.fr       */
+/*   Updated: 2021/08/25 14:35:36 by aclose           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,19 +67,42 @@ int	get_heredocs_redir(t_node *node)
 	t_redirection	*redir;
 
 	signal(SIGQUIT, SIG_IGN);
+	signal(SIGINT, SIG_DFL);
 	redir = node->redirections;
 	while (redir)
 	{
 		if (redir->mode == M_HEREDOC)
 		{
 			if (get_here_document(redir->filename, redir->should_expand) != 0)
-			{
-				signal(SIGQUIT, sigquit_handler_exec);
 				return (1);
-			}
 		}
 		redir = redir->next;
 	}
-	signal(SIGQUIT, sigquit_handler_exec);
+	return (0);
+}
+
+int	get_heredocs(t_node *node)
+{
+	pid_t	cpid;
+	int		wstatus;
+
+	cpid = fork();
+	if (cpid < 0)
+	{
+		put_str_fd(STDERR_FILENO, "minishell: fork: ");
+		put_str_fd_nl(STDERR_FILENO, strerror(errno));
+		return (errno);
+	}
+	else if (cpid == FORKED_CHILD)
+		exit(get_heredocs_redir(node));
+	waitpid(cpid, &wstatus, 0);
+	if (WIFEXITED(wstatus))
+		return (g_shell.last_exit_status = WEXITSTATUS(wstatus));
+	else if (WIFSIGNALED(wstatus))
+	{
+		if (WTERMSIG(wstatus) == SIGINT)
+			printf("\n");
+		return (g_shell.last_exit_status = WTERMSIG(wstatus) + 128);
+	}
 	return (0);
 }

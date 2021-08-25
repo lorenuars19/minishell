@@ -6,7 +6,7 @@
 /*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/25 13:43:36 by aclose            #+#    #+#             */
-/*   Updated: 2021/08/25 14:14:57 by aclose           ###   ########.fr       */
+/*   Updated: 2021/08/25 14:36:30 by aclose           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	print_export_name_error(char *name);
 t_bool	is_line_empty(char *line);
 int		print_error_filename(char *filename);
 int		set_redirection(t_node *node, t_context *ctx);
-int		get_heredocs_redir(t_node *node);
+int		get_heredocs(t_node *node);
 t_bool	is_command_a_builtin(t_node *node);
 void	wait_for_children(t_node *node, t_bool is_end_of_pipeline);
 char	*get_bin_filename(char *name);
