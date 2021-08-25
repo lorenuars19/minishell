@@ -49,5 +49,6 @@ int exec_builtin_in_parent(t_node *node, t_context *ctx);
 t_bool there_is_a_heredoc_redirection(t_node *node);
 t_bool is_part_of_pipeline(t_context *ctx);
 void destroy_strs(char **strs, int i);
+void sort_envp(char **envp);
 
 #endif

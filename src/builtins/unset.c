@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   unset.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 13:16:45 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 13:16:45 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 static t_bool	is_a_valid_variable_name(char *name)
@@ -40,7 +52,7 @@ static void	delete_variable_from_envp(char *name, char **envp)
 		{
 			free(envp[i]);
 			shift_envp_up(envp, i);
-			return;
+			return ;
 		}
 		i++;
 	}

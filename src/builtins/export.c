@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 13:18:24 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 13:29:18 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-static t_bool variable_already_exits_in_envp(char **envp, char *name)
+static t_bool	variable_already_exits_in_envp(char **envp, char *name)
 {
-	int i;
-	int length;
+	int	i;
+	int	length;
 
 	length = 0;
 	while (name[length] && name[length] != '=')
@@ -18,11 +30,23 @@ static t_bool variable_already_exits_in_envp(char **envp, char *name)
 	return (FALSE);
 }
 
-static int modify_var_in_envp(char **envp, char *name)
+static int	replace_line_in_envp(int i, char *name, t_bool should_append_equal)
 {
-	int length;
-	int i;
-	t_bool should_append_equal;
+	free(g_shell.envp[i]);
+	g_shell.envp[i] = ft_calloc(str_len(name) + 2, sizeof(char));
+	if (!g_shell.envp[i])
+		return (1);
+	ft_strncpy(g_shell.envp[i], name, str_len(name));
+	if (should_append_equal)
+		g_shell.envp[i][str_len(name)] = '=';
+	return (0);
+}
+
+static int	modify_var_in_envp(char **envp, char *name)
+{
+	int		length;
+	int		i;
+	t_bool	should_append_equal;
 
 	length = 0;
 	while (name[length] && name[length] != '=')
@@ -34,24 +58,15 @@ static int modify_var_in_envp(char **envp, char *name)
 	while (envp[i])
 	{
 		if (ft_strncmp(name, envp[i], length) == 0 && envp[i][length] == '=')
-		{
-			free(envp[i]);
-			envp[i] = ft_calloc(str_len(name) + 2, sizeof(char));
-			if (!envp[i])
-				return (1);
-			ft_strncpy(envp[i], name, str_len(name));
-			if (should_append_equal)
-				envp[i][str_len(name)] = '=';
-			return (0);
-		}
+			return (replace_line_in_envp(i, name, should_append_equal));
 		i++;
 	}
 	return (0);
 }
 
-static int insert_new_value_in_envp(char *name)
+static int	insert_new_value_in_envp(char *name)
 {
-	int i;
+	int	i;
 
 	g_shell.envp = realloc_envp_with_one_more_line();
 	if (!g_shell.envp)
@@ -68,10 +83,10 @@ static int insert_new_value_in_envp(char *name)
 	return (0);
 }
 
-int builtin_export(char *argv[])
+int	builtin_export(char *argv[])
 {
-	int i;
-	t_bool has_met_an_error;
+	int		i;
+	t_bool	has_met_an_error;
 
 	if (!argv[1])
 		return (print_sorted_envp(g_shell.envp));
@@ -84,7 +99,7 @@ int builtin_export(char *argv[])
 			print_export_name_error(argv[i]);
 			has_met_an_error = TRUE;
 			i++;
-			continue;
+			continue ;
 		}
 		if (variable_already_exits_in_envp(g_shell.envp, argv[i]))
 			modify_var_in_envp(g_shell.envp, argv[i]);

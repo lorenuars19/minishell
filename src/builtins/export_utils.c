@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export_utils.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 13:19:50 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 13:40:09 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-int ft_strncmp(const char *s1, const char *s2, size_t n)
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
-	unsigned int i;
+	unsigned int	i;
 
 	i = 0;
 	if (n == 0)
@@ -16,41 +28,14 @@ int ft_strncmp(const char *s1, const char *s2, size_t n)
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-static void sort_envp(char **envp)
+static void	print_one_exported_variable(char *variable)
 {
-	t_bool has_a_swap_occured;
-	char *tmp;
-	int i;
-
-	if (!envp || !envp[0])
-		return;
-	has_a_swap_occured = TRUE;
-	while (has_a_swap_occured)
-	{
-		has_a_swap_occured = FALSE;
-		i = 0;
-		while (envp[i + 1])
-		{
-			if (str_cmp(envp[i], envp[i + 1]) > 0)
-			{
-				has_a_swap_occured = TRUE;
-				tmp = envp[i];
-				envp[i] = envp[i + 1];
-				envp[i + 1] = tmp;
-			}
-			i++;
-		}
-	}
-}
-
-static void print_one_exported_variable(char *variable)
-{
-	int i;
+	int	i;
 
 	if (!variable)
-		return;
+		return ;
 	if (!ft_strncmp("_=", variable, 2))
-		return;
+		return ;
 	printf("declare -x ");
 	i = 0;
 	while (variable[i] && variable[i] != '=')
@@ -59,16 +44,16 @@ static void print_one_exported_variable(char *variable)
 		i++;
 	}
 	if (variable[i] == '\0')
-		return;
+		return ;
 	printf("=\"");
 	printf("%s", variable + i + 1);
 	printf("\"\n");
 }
 
-int print_sorted_envp(char **envp)
+int	print_sorted_envp(char **envp)
 {
-	char **dup;
-	int i;
+	char	**dup;
+	int		i;
 
 	dup = make_envp_copy(envp);
 	if (!dup)
@@ -84,9 +69,9 @@ int print_sorted_envp(char **envp)
 	return (0);
 }
 
-t_bool is_a_valid_exported_name(char *name)
+t_bool	is_a_valid_exported_name(char *name)
 {
-	int i;
+	int	i;
 
 	if (!name)
 		return (FALSE);
@@ -102,7 +87,7 @@ t_bool is_a_valid_exported_name(char *name)
 	return (TRUE);
 }
 
-void print_export_name_error(char *name)
+void	print_export_name_error(char *name)
 {
 	put_str_fd(STDERR_FILENO, "minishell: export: '");
 	put_str_fd(STDERR_FILENO, name);
