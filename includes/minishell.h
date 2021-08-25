@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 13:43:54 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 13:43:54 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -19,7 +31,7 @@
 
 # define HEREDOC_FILENAME "/tmp/.minishell_heredoc.txt"
 
-typedef struct
+typedef struct s_shell
 {
 	char	**envp;
 	t_node	*nodes;
