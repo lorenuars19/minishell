@@ -6,7 +6,7 @@
 /*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/24 21:59:14 by aclose            #+#    #+#             */
-/*   Updated: 2021/08/24 21:59:14 by aclose           ###   ########.fr       */
+/*   Updated: 2021/08/25 14:52:52 by aclose           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,17 +80,21 @@ int	syntax_checker(char *line, t_token *tokens)
 		return (1);
 	if (contains_unclosed_quotes(line))
 	{
-		put_str_fd(STDERR_FILENO, "unclosed quotes in line\n");
+		put_str_fd(STDERR_FILENO, "minishell: unclosed quotes in line\n");
+		g_shell.last_exit_status = 2;
 		return (1);
 	}
 	if (!has_a_filename_after_redirection_operators(tokens))
 	{
-		put_str_fd(STDERR_FILENO, "syntax error near redirection operator\n");
+		put_str_fd(STDERR_FILENO, "minishell: syntax error"
+			" near redirection operator\n");
+		g_shell.last_exit_status = 2;
 		return (1);
 	}
 	if (!has_a_valid_command_before_and_after_pipes(tokens))
 	{
-		put_str_fd(STDERR_FILENO, "syntax error near '|'\n");
+		put_str_fd(STDERR_FILENO, "minishell: syntax error near '|'\n");
+		g_shell.last_exit_status = 2;
 		return (1);
 	}
 	return (0);
