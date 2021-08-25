@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_builtin.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 12:51:04 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 12:51:06 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-static int fds_cleanup(t_context *ctx, int copy_fd[2])
+static int	fds_cleanup(t_context *ctx, int copy_fd[2])
 {
 	if (ctx->fd[0] != STDIN_FILENO)
 	{
@@ -17,9 +29,9 @@ static int fds_cleanup(t_context *ctx, int copy_fd[2])
 	return (0);
 }
 
-t_bool is_command_a_builtin(t_node *node)
+t_bool	is_command_a_builtin(t_node *node)
 {
-	static char *builtin_names[] = {
+	static char	*builtin_names[] = {
 		"echo",
 		"cd",
 		"pwd",
@@ -28,7 +40,7 @@ t_bool is_command_a_builtin(t_node *node)
 		"env",
 		"exit",
 		NULL};
-	int i;
+	int			i;
 
 	if (!node->args[0])
 		return (FALSE);
@@ -42,15 +54,15 @@ t_bool is_command_a_builtin(t_node *node)
 	return (FALSE);
 }
 
-int exec_builtin(t_node *node)
+int	exec_builtin(t_node *node)
 {
-	static int (*builtins[])(char *argv[]) = {
+	static	int		(*builtins[])(char *argv[]) = {
 		builtin_echo, builtin_cd, builtin_pwd, builtin_export,
 		builtin_unset, builtin_env, builtin_exit};
-	static char *builtin_names[] = {
+	static char		*builtin_names[] = {
 		"echo", "cd", "pwd", "export",
 		"unset", "env", "exit", NULL};
-	int i;
+	int				i;
 
 	i = 0;
 	while (builtin_names[i])
@@ -62,9 +74,9 @@ int exec_builtin(t_node *node)
 	return (-1);
 }
 
-int exec_builtin_in_parent(t_node *node, t_context *ctx)
+int	exec_builtin_in_parent(t_node *node, t_context *ctx)
 {
-	int copy_fd[2];
+	int	copy_fd[2];
 
 	if (set_redirection(node, ctx) != 0)
 	{

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_heredocs.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 12:53:19 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 12:53:19 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 static char	*get_line_heredoc(char *line, t_bool should_expand)
@@ -22,14 +34,14 @@ static int	get_lines_heredoc(int fd, char *delimiter, t_bool should_expand)
 	{
 		line = get_line_heredoc(line, should_expand);
 		if (!line)
-			break;
+			break ;
 		put_str_fd_nl(fd, line);
 		free(line);
 		line = readline("> ");
 	}
 	if (!line)
 		put_str_fd(STDERR_FILENO, "minishell: warning: here-document "
-								  "delimited by end-of-file (wanted `eof')\n");
+			"delimited by end-of-file (wanted `eof')\n");
 	free(line);
 	return (0);
 }
@@ -50,9 +62,9 @@ static int	get_here_document(char *delimiter, t_bool should_expand)
 	return (0);
 }
 
-int get_heredocs_redir(t_node *node)
+int	get_heredocs_redir(t_node *node)
 {
-	t_redirection *redir;
+	t_redirection	*redir;
 
 	signal(SIGQUIT, SIG_IGN);
 	redir = node->redirections;

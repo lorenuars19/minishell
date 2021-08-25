@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 12:54:36 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 12:54:37 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 static void	exec_command_child(t_node *node, t_context *ctx)
@@ -47,7 +59,7 @@ static int	exec_command(t_node *node, t_context *ctx)
 	return (1);
 }
 
-static int exec_pipe(t_node *node, t_context *ctx)
+static int	exec_pipe(t_node *node, t_context *ctx)
 {
 	int			p[2];
 	t_context	lhs_ctx;
@@ -64,21 +76,18 @@ static int exec_pipe(t_node *node, t_context *ctx)
 	lhs_ctx.fd[STDOUT_FILENO] = p[STDOUT_FILENO];
 	lhs_ctx.fd_close = p[STDIN_FILENO];
 	children = exec_node(node->left, &lhs_ctx);
-
 	close(p[STDOUT_FILENO]);
-
 	rhs_ctx = *ctx;
 	rhs_ctx.fd[STDIN_FILENO] = p[STDIN_FILENO];
 	rhs_ctx.fd_close = -1;
 	children += exec_node(node->right, &rhs_ctx);
-
 	close(p[STDIN_FILENO]);
 	return (children);
 }
 
-int exec_node(t_node *node, t_context *ctx)
+int	exec_node(t_node *node, t_context *ctx)
 {
-	int ret;
+	int	ret;
 
 	ret = 0;
 	if (node->type == COMMAND_NODE)
@@ -88,9 +97,9 @@ int exec_node(t_node *node, t_context *ctx)
 	return (ret);
 }
 
-int exec(t_node *node)
+int	exec(t_node *node)
 {
-	t_context ctx;
+	t_context	ctx;
 
 	ctx.fd[STDIN_FILENO] = STDIN_FILENO;
 	ctx.fd[STDOUT_FILENO] = STDOUT_FILENO;

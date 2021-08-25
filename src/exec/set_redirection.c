@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   set_redirection.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 12:48:01 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 12:48:02 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-int print_error_filename(char *filename)
+int	print_error_filename(char *filename)
 {
 	put_str_fd(STDERR_FILENO, "minishell: ");
 	put_str_fd(STDERR_FILENO, filename);
@@ -9,9 +21,9 @@ int print_error_filename(char *filename)
 	return (1);
 }
 
-static int set_input_redirection(t_redirection *redirection, t_context *ctx)
+static int	set_input_redirection(t_redirection *redirection, t_context *ctx)
 {
-	int fd;
+	int	fd;
 
 	if (redirection->mode == M_INPUT)
 	{
@@ -34,9 +46,9 @@ static int set_input_redirection(t_redirection *redirection, t_context *ctx)
 	return (0);
 }
 
-static int set_output_redirection(t_redirection *redirection, t_context *ctx)
+static int	set_output_redirection(t_redirection *redirection, t_context *ctx)
 {
-	int fd;
+	int	fd;
 
 	if (redirection->mode == M_TRUNCATE)
 	{
@@ -59,9 +71,9 @@ static int set_output_redirection(t_redirection *redirection, t_context *ctx)
 	return (0);
 }
 
-int set_redirection(t_node *node, t_context *ctx)
+int	set_redirection(t_node *node, t_context *ctx)
 {
-	t_redirection *current_redir;
+	t_redirection	*current_redir;
 
 	current_redir = node->redirections;
 	while (current_redir)
@@ -71,7 +83,8 @@ int set_redirection(t_node *node, t_context *ctx)
 			if (set_input_redirection(current_redir, ctx) != 0)
 				return (1);
 		}
-		else if (current_redir->mode == M_TRUNCATE || current_redir->mode == M_APPEND)
+		else if (current_redir->mode == M_TRUNCATE
+			|| current_redir->mode == M_APPEND)
 		{
 			if (set_output_redirection(current_redir, ctx) != 0)
 				return (1);

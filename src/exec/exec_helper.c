@@ -1,13 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_helper.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 12:52:45 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 12:52:46 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-void wait_for_children(t_node *node, t_bool is_end_of_pipeline)
+void	wait_for_children(t_node *node, t_bool is_end_of_pipeline)
 {
-	int wstatus;
+	int	wstatus;
 
 	if (node->type == COMMAND_NODE && node->pid != 0)
 	{
 		if (waitpid(node->pid, &wstatus, 0) == -1)
-			return;
+			return ;
 		if (WIFEXITED(wstatus) && is_end_of_pipeline)
 			g_shell.last_exit_status = WEXITSTATUS(wstatus);
 		else if (WIFSIGNALED(wstatus) && is_end_of_pipeline)
@@ -26,9 +38,9 @@ void wait_for_children(t_node *node, t_bool is_end_of_pipeline)
 	}
 }
 
-t_bool there_is_a_heredoc_redirection(t_node *node)
+t_bool	there_is_a_heredoc_redirection(t_node *node)
 {
-	t_redirection *redir;
+	t_redirection	*redir;
 
 	redir = node->redirections;
 	while (redir)
@@ -40,11 +52,11 @@ t_bool there_is_a_heredoc_redirection(t_node *node)
 	return (FALSE);
 }
 
-static char *get_bin_filename_helper(char *name, char **paths)
+static char	*get_bin_filename_helper(char *name, char **paths)
 {
-	int i;
-	char *bin_filename;
-	struct stat statbuf;
+	int			i;
+	char		*bin_filename;
+	struct stat	statbuf;
 
 	i = 0;
 	while (paths[i])
@@ -61,11 +73,11 @@ static char *get_bin_filename_helper(char *name, char **paths)
 	return (NULL);
 }
 
-char *get_bin_filename(char *name)
+char	*get_bin_filename(char *name)
 {
-	char *path_variable;
-	char **paths;
-	char *bin_filename;
+	char	*path_variable;
+	char	**paths;
+	char	*bin_filename;
 
 	if (str_has(name, '/'))
 		return (str_dupli(name));
@@ -86,10 +98,9 @@ char *get_bin_filename(char *name)
 	return (bin_filename);
 }
 
-t_bool is_part_of_pipeline(t_context *ctx)
+t_bool	is_part_of_pipeline(t_context *ctx)
 {
 	if (ctx->fd[0] != STDIN_FILENO || ctx->fd[1] != STDOUT_FILENO)
 		return (TRUE);
 	return (FALSE);
 }
-
