@@ -1,5 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   signals.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 12:56:30 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 12:56:31 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "minishell.h"
 
 void	sigint_handler_interactive(int signum)
 {
@@ -29,9 +40,9 @@ void	eof_exit(void)
 	exit(0);
 }
 
-t_bool is_line_empty(char *line)
+t_bool	is_line_empty(char *line)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (line[i])
