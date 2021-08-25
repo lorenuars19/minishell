@@ -6,7 +6,7 @@
 /*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/25 13:49:51 by aclose            #+#    #+#             */
-/*   Updated: 2021/08/25 13:49:57 by aclose           ###   ########.fr       */
+/*   Updated: 2021/08/25 14:13:54 by aclose           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,13 @@ struct s_node
 	pid_t			pid;
 };
 
+int				parse(char *line);
+int				syntax_checker(char *line, t_token *tokens);
 t_token			*scanner(char *line);
+int				expand_variables(char **envp, t_token *tokens);
+int				merge_tokens(t_token *tokens);
+t_node			*parser(t_token *tokens);
+
 t_token_type	get_token_type(char c);
 void			print_tokens(t_token *tokens);
 char			*ft_strcdup(char *str, char c);
@@ -81,25 +87,19 @@ void			free_tokens_excl_data(t_token *tokens);
 void			free_tokens_incl_data(t_token *tokens);
 void			*ft_calloc(size_t nmemb, size_t size);
 void			print_nodes(t_node *nodes, int spaces);
-int				expand_variables(char **envp, t_token *tokens);
 void			free_nodes(t_node *nodes);
 int				ft_strncpy(char *dest, char *src, int n);
-int				merge_tokens(t_token *tokens);
-t_bool			has_redirection_type(t_token *token);
-int				syntax_checker(char *line, t_token *tokens);
 t_bool			has_redirection_type(t_token *token);
 void			skip_blank_tokens(t_token **tokens);
 char			**make_envp_copy(char **envp);
 void			free_envp(char **envp);
 char			*get_value_from_envp(char *name, char **envp);
 int				expand_in_one_token(t_token *token, char **envp);
-int				parse(char *line);
 t_bool			contains_redirections(t_token *tokens);
 int				get_redirections(t_token *tokens, t_node *node);
 t_bool			is_pipe_next(t_token *tokens);
 char			**get_args(t_token *tokens);
 void			skip_tokens_until_next_command(t_token **tokens);
-t_node			*parser(t_token *tokens);
 int				get_quote_token(char *line, t_token *token, int *index);
 int				get_general_token(char *line, t_token *token, int *index);
 int				get_blank_token(char *line, t_token *token, int *index);
