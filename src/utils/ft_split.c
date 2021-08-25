@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_split.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 13:01:54 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 13:01:55 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 static int	ft_count_words(char const *s, char c)
@@ -33,20 +45,10 @@ static size_t	ft_word_length(char const *s, char c, int index)
 	return (i);
 }
 
-static void	destroy_strs(char **strs, int i)
+static char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
-	int	j;
-
-	j = 0;
-	while (j < i)
-		free(strs[j++]);
-	free(strs);
-}
-
-static char *ft_substr(char const *s, unsigned int start, size_t len)
-{
-	size_t i;
-	char *res;
+	size_t	i;
+	char	*res;
 
 	if (!s)
 		return (NULL);

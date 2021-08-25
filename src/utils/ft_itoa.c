@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_itoa.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 12:59:28 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 12:59:28 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-static int ft_length(int n)
+static int	ft_length(int n)
 {
-	long i;
-	int len;
+	long	i;
+	int		len;
 
 	if (n == 0)
 		return (1);
@@ -22,12 +34,12 @@ static int ft_length(int n)
 	return (len);
 }
 
-char *ft_itoa(int n)
+char	*ft_itoa(int n)
 {
-	char *res;
-	unsigned int i;
-	int is_neg;
-	int len;
+	char			*res;
+	unsigned int	i;
+	int				is_neg;
+	int				len;
 
 	if (n < 0)
 		is_neg = 1;

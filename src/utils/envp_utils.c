@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   envp_utils.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/25 12:59:59 by aclose            #+#    #+#             */
+/*   Updated: 2021/08/25 13:00:00 by aclose           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-char *get_value_from_envp(char *name, char **envp)
+char	*get_value_from_envp(char *name, char **envp)
 {
-	int i;
-	size_t length;
+	int		i;
+	size_t	length;
 
 	i = 0;
 	length = str_len(name);
@@ -54,7 +66,7 @@ void	free_envp(char **envp)
 	int	i;
 
 	if (!envp)
-		return;
+		return ;
 	i = 0;
 	while (envp[i])
 	{
