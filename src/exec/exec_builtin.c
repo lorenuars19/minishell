@@ -6,7 +6,7 @@
 /*   By: aclose <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/25 12:51:04 by aclose            #+#    #+#             */
-/*   Updated: 2021/08/25 12:51:06 by aclose           ###   ########.fr       */
+/*   Updated: 2021/09/07 12:46:31 by aclose           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ t_bool	is_command_a_builtin(t_node *node)
 
 int	exec_builtin(t_node *node)
 {
-	static	int		(*builtins[])(char *argv[]) = {
+	static int		(*builtins[])(char *argv[]) = {
 		builtin_echo, builtin_cd, builtin_pwd, builtin_export,
 		builtin_unset, builtin_env, builtin_exit};
 	static char		*builtin_names[] = {
